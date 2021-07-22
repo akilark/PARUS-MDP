@@ -4,23 +4,17 @@ using System.Text;
 
 namespace CatalogCreator
 {
-	class DoubleRepair
+	/// <summary>
+	/// Класс двойных ремонтов
+	/// </summary>
+	public class DoubleRepair
 	{
 		private string[] _repairSchemeName;
 		private string[] _doubleRepairSchemeName = new string[0];
 
-		private string[] RepairSchemeName
-		{
-			get
-			{
-				return _repairSchemeName;
-			}
-			set
-			{
-				_repairSchemeName = value;
-			}
-		}
-
+		/// <summary>
+		/// Свойство хранящее массив данных двойных ремонтных схем
+		/// </summary>
 		public string[] DoubleRepairSchemeName
 		{
 			get
@@ -33,35 +27,49 @@ namespace CatalogCreator
 			}
 		}
 
+		/// <summary>
+		/// Конструктор класса c 1 параметром
+		/// </summary>
+		/// <param name="repairSchemeName"></param>
 		public DoubleRepair(string[] repairSchemeName)
 		{
-			RepairSchemeName = repairSchemeName;
+			_repairSchemeName = repairSchemeName;
 			if (repairSchemeName.Length == 0)
 			{
-				throw new Exception("Для расчета двойных ремонтов необходимо задать одинарные ремонты");
+				throw new Exception("Для определения схем двойных ремонтов необходимо " +
+					"задать схемы одинарных ремонтов");
 			}
 			GenerateDoubleRepairSchemeName();
 		}
 
+		/// <summary>
+		/// Метод производящий подсчет двойных ремонтных схем
+		/// </summary>
+		/// <returns>количество двойных ремонтных схем</returns>
 		private int DoubleSchemeCount()
 		{
 			int doubleSchemeSize = 0;
-			for (int schemeSize = RepairSchemeName.Length - 1; schemeSize > 0; schemeSize --)
+			for (int schemeSize = _repairSchemeName.Length - 1; schemeSize > 0; 
+				schemeSize --)
 			{
 				doubleSchemeSize = doubleSchemeSize + schemeSize;
 			}
 			return doubleSchemeSize;
 		}
 
+		/// <summary>
+		/// Создать все комбинации двойных ремонтных схем
+		/// </summary>
 		private void GenerateDoubleRepairSchemeName()
 		{
 			Array.Resize(ref _doubleRepairSchemeName, DoubleSchemeCount());
 			int member = 0;
-			for (int i = 0; i < RepairSchemeName.Length; i++)
+			for (int i = 0; i < _repairSchemeName.Length; i++)
 			{
-				for(int j = i + 1; j < RepairSchemeName.Length; j++)
+				for(int j = i + 1; j < _repairSchemeName.Length; j++)
 				{
-					_doubleRepairSchemeName[member] = (RepairSchemeName[i] + "; " + RepairSchemeName[j]);
+					_doubleRepairSchemeName[member] = (_repairSchemeName[i] + "; " +
+						_repairSchemeName[j]);
 					member = member + 1;
 				}
 			}

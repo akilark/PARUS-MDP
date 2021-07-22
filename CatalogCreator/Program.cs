@@ -4,13 +4,16 @@ using System.Collections.Generic;
 
 namespace CatalogCreator
 {
+	/// <summary>
+	/// Класс для тестов
+	/// </summary>
 	class Program
 	{
 		static void Main(string[] args)
 		{
 			//TEST 1 Создание каталога без ремонтных схем
 			
-			Catalog catalogCreator = new Catalog();
+			CatalogCreator catalogCreator = new CatalogCreator();
 
 			catalogCreator.DirectoryPath = @"C:\test";
 			catalogCreator.RootName = "Камала- Красноярская";
@@ -30,7 +33,7 @@ namespace CatalogCreator
 			catalogCreator.Create();
 
 			//TEST 2 Создание каталога без реверсивного перетока
-			Catalog catalogCreator2 = new Catalog();
+			CatalogCreator catalogCreator2 = new CatalogCreator();
 
 			catalogCreator2.DirectoryPath = @"C:\test\TEstestetstetstetset\JSAfafasfjkasflasfka;sfasfasfasfasf";
 			catalogCreator2.RootName = "2Камала- Красноярская";
@@ -49,7 +52,7 @@ namespace CatalogCreator
 
 			//TEST 3 Создание каталога без двойных ремонтов
 
-			Catalog catalogCreator3 = new Catalog();
+			CatalogCreator catalogCreator3 = new CatalogCreator();
 
 			catalogCreator3.DirectoryPath = @"C:\test\TEstestetstetstetset\JSAfafasfjkasflasfka;sfasfasfasfasf";
 			catalogCreator3.RootName = "3Камала- Красноярская";
@@ -70,7 +73,7 @@ namespace CatalogCreator
 
 			//TEST 4 создание каталога с 3-мя влияющими факторами
 
-			Catalog catalogCreator4 = new Catalog();
+			CatalogCreator catalogCreator4 = new CatalogCreator();
 
 			catalogCreator4.DirectoryPath = @"C:\test\TEstestetstetstetset\JSAfafasfjkasflasfka;sfasfasfasfasf";
 			catalogCreator4.RootName = "4Камала- Красноярская";
@@ -93,7 +96,7 @@ namespace CatalogCreator
 
 			//TEST 5 создание каталога с 4 значениями влияющего фактора
 
-			Catalog catalogCreator5 = new Catalog();
+			CatalogCreator catalogCreator5 = new CatalogCreator();
 
 			catalogCreator5.DirectoryPath = @"C:\test\TEstestetstetstetset\JSAfafasfjkasflasfka;sfasfasfasfasf";
 			catalogCreator5.RootName = "5Камала- Красноярская";
@@ -114,7 +117,7 @@ namespace CatalogCreator
 
 			//TEST 6 Создание каталога без влияющих факторов но с созданием list не реверсивный переток
 
-			Catalog catalogCreator6 = new Catalog();
+			CatalogCreator catalogCreator6 = new CatalogCreator();
 
 			catalogCreator6.DirectoryPath = @"C:\test";
 			catalogCreator6.RootName = "6Камала- Красноярская";
@@ -130,7 +133,7 @@ namespace CatalogCreator
 
 			//TEST 7 Создание каталога без влияющих факторов, без создания List реверсивный переток
 
-			Catalog catalogCreator7 = new Catalog();
+			CatalogCreator catalogCreator7 = new CatalogCreator();
 
 			catalogCreator7.DirectoryPath = @"C:\test";
 			catalogCreator7.RootName = "7Камала- Красноярская";
@@ -143,9 +146,9 @@ namespace CatalogCreator
 
 			catalogCreator7.Create();
 
-			//TEST 8 создание каталога с 3-мя влияющими факторами
+			//TEST 8 создание каталога с 4-мя влияющими факторами
 
-			Catalog catalogCreator8 = new Catalog();
+			CatalogCreator catalogCreator8 = new CatalogCreator();
 
 			catalogCreator8.DirectoryPath = @"C:\test\";
 			catalogCreator8.RootName = "8Камала- Красноярская";
@@ -155,8 +158,7 @@ namespace CatalogCreator
 			catalogCreator8.FactorsWest = new List<(string, string[])> {
 				("Количество генераторов Красноярская ГРЭС-2", new string[] {"2","4"}),
 				("Количество генераторов Красноярская ГЭС-220 кВ", new string[] { "2", "4" }),
-				("Потребление центрального Красноярского энергоузла", new string[] { "2000 МВт", "2222 МВт" }),
-			("генерация", new string[] { "2000 МВт", "2222 МВт" })};
+				("Потребление центрального Красноярского энергоузла", new string[] { "2000 МВт", "2222 МВт", "444МВт" })};
 
 			catalogCreator8.FactorsEast = new List<(string, string[])> {
 				("Количество генераторов Красноярская ГЭС-220 кВ", new string[] { "2", "4" }) };
