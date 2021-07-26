@@ -9,6 +9,7 @@ namespace CatalogCreator
 	/// </summary>
 	public class CatalogCreator
 	{
+		public static readonly string[] Directions = new string[] { "На запад", "На восток" };
 		private string _path;
 		private string _rootName;
 		private string[] _repairScheme;
@@ -16,9 +17,8 @@ namespace CatalogCreator
 		private List<(string, string[])> _factorsEast;
 		private List<(string, string[])> _factorsWest;
 		private List<(string, string[])> _factors;
-		private string _directionEastTitle = "На восток";
-		private string _directionsWestTitle = "На запад";
-		private string[] _directions = new string[] { "На запад", "На восток" };
+		private const string _directionEastTitle = "На восток";
+		private const string _directionsWestTitle = "На запад";
 		public bool _reverseable;
 		public bool _flagDoubleRepair = true;
 		public bool _flagRepair; //Если только нормальная схема - false
@@ -173,7 +173,7 @@ namespace CatalogCreator
 		{
 			if(_reverseable == true)
 			{
-				foreach (string direct in _directions)
+				foreach (string direct in Directions)
 				{
 					var pathReversable = Path.Combine(pathRoot, direct);
 					Directory.CreateDirectory(pathReversable);

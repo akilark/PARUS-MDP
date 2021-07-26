@@ -11,6 +11,8 @@ namespace CatalogCreator
 	{
 		static void Main(string[] args)
 		{
+			var CatalogRead = new CatalogReader(@"C:\test\7Камала- Красноярская");
+			/*
 			//TEST 1 Создание каталога без ремонтных схем
 			
 			CatalogCreator catalogCreator = new CatalogCreator();
@@ -167,6 +169,7 @@ namespace CatalogCreator
 			catalogCreator8._reverseable = true;
 
 			catalogCreator8.Create();
+			*/
 
 		}
 	}
