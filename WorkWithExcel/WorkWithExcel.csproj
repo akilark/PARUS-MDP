@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="5.7.2" />
+    <Reference Include="CatalogCreator">
+      <HintPath>..\CatalogCreator\bin\Debug\netcoreapp3.1\CatalogCreator.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

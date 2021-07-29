@@ -9,7 +9,6 @@ namespace CatalogCreator
 	/// </summary>
 	public class CatalogCreator
 	{
-		public static readonly string[] Directions = new string[] { "На запад", "На восток" };
 		private string _path;
 		private string _rootName;
 		private string[] _repairScheme;
@@ -17,12 +16,25 @@ namespace CatalogCreator
 		private List<(string, string[])> _factorsEast;
 		private List<(string, string[])> _factorsWest;
 		private List<(string, string[])> _factors;
+		private string[] _directions;
 		private const string _directionEastTitle = "На восток";
 		private const string _directionsWestTitle = "На запад";
 		public bool _reverseable;
 		public bool _flagDoubleRepair = true;
 		public bool _flagRepair; //Если только нормальная схема - false
 
+
+		public string[] Directions
+		{
+			get
+			{
+				return _directions;
+			}
+			set
+			{
+				_directions = value;
+			}
+		}
 		/// <summary>
 		/// Конструктор класса с 2 параметрами
 		/// </summary>
@@ -333,7 +345,7 @@ namespace CatalogCreator
 
 			for(int i= 0; i < amountFactorValues.Length; i++)
 			{
-				factorsMixedSize = factorsMixedSize * amountFactorValues[i];
+				factorsMixedSize +=  amountFactorValues[i];
 			}
 
 			var factorsMixed = new string[factorsMixedSize];
@@ -343,13 +355,13 @@ namespace CatalogCreator
 			{
 				if(currentFactor == 0)
 				{
-					delimer = delimer * amountFactorValues[currentFactor];
+					delimer *= amountFactorValues[currentFactor];
 				}
 				else
 				{
-					delimer = delimer * amountFactorValues[currentFactor] / amountFactorValues[currentFactor - 1];
+					delimer *= amountFactorValues[currentFactor] / amountFactorValues[currentFactor - 1];
 				}
-				areaSize = areaSize / delimer;
+				areaSize /= delimer;
 
 				var counterUnitInArea = 0;
 				var factorIndex = 0;
