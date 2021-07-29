@@ -6,8 +6,10 @@ namespace WorkWithDataSource
 	{
 		static void Main(string[] args)
 		{
-			PullData pull = new PullData();
+			PullData pull = new PullData("Камала- Красноярская");
+			pull.PullSections();
 			pull.PullFactors();
+			pull.PullScheme();
 
 		}
 	}

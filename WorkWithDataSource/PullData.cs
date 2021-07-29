@@ -7,12 +7,39 @@ namespace WorkWithDataSource
 {
 	public class PullData
 	{
-		private const string sqlExpressionScheme = "";
-		private const string sqlExpressionFactors = @"SELECT  Sections.Section, SectionWithFactors.Direction, Factors.Factor, Factors.FactorValue
-			FROM [dbo].[SectionWithFactors], [dbo].[Sections], [dbo].[Factors]
-			WHERE Sections.Section_ID = SectionWithFactors.Section_ID and SectionWithFactors.Factor_ID = Factors.Factor_ID";
-		
-		private void Pull(string sqlExpression)
+		private string _sectionName;
+		private List<string> _sections = new List<string>();
+		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
+		private List<(string, (string, bool)[])> _scheme = new List<(string, (string, bool)[])>();
+
+		public PullData(string sectionName)
+		{
+			_sectionName = sectionName;
+		}
+
+		public void PullFactors()
+		{
+			string sqlExpression = @$"SELECT  SectionWithFactors.Direction, Factors.Factor, Factors.FactorValue
+		FROM [dbo].[SectionWithFactors], [dbo].[Sections], [dbo].[Factors]
+		WHERE Sections.Section_ID = SectionWithFactors.Section_ID and SectionWithFactors.Factor_ID = Factors.Factor_ID and Sections.Section = '{_sectionName}'";
+			connectWithDataBase(sqlExpression, DataType.Factor);
+		}
+
+		public void PullSections()
+		{
+			string sqlExpression = @$"SELECT Sections.Section FROM [dbo].[Sections]";
+			connectWithDataBase(sqlExpression, DataType.Section);
+		}
+
+		public void PullScheme()
+		{
+			string sqlExpression = @$"SELECT Repair.Repair_Scheme, Repair.Disturbance, Disturbances.Automation
+  FROM [dbo].[Disturbances], [dbo].[Repair],[dbo].[Sections]
+  WHERE Sections.Section_ID = Repair.Section_ID and Disturbances.Disturbance = Repair.Disturbance and Sections.Section = '{_sectionName}'";
+			connectWithDataBase(sqlExpression, DataType.Scheme);
+		}
+
+		private void connectWithDataBase(string sqlExpression, DataType dataType)
 		{
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
             builder.DataSource = @"LAPTOP-EFSS8TJ6\SQLEXPRESS";
@@ -26,23 +53,108 @@ namespace WorkWithDataSource
 					connection.Open();
 					using (SqlDataReader reader = command.ExecuteReader())
 					{
-						PullScheme(reader);
+						switch(dataType)
+						{
+							case DataType.Section:
+							{
+								SectionConvertToList(reader);
+								break;
+							}
+							case DataType.Factor:
+							{
+								FactorsConvertToList(reader);
+								break;
+							}
+							case DataType.Scheme:
+							{
+								SchemeConvertToList(reader);
+								break;
+							}
+						}
 					}
 				}
 			}
 		}
 
-		private void PullScheme(SqlDataReader reader)
+		private void SectionConvertToList(SqlDataReader reader)
 		{
 			while (reader.Read())
 			{
-				Console.WriteLine(@"{0} /\ {1} /\ {2} /\ {3}", reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetString(3));
+				_sections.Add(reader.GetString(0));
 			}
 		}
 
-		public void PullFactors()
+		private void FactorsConvertToList(SqlDataReader reader)
 		{
-			Pull(sqlExpressionFactors);
+			string[] factorValues = new string[0];
+
+			(string, string[])[] factors = new (string, string[])[0];
+			bool firstFactorFlag = true;
+			bool firstDirectionFlag = true;
+			string compareDirection = "";
+			string compareFactor = "";
+			while (reader.Read())
+			{
+				if(reader.GetString(0) != compareDirection)
+				{
+					if (!firstDirectionFlag)
+					{
+						_factors.Add((compareDirection, factors));
+					}
+					compareDirection = reader.GetString(0);
+				}
+
+				if (reader.GetString(1) != compareFactor)
+				{
+					if (!firstFactorFlag)
+					{
+						Array.Resize(ref factors, factors.Length + 1);
+						factors[factors.Length - 1] = (compareFactor, factorValues);
+					}
+					compareFactor = reader.GetString(1);
+				}
+
+				if (reader.GetString(1) == compareFactor)
+				{
+					Array.Resize(ref factorValues, factorValues.Length + 1);
+					factorValues[factorValues.Length - 1] = (reader.GetString(2));
+				
+				}
+				firstFactorFlag = false;
+				firstDirectionFlag = false;
+			}
+			Array.Resize(ref factors, factors.Length + 1);
+			factors[factors.Length - 1] = (compareFactor, factorValues);
+			_factors.Add((compareDirection, factors));
 		}
+
+		private void SchemeConvertToList(SqlDataReader reader)
+		{
+			(string, bool)[] disturbance = new (string, bool)[0];
+			bool firstSchemeFlag = true;
+			string compareScheme ="";
+			while (reader.Read())
+			{
+				if( reader.GetString(0) != compareScheme )
+				{
+					if(!firstSchemeFlag)
+					{
+						_scheme.Add((compareScheme, (disturbance)));
+					}
+					compareScheme = reader.GetString(0);
+				}
+
+				if(reader.GetString(0) == compareScheme)
+				{
+					Array.Resize(ref disturbance, disturbance.Length + 1);
+					disturbance[disturbance.Length - 1] = (reader.GetString(1), reader.GetBoolean(2));
+				}
+
+				firstSchemeFlag = false;
+			}
+			_scheme.Add((compareScheme, (disturbance)));
+		}
+
+
 	}
 }
