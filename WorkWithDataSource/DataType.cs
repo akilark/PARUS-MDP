@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WorkWithDataSource
 {
-	enum DataType
+	public enum DataType
 	{
 		Factor,
 		Scheme,

@@ -11,10 +11,27 @@ namespace WorkWithDataSource
 		private List<string> _sections = new List<string>();
 		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
 		private List<(string, (string, bool)[])> _scheme = new List<(string, (string, bool)[])>();
+		private SqlConnectionStringBuilder _sqlConnectionBuilder;
 
 		public PullData(string sectionName)
 		{
 			_sectionName = sectionName;
+		}
+
+		public List<string> Sections => _sections;
+
+		internal string StringConnect
+		{
+			get
+			{
+				_sqlConnectionBuilder = new SqlConnectionStringBuilder();
+				_sqlConnectionBuilder.DataSource = @"LAPTOP-EFSS8TJ6\SQLEXPRESS";
+				_sqlConnectionBuilder.UserID = @"ParusMDP";
+				_sqlConnectionBuilder.Password = "1234567890";
+				_sqlConnectionBuilder.InitialCatalog = "PARUS-MDP";
+				return _sqlConnectionBuilder.ConnectionString;
+			}
+			
 		}
 
 		public void PullFactors()
@@ -22,31 +39,28 @@ namespace WorkWithDataSource
 			string sqlExpression = @$"SELECT  SectionWithFactors.Direction, Factors.Factor, Factors.FactorValue
 		FROM [dbo].[SectionWithFactors], [dbo].[Sections], [dbo].[Factors]
 		WHERE Sections.Section_ID = SectionWithFactors.Section_ID and SectionWithFactors.Factor_ID = Factors.Factor_ID and Sections.Section = '{_sectionName}'";
-			connectWithDataBase(sqlExpression, DataType.Factor);
+			ConnectWithDataBase(sqlExpression, DataType.Factor);
 		}
 
 		public void PullSections()
 		{
 			string sqlExpression = @$"SELECT Sections.Section FROM [dbo].[Sections]";
-			connectWithDataBase(sqlExpression, DataType.Section);
+			ConnectWithDataBase(sqlExpression, DataType.Section);
 		}
 
 		public void PullScheme()
 		{
-			string sqlExpression = @$"SELECT Repair.Repair_Scheme, Repair.Disturbance, Disturbances.Automation
-  FROM [dbo].[Disturbances], [dbo].[Repair],[dbo].[Sections]
-  WHERE Sections.Section_ID = Repair.Section_ID and Disturbances.Disturbance = Repair.Disturbance and Sections.Section = '{_sectionName}'";
-			connectWithDataBase(sqlExpression, DataType.Scheme);
+			string sqlExpression = @$"SELECT Schemes.Scheme, Schemes.Disturbance, Schemes.Automation
+  FROM [dbo].[Schemes],[dbo].[Sections]
+  WHERE Sections.Section_ID = Schemes.Section_ID and Sections.Section = '{_sectionName}'";
+			ConnectWithDataBase(sqlExpression, DataType.Scheme);
 		}
 
-		private void connectWithDataBase(string sqlExpression, DataType dataType)
+		private void ConnectWithDataBase(string sqlExpression, DataType dataType)
 		{
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-            builder.DataSource = @"LAPTOP-EFSS8TJ6\SQLEXPRESS";
-            builder.UserID = @"ParusMDP";
-            builder.Password = "1234567890";
-            builder.InitialCatalog = "PARUS-MDP";
-            using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+
+			
+            using (SqlConnection connection = new SqlConnection(StringConnect))
 			{
 				using (SqlCommand command = new SqlCommand(sqlExpression, connection))
 				{
@@ -75,6 +89,7 @@ namespace WorkWithDataSource
 				}
 			}
 		}
+
 
 		private void SectionConvertToList(SqlDataReader reader)
 		{

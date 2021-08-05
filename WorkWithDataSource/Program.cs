@@ -11,6 +11,13 @@ namespace WorkWithDataSource
 			pull.PullFactors();
 			pull.PullScheme();
 
+			ChangeData push = new ChangeData("Камала- Шамала");
+			push.Direction="На восток";
+			push.Factor = "Рыбов";
+			push.FactorValue = "15";
+			push.Insert();
+		
+
 		}
 	}
 }
