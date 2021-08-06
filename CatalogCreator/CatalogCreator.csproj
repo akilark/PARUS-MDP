@@ -9,4 +9,10 @@
     <PackageReference Include="EPPlus" Version="5.7.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="WorkWithDataSource">
+      <HintPath>..\WorkWithDataSource\bin\Release\netcoreapp3.1\WorkWithDataSource.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

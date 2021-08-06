@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WorkWithDataSource
 {
@@ -6,17 +7,21 @@ namespace WorkWithDataSource
 	{
 		static void Main(string[] args)
 		{
-			PullData pull = new PullData("Камала- Красноярская");
-			pull.PullSections();
+			PullData pull = new PullData();
 			pull.PullFactors();
-			pull.PullScheme();
+			pull.PullSchemes();
+			pull.PullSections();
 
-			ChangeData push = new ChangeData("Камала- Шамала");
-			push.Direction="На восток";
-			push.Factor = "Рыбов";
-			push.FactorValue = "15";
-			push.Insert();
-		
+			List<string> sections = pull.Sections;
+
+			//ChangeData pushSection = new ChangeData("Камала- Красноярская");
+			//pushSection.Delete();
+
+			ChangeData pushScheme = new ChangeData("Тест_1", "Нормальная схема", "ФОЛ Тест_5", 1);
+			pushScheme.Insert();
+
+			ChangeData pushFactors = new ChangeData("Тест_1", "На Запад", "Фактор Тест_2", "2");
+			pushFactors.Insert();
 
 		}
 	}

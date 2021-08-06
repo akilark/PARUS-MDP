@@ -10,117 +10,46 @@ namespace WorkWithDataSource
 		private string _sectionName;
 		private string _direction;
 		private string _factor;
-		private int _factorId;
 		private string _factorValue;
 		private string _scheme;
 		private string _disturbance;
-		private bool _automatics;
+		private int _automatics;
+		private DataType _dataType;
 		private PullData _pullData;
 
-		public string Section
-		{
-			set
-			{
-				_sectionName = value;
-				_direction = null;
-				_factor = null;
-				_factorValue = null;
-				_scheme = null;
-				_disturbance = null;
-				_automatics = false;
-			}
-		}
-
-		public string Direction
-		{
-			set
-			{
-				_direction = value;
-				_factor = null;
-				_factorValue = null;
-			}
-		}
-
-		public string Factor
-		{
-			set
-			{
-				_factor = value;
-				_factorValue = null;
-			}
-		}
-
-		public string FactorValue
-		{
-			set
-			{
-				_factorValue = value;
-			}
-		}
-
-		public string Scheme
-		{
-			set
-			{
-				_scheme = value;
-				_disturbance = null;
-				_automatics = false;
-			}
-		}
-
-		public string Disturbance
-		{
-			set
-			{
-				_disturbance = value;
-				_automatics = false;
-			}
-		}
-
-		public bool Automatic
-		{
-			set
-			{
-				_automatics = value;
-			}
-		}
-
-
-		//Сделать несколько перегрузок под все потребности и удалить свойства
 		public ChangeData(string SectionName)
 		{
 			_sectionName = SectionName;
 			_pullData = new PullData(SectionName);
+			_dataType = DataType.Section;
 		}
 
-		private DataType Validator()
+		public ChangeData(string SectionName, string Direction, string Factor, string FactorValue)
 		{
-			if (_sectionName != null)
+			_sectionName = SectionName;
+			_pullData = new PullData(SectionName);
+			_direction = Direction;
+			_factor = Factor;
+			_factorValue = FactorValue;
+			_dataType = DataType.Factor;
+		}
+
+		public ChangeData(string SectionName, string Scheme, string Disturbance, int Automatics)
+		{
+			_sectionName = SectionName;
+			_pullData = new PullData(SectionName);
+			_scheme = Scheme;
+			_disturbance = Disturbance;
+			if(Automatics != 0)
 			{
-				if (_direction != null)
-				{
-					if (_factor == null) throw new Exception("Необходимо задать значение фактора");
-
-					if (_factorValue == null) throw new Exception("Необходимо задать значение фактора");
-
-					return DataType.Factor;
-				}
-				if (_scheme != null)
-				{
-					if (_disturbance == null) throw new Exception("Необходимо задать возмущение");
-					return DataType.Scheme;
-				}
-
-				return DataType.Section;			
+				_automatics = 1;
 			}
 			else
 			{
-				throw new Exception("Название сечения не может быть null");
+				_automatics = 0;
 			}
-
+			_dataType = DataType.Scheme;
 		}
-
-
 
 		private int ConnectWithDataBaseID(string sqlExpression)
 		{
@@ -133,88 +62,138 @@ namespace WorkWithDataSource
 
 		}
 
-		public void Exist()
+		public void ExistSection()
 		{
-			//делать проверку существования, если проверка отрицательна, то создаем верхнюю папку, то того момента, пока конфликтов не будет возникать
+			if (ConnectWithDataBaseID(@$"SELECT COUNT(Section_ID) FROM[dbo].[Sections] WHERE Section = '{_sectionName}'") == 0)
+			{
+				InsertSection();
+			}
 		}
 
 		public void Insert()
 		{
-			string sqlExpression;
-			switch (Validator())
+			
+			switch (_dataType)
 			{
 				case DataType.Section:
 					{
-						int sectionId = ConnectWithDataBaseID(@"SELECT COUNT(Section_ID) FROM[dbo].[Sections]") + 1;
-						sqlExpression = @$"INSERT INTO [dbo].[Sections] VALUES ({sectionId},'{_sectionName}')";
-						ExecuteExpression(sqlExpression);
+						InsertSection();
 						break;
 					}
 				case DataType.Factor:
 					{
-						int sectionId = ConnectWithDataBaseID(@$"SELECT Section_ID FROM[dbo].[Sections] WHERE Section = '{_sectionName}'");
-						int factorId;
-						if(ConnectWithDataBaseID(@$"SELECT COUNT(Factor_ID) FROM[dbo].[Factors] 
-							WHERE Factor = '{_factor}' and FactorValue = '{_factorValue}'") == 0)
-						{
-							factorId = ConnectWithDataBaseID(@"SELECT COUNT(Factor_ID) FROM[dbo].[Factors]") + 1;
-						}
-						else
-						{
-							factorId = ConnectWithDataBaseID(@$"SELECT Factor_ID FROM[dbo].[Factors] 
-							WHERE Factor = '{_factor}' and FactorValue = '{_factorValue}'");
-						}
-						sqlExpression = @$"INSERT INTO [dbo].[Factors] VALUES('{factorId}','{_factor}','{_factorValue}')";
-						ExecuteExpression(sqlExpression);
-
-						sqlExpression = @$"INSERT INTO [dbo].[SectionWithFactors] VALUES({sectionId},'{_direction}',{factorId})";
-
-						ExecuteExpression(sqlExpression);
-
+						InsertFactors();
 						break;
 					}
 				case DataType.Scheme:
 					{
-						int sectionId = ConnectWithDataBaseID(@$"SELECT Section_ID FROM[dbo].[Sections] WHERE Section = '{_sectionName}'");
-						sqlExpression = @$"INSERT INTO [dbo].[Schemes] VALUES ({sectionId},'{_scheme}','{_disturbance}',{_automatics})";
+						InsertScheme();
 						break;
 					}
 			}
 
 		}
 
+		private void InsertSection()
+		{
+			if(ConnectWithDataBaseID(@$"SELECT COUNT(Section_ID) FROM[dbo].[Sections] WHERE Section = '{_sectionName}'") == 0)
+			{
+				int sectionId;
+				if (ConnectWithDataBaseID(@$"SELECT COUNT(Section_ID) FROM[dbo].[Sections]") != 0)
+				{
+					sectionId = ConnectWithDataBaseID(@"SELECT MAX(Section_ID) FROM[dbo].[Sections]") + 1;
+				}
+				else
+				{
+					sectionId = 1;
+				}
+				var sqlExpression = @$"INSERT INTO [dbo].[Sections] VALUES ({sectionId},'{_sectionName}')";
+				ExecuteExpression(sqlExpression);
+			}			
+		}
+
+		private void InsertFactors()
+		{
+			ExistSection();
+			var sectionId = ConnectWithDataBaseID(@$"SELECT Section_ID FROM[dbo].[Sections] WHERE Section = '{_sectionName}'");
+			if (ConnectWithDataBaseID(@$"SELECT COUNT(Section_ID) FROM[dbo].[Factors] WHERE
+				Section_ID = {sectionId} and 
+				Direction = '{_direction}' and 
+				Factor = '{_factor}' and 
+				FactorValue = '{_factorValue}'") == 0)
+			{
+				var sqlExpression = @$"INSERT INTO [dbo].[Factors] VALUES({sectionId},'{_direction}','{_factor}','{_factorValue}')";
+				ExecuteExpression(sqlExpression);
+			}
+		}
+
+		private void InsertScheme()
+		{
+			ExistSection();
+			var sectionId = ConnectWithDataBaseID(@$"SELECT Section_ID FROM[dbo].[Sections] WHERE Section = '{_sectionName}'");
+			if (ConnectWithDataBaseID(@$"SELECT COUNT(Section_ID) FROM[dbo].[Schemes] WHERE
+				Section_ID = {sectionId} and 
+				Scheme = '{_scheme}' and 
+				Disturbance = '{_disturbance}' and 
+				Automation = '{_automatics}'") == 0)
+			{
+				var sqlExpression = @$"INSERT INTO [dbo].[Schemes] VALUES ({sectionId},'{_scheme}','{_disturbance}',{_automatics})";
+				ExecuteExpression(sqlExpression);
+			}
+		}
+
 		public void Delete()
 		{
-			string sqlExpression;
-			switch (Validator())
+			switch (_dataType)
 			{
 				case DataType.Section:
 					{
-						int sectionId = ConnectWithDataBaseID(@$"SELECT Section_ID FROM[dbo].[Sections] Where Section = '{_sectionName}");
-						sqlExpression = $@"DELETE FROM [dbo].[SectionWithFactors] where Section_ID = '{sectionId}'";
-						ExecuteExpression(sqlExpression);
-
-						sqlExpression = @$"DELETE FROM [dbo].[Sections] WHERE Section = '{_sectionName}'";
-						ExecuteExpression(sqlExpression);
+						DeleteSection();
 						break;
 					}
 				case DataType.Factor:
 					{
-						int factorId = ConnectWithDataBaseID(@$"SELECT Factor_ID FROM[dbo].[Factors] 
-							WHERE Factor = '{_factor}' and FactorValue = '{_factorValue}'");
-						sqlExpression = $@"DELETE FROM [dbo].[SectionWithFactors] where Factor_ID = '{factorId}'";
-						ExecuteExpression(sqlExpression);
-						sqlExpression = @$"DELETE FROM [dbo].[Factors] WHERE Factor_ID = '{factorId}'";
-						ExecuteExpression(sqlExpression);
+						DeleteFactor();
 						break;
 					}
 				case DataType.Scheme:
 					{
-						sqlExpression = @$"DELETE FROM [dbo].[Schemes] WHERE Scheme = '{_scheme}'";
-						ExecuteExpression(sqlExpression);
+						DeleteScheme();
 						break;
 					}
 			}
+		}
+
+		private void DeleteSection()
+		{
+			if (ConnectWithDataBaseID(@$"SELECT COUNT(Section_ID) FROM[dbo].[Sections] WHERE Section = '{_sectionName}'") != 0)
+			{
+				var sqlExpression = @$"DELETE FROM [dbo].[Sections] WHERE Section = '{_sectionName}'";
+				ExecuteExpression(sqlExpression);
+			}
+			else
+			{
+				throw new Exception("Такого сечения не существует в базе");
+			}
+		}
+
+		private void DeleteFactor()
+		{
+			var sectionId = ConnectWithDataBaseID(@$"SELECT Section_ID FROM[dbo].[Sections] WHERE Section = '{_sectionName}'");
+			var sqlExpression = @$"DELETE FROM [dbo].[Factors] WHERE Section_ID = {sectionId} and 
+				Direction = '{_direction}' and 
+				Factor = '{_factor}' and 
+				FactorValue = '{_factorValue}'";
+			ExecuteExpression(sqlExpression);
+		}
+
+		private void DeleteScheme()
+		{
+			var sectionId = ConnectWithDataBaseID(@$"SELECT Section_ID FROM[dbo].[Sections] WHERE Section = '{_sectionName}'");
+			var sqlExpression = @$"DELETE FROM [dbo].[Schemes] WHERE Section_ID = {sectionId} and 
+				Scheme = '{_scheme}' 
+				and Disturbance = '{_disturbance}'";
+			ExecuteExpression(sqlExpression);
 		}
 
 		private void ExecuteExpression(string sqlExpression)

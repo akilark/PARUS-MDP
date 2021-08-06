@@ -22,6 +22,12 @@ namespace CatalogCreator
 		public bool _reverseable;
 		public bool _flagDoubleRepair = true;
 		public bool _flagRepair; //Если только нормальная схема - false
+		
+		private string _sectionName;
+		private List<string> _sections = new List<string>();
+		private List<(string, (string, string[])[])> _factorsы = new List<(string, (string, string[])[])>();
+		private List<(string, (string, bool)[])> _schemes = new List<(string, (string, bool)[])>();
+
 
 
 		public string[] Directions

@@ -10,8 +10,13 @@ namespace WorkWithDataSource
 		private string _sectionName;
 		private List<string> _sections = new List<string>();
 		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
-		private List<(string, (string, bool)[])> _scheme = new List<(string, (string, bool)[])>();
+		private List<(string, (string, bool)[])> _schemes = new List<(string, (string, bool)[])>();
 		private SqlConnectionStringBuilder _sqlConnectionBuilder;
+
+		public PullData()
+		{
+			_sectionName = " ";
+		}
 
 		public PullData(string sectionName)
 		{
@@ -19,6 +24,11 @@ namespace WorkWithDataSource
 		}
 
 		public List<string> Sections => _sections;
+
+		public List<(string, (string, string[])[])> Factors => _factors;
+
+		public List<(string, (string, bool)[])> Shemes => _schemes;
+
 
 		internal string StringConnect
 		{
@@ -36,9 +46,9 @@ namespace WorkWithDataSource
 
 		public void PullFactors()
 		{
-			string sqlExpression = @$"SELECT  SectionWithFactors.Direction, Factors.Factor, Factors.FactorValue
-		FROM [dbo].[SectionWithFactors], [dbo].[Sections], [dbo].[Factors]
-		WHERE Sections.Section_ID = SectionWithFactors.Section_ID and SectionWithFactors.Factor_ID = Factors.Factor_ID and Sections.Section = '{_sectionName}'";
+			string sqlExpression = @$"SELECT  Factors.Direction, Factors.Factor, Factors.FactorValue
+		FROM [dbo].[Sections], [dbo].[Factors]
+		WHERE Sections.Section_ID = Factors.Section_ID and Sections.Section = '{_sectionName}'";
 			ConnectWithDataBase(sqlExpression, DataType.Factor);
 		}
 
@@ -48,7 +58,7 @@ namespace WorkWithDataSource
 			ConnectWithDataBase(sqlExpression, DataType.Section);
 		}
 
-		public void PullScheme()
+		public void PullSchemes()
 		{
 			string sqlExpression = @$"SELECT Schemes.Scheme, Schemes.Disturbance, Schemes.Automation
   FROM [dbo].[Schemes],[dbo].[Sections]
@@ -58,8 +68,6 @@ namespace WorkWithDataSource
 
 		private void ConnectWithDataBase(string sqlExpression, DataType dataType)
 		{
-
-			
             using (SqlConnection connection = new SqlConnection(StringConnect))
 			{
 				using (SqlCommand command = new SqlCommand(sqlExpression, connection))
@@ -154,7 +162,7 @@ namespace WorkWithDataSource
 				{
 					if(!firstSchemeFlag)
 					{
-						_scheme.Add((compareScheme, (disturbance)));
+						_schemes.Add((compareScheme, (disturbance)));
 					}
 					compareScheme = reader.GetString(0);
 				}
@@ -167,7 +175,7 @@ namespace WorkWithDataSource
 
 				firstSchemeFlag = false;
 			}
-			_scheme.Add((compareScheme, (disturbance)));
+			_schemes.Add((compareScheme, (disturbance)));
 		}
 
 
