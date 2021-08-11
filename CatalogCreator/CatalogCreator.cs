@@ -11,167 +11,22 @@ namespace CatalogCreator
 	{
 		private string _path;
 		private string _rootName;
-		private string[] _repairScheme;
-		private string[] _allScheme;
-		private List<(string, string[])> _factorsEast;
-		private List<(string, string[])> _factorsWest;
-		private List<(string, string[])> _factors;
-		private string[] _directions;
-		private const string _directionEastTitle = "На восток";
-		private const string _directionsWestTitle = "На запад";
-		public bool _reverseable;
-		public bool _flagDoubleRepair = true;
-		public bool _flagRepair; //Если только нормальная схема - false
-		
-		private string _sectionName;
-		private List<string> _sections = new List<string>();
-		private List<(string, (string, string[])[])> _factorsы = new List<(string, (string, string[])[])>();
+		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
 		private List<(string, (string, bool)[])> _schemes = new List<(string, (string, bool)[])>();
 
-
-
-		public string[] Directions
-		{
-			get
-			{
-				return _directions;
-			}
-			set
-			{
-				_directions = value;
-			}
-		}
 		/// <summary>
 		/// Конструктор класса с 2 параметрами
 		/// </summary>
 		/// <param name="path"></param>
 		/// <param name="rootName"></param>
-		public CatalogCreator(string path, string rootName)
+		public CatalogCreator(string path, string rootName, List<(string, (string, string[])[])> Factors, List<(string, (string, bool)[])> Shemes)
 		{
-			_reverseable = false;
-			_flagRepair = false; 
+			_path = path;
+			_rootName = rootName;
+			_factors = Factors;
+			_schemes = Shemes;
 		}
 
-		/// <summary>
-		/// Конструктор класса без параметров
-		/// </summary>
-		public CatalogCreator() { }
-
-		/// <summary>
-		/// Свойство хранящее путь где будет создан каталог 
-		/// </summary>
-		public string DirectoryPath
-		{
-			get
-			{
-				return _path;
-			}
-			set
-			{
-				_path = value;
-			}
-		}
-
-		/// <summary>
-		/// Свойство хранящее имя корневой папки (название сечения)
-		/// </summary>
-		public string RootName 
-		{
-			get
-			{
-				return _rootName;
-			}
-			set
-			{
-				_rootName = value;
-			}
-		}
-
-		/// <summary>
-		/// Свойство хранящее массив ремонтных схем
-		/// </summary>
-		public string[] RepairScheme
-		{
-			get
-			{
-				return _repairScheme;
-			}
-			set
-			{
-				_repairScheme = value;
-				_flagRepair = true;
-			}
-		}
-
-		/// <summary>
-		/// Свойство хранящее массив всех рассматриваемых схем
-		/// </summary>
-		public string[] AllScheme
-		{
-			get
-			{
-				return _allScheme;
-			}
-			set
-			{
-				_allScheme = value;
-			}
-		}
-
-		/// <summary>
-		/// Свойство хранящее список влияющих факторов на восток
-		/// </summary>
-		public List<(string, string[])> FactorsEast
-		{
-			get
-			{
-				return _factorsEast;
-			}
-			set
-			{
-				_factorsEast = value;
-				if (FactorsWest != null)
-				{
-					_reverseable = true;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Свойство хранящее список влияющих факторов на запад
-		/// </summary>
-		public List<(string, string[])> FactorsWest
-		{
-			get
-			{
-				return _factorsWest;
-			}
-			set
-			{
-				_factorsWest = value;
-
-				if (FactorsEast != null)
-				{
-					_reverseable = true;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Свойство хранящее список влияющих факторов без указания направления мощности
-		/// </summary>
-		public List<(string, string[])> Factors
-		{
-			get
-			{
-				return _factors;
-			}
-			set
-			{
-				_factors = value;
-				_reverseable = false;
-			}
-		}
 
 		/// <summary>
 		/// Функция формирующая каталог на основе входных данных
@@ -189,18 +44,11 @@ namespace CatalogCreator
 		/// <param name="pathRoot">путь к корневой папке</param>
 		private void CreateReversable(string pathRoot)
 		{
-			if(_reverseable == true)
+			foreach ((string, (string, string[])[]) direct in _factors)
 			{
-				foreach (string direct in Directions)
-				{
-					var pathReversable = Path.Combine(pathRoot, direct);
-					Directory.CreateDirectory(pathReversable);
-					CreateScheme(pathReversable);
-				}
-			}
-			else
-			{
-				CreateScheme(pathRoot);
+				var pathReversable = Path.Combine(pathRoot, direct.Item1);
+				Directory.CreateDirectory(pathReversable);
+				CreateScheme(pathReversable);
 			}
 		}
 
@@ -208,35 +56,15 @@ namespace CatalogCreator
 		/// Преобразующий входные данные о ремонтных схем в правильный вид 
 		/// в зависимости от условий
 		/// </summary>
-		private void ExpandSchemeArray()
+		private string[] SchemeArray()
 		{
-			if (_flagRepair)
+			var schemeArraySize = _schemes.Count;
+			var allScheme = new string[schemeArraySize];
+			for (int schemeIndex = 0; schemeIndex < schemeArraySize; schemeIndex++)
 			{
-				if (_flagDoubleRepair)
-				{
-					var doubleRepair = new DoubleRepair(RepairScheme);
-					var repairTmp = new string[RepairScheme.Length + 
-						doubleRepair.DoubleRepairSchemeName.Length + 1];
-					repairTmp[0] = "Нормальная схема";
-					RepairScheme.CopyTo(repairTmp, 1);
-					doubleRepair.DoubleRepairSchemeName.CopyTo(repairTmp, 
-						RepairScheme.Length + 1);
-					_allScheme = repairTmp;
-				}
-				else
-				{
-					var repairTmp = new string[RepairScheme.Length + 1];
-					repairTmp[0] = "Нормальная схема";
-					RepairScheme.CopyTo(repairTmp, 1);
-					_allScheme = repairTmp;
-				}
+				allScheme[schemeIndex] = _schemes[schemeIndex].Item1;
 			}
-			else
-			{
-				var repairTmp = new string[1];
-				repairTmp[0] = "Нормальная схема";
-				_allScheme = repairTmp;
-			}
+			return allScheme;
 		}
 
 		/// <summary>
@@ -247,21 +75,14 @@ namespace CatalogCreator
 		private void CreateScheme(string pathReversable)
 		{
 			var serialNumber = 1;
-			ExpandSchemeArray();
-			foreach (string scheme in _allScheme)
+			var allScheme = SchemeArray();
+			foreach (string scheme in allScheme)
 			{
 				string pathScheme = Path.Combine(pathReversable, "№"+ serialNumber+ "_" + scheme);
 				Directory.CreateDirectory(pathScheme);
 				serialNumber++;
 
-				if (_reverseable)
-				{
-					DirectionFactors(pathScheme);
-				}
-				else
-				{
-					CreateFactorsCatalog(pathScheme, _factors);
-				}
+				DirectionFactors(pathScheme);
 			}
 		}
 
@@ -272,19 +93,28 @@ namespace CatalogCreator
 		/// производится определение</param>
 		private void DirectionFactors(string pathScheme)
 		{
-			
-			if (pathScheme.Contains(_directionEastTitle))
+			if (pathScheme.Contains(_factors[0].Item1))
 			{
-				CreateFactorsCatalog(pathScheme, _factorsEast);
+				List<(string, string[])> factorList = new List<(string, string[])>();
+				foreach ((string, string[]) factor in _factors[0].Item2)
+				{
+					factorList.Add(factor);
+				}
+				CreateFactorsCatalog(pathScheme, factorList);
 			}
-			else if (pathScheme.Contains(_directionsWestTitle))
+			if (_factors.Count == 2)
 			{
-				CreateFactorsCatalog(pathScheme, _factorsWest);
+				if (pathScheme.Contains(_factors[1].Item1))
+				{
+					List<(string, string[])> factorList = new List<(string, string[])>();
+					foreach ((string, string[]) factor in _factors[1].Item2)
+					{
+						factorList.Add(factor);
+					}
+					CreateFactorsCatalog(pathScheme, factorList);
+				}
 			}
-			else
-			{
-				CreateFactorsCatalog(pathScheme, _factors);
-			}
+
 		}
 
 		/// <summary>
@@ -365,7 +195,7 @@ namespace CatalogCreator
 				}
 				else
 				{
-					delimer *= amountFactorValues[currentFactor] / amountFactorValues[currentFactor - 1];
+					delimer = delimer * amountFactorValues[currentFactor] / amountFactorValues[currentFactor - 1];
 				}
 				areaSize /= delimer;
 

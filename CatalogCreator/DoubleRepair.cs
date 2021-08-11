@@ -5,7 +5,7 @@ using System.Text;
 namespace CatalogCreator
 {
 	/// <summary>
-	/// Класс двойных ремонтов
+	/// Класс двойных ремонтов (В текущей реализации не используется)
 	/// </summary>
 	public class DoubleRepair
 	{

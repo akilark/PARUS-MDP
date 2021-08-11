@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using WorkWithDataSource;
 
 namespace CatalogCreator
 {
@@ -11,7 +12,13 @@ namespace CatalogCreator
 	{
 		static void Main(string[] args)
 		{
-			var CatalogRead = new CatalogReader(@"C:\test\7Камала- Красноярская");
+			PullData pull = new PullData("Тест_1");
+			pull.PullFactors();
+			pull.PullSchemes();
+			CatalogCreator catalog = new CatalogCreator(@"C:\test", "Тест_1", pull.Factors, pull.Shemes);
+			catalog.Create();
+			
+			//var CatalogRead = new CatalogReader(@"C:\test\Камала- Красноярская");
 			/*
 			//TEST 1 Создание каталога без ремонтных схем
 			

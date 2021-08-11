@@ -100,11 +100,20 @@ namespace CatalogCreator
 			ReversableCheck(path);
 		}
 
+		/// <summary>
+		/// Определение Имени сечения
+		/// </summary>
+		/// <param name="path">путь в папку сечение</param>
 		private void FindRootName(string path)
 		{
 			_rootName = FolderName(path);
 		}
 
+
+		/// <summary>
+		/// проверка реверсивный ли переток
+		/// </summary>
+		/// <param name="path"></param>
 		private void ReversableCheck(string path)
 		{
 			var directorysArray = Directory.GetDirectories(path);
@@ -124,6 +133,11 @@ namespace CatalogCreator
 			}
 		}
 
+		/// <summary>
+		/// Определение имени схемы
+		/// </summary>
+		/// <param name="path">путь к папке для определенной схемы</param>
+		/// <returns>имя схемы</returns>
 		private string FindSchemeName(string path)
 		{
 			var directorysArray = Directory.GetDirectories(path);
@@ -135,6 +149,11 @@ namespace CatalogCreator
 			return directorysArray[0];
 		}
 
+		/// <summary>
+		/// определение факторов
+		/// </summary>
+		/// <param name="schemePath">путь к папке для определенного сочетания факторов</param>
+		/// <returns> Список факторов</returns>
 		private List<(string, string[])> FindFactors(string schemePath)
 		{
 			var directoriesArray = Directory.GetDirectories(schemePath);
@@ -191,10 +210,9 @@ namespace CatalogCreator
 		}
 
 		/// <summary>
-		/// Считает, что для всех схем одни и теже температуры, 
-		/// но температуры могут быть разные в зависимости направления мощности 
+		/// Определения направления
 		/// </summary>
-		/// <param name="factorsPath"></param>
+		/// <param name="factorsPath">путь к нижней папке в каталоге</param>
 		private void FindTemperature(string factorsPath)
 		{
 			string direction = "без направления";
@@ -230,7 +248,11 @@ namespace CatalogCreator
 			}
 		}
 		
-
+		/// <summary>
+		/// Получение названия папки из ссылки на папку
+		/// </summary>
+		/// <param name="path">ссылка на папку</param>
+		/// <returns>название папки</returns>
 		private string FolderName(string path)
 		{
 			while (path.Contains(@"\"))

@@ -7,7 +7,7 @@ namespace WorkWithDataSource
 	{
 		static void Main(string[] args)
 		{
-			PullData pull = new PullData();
+			PullData pull = new PullData("Тест_1");
 			pull.PullFactors();
 			pull.PullSchemes();
 			pull.PullSections();
