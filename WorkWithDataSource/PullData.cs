@@ -14,12 +14,13 @@ namespace WorkWithDataSource
 		private List<string> _sections = new List<string>();
 		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
 		private List<(string, (string, bool)[])> _schemes = new List<(string, (string, bool)[])>();
-		private SqlConnectionStringBuilder _sqlConnectionBuilder;
+		private DataBaseAutentification _sqlConnectionString;
 
 		//TODO: удалить тестовый конструктор
 		public PullData()
 		{
 			_sectionName = " ";
+			_sqlConnectionString = new DataBaseAutentification();
 		}
 
 		/// <summary>
@@ -29,6 +30,7 @@ namespace WorkWithDataSource
 		public PullData(string sectionName)
 		{
 			_sectionName = sectionName;
+			_sqlConnectionString = new DataBaseAutentification();
 		}
 
 		/// <summary>
@@ -47,30 +49,13 @@ namespace WorkWithDataSource
 		public List<(string, (string, bool)[])> Shemes => _schemes;
 
 		/// <summary>
-		/// Свойство возврщающее строку подключения к БД
-		/// </summary>
-		internal string StringConnect
-		{
-			get
-			{
-				_sqlConnectionBuilder = new SqlConnectionStringBuilder();
-				_sqlConnectionBuilder.DataSource = @"LAPTOP-EFSS8TJ6\SQLEXPRESS";
-				_sqlConnectionBuilder.UserID = @"ParusMDP";
-				_sqlConnectionBuilder.Password = "1234567890";
-				_sqlConnectionBuilder.InitialCatalog = "PARUS-MDP";
-				return _sqlConnectionBuilder.ConnectionString;
-			}
-		}
-
-
-		/// <summary>
 		/// Метод для заполнения списка факторов из БД
 		/// </summary>
 		public void PullFactors()
 		{
 			string sqlExpression = @$"SELECT  Factors.Direction, Factors.Factor, Factors.FactorValue
-		FROM [dbo].[Sections], [dbo].[Factors]
-		WHERE Sections.Section_ID = Factors.Section_ID and Sections.Section = '{_sectionName}'";
+				FROM [dbo].[Sections], [dbo].[Factors]
+				WHERE Sections.Section_ID = Factors.Section_ID and Sections.Section = '{_sectionName}'";
 			ConnectWithDataBase(sqlExpression, DataType.Factor);
 		}
 
@@ -83,17 +68,26 @@ namespace WorkWithDataSource
 			ConnectWithDataBase(sqlExpression, DataType.Section);
 		}
 
+		/// <summary>
+		/// Метод для заполнения списка схем из БД
+		/// </summary>
 		public void PullSchemes()
 		{
 			string sqlExpression = @$"SELECT Schemes.Scheme, Schemes.Disturbance, Schemes.Automation
-  FROM [dbo].[Schemes],[dbo].[Sections]
-  WHERE Sections.Section_ID = Schemes.Section_ID and Sections.Section = '{_sectionName}'";
+				FROM [dbo].[Schemes],[dbo].[Sections]
+				WHERE Sections.Section_ID = Schemes.Section_ID and Sections.Section = '{_sectionName}'";
 			ConnectWithDataBase(sqlExpression, DataType.Scheme);
 		}
 
+		/// <summary>
+		/// Метод для соединения с БД
+		/// </summary>
+		/// <param name="sqlExpression">Строка подключения к БД</param>
+		/// <param name="dataType">Что необходимо извлечь</param>
 		private void ConnectWithDataBase(string sqlExpression, DataType dataType)
 		{
-            using (SqlConnection connection = new SqlConnection(StringConnect))
+            using (SqlConnection connection = new SqlConnection(
+				_sqlConnectionString.GetStringForConnect()))
 			{
 				using (SqlCommand command = new SqlCommand(sqlExpression, connection))
 				{
@@ -123,7 +117,11 @@ namespace WorkWithDataSource
 			}
 		}
 
-
+		/// <summary>
+		/// Перевод данных о сечениях из БД в тип данных используемый в приложении
+		/// </summary>
+		/// <param name="reader"> Объект класса SqlDataReader предоставляет 
+		/// способ чтения потока строк в БД</param>
 		private void SectionConvertToList(SqlDataReader reader)
 		{
 			while (reader.Read())
@@ -132,6 +130,11 @@ namespace WorkWithDataSource
 			}
 		}
 
+		/// <summary>
+		/// Перевод данных о факторах из БД в тип данных используемый в приложении
+		/// </summary>
+		/// <param name="reader"> Объект класса SqlDataReader предоставляет 
+		/// способ чтения потока строк в БД</param>
 		private void FactorsConvertToList(SqlDataReader reader)
 		{
 			string[] factorValues = new string[0];
@@ -178,6 +181,11 @@ namespace WorkWithDataSource
 			_factors.Add((compareDirection, factors));
 		}
 
+		/// <summary>
+		/// Перевод данных о схемах из БД в тип данных используемый в приложении
+		/// </summary>
+		/// <param name="reader"> Объект класса SqlDataReader предоставляет 
+		/// способ чтения потока строк в БД</param>
 		private void SchemeConvertToList(SqlDataReader reader)
 		{
 			(string, bool)[] disturbance = new (string, bool)[0];
@@ -204,7 +212,5 @@ namespace WorkWithDataSource
 			}
 			_schemes.Add((compareScheme, (disturbance)));
 		}
-
-
 	}
 }

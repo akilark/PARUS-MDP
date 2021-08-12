@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace WorkWithDataSource
 {
+	/// <summary>
+	/// Класс для тестов
+	/// </summary>
 	class Program
 	{
 		static void Main(string[] args)
@@ -17,10 +20,10 @@ namespace WorkWithDataSource
 			//ChangeData pushSection = new ChangeData("Камала- Красноярская");
 			//pushSection.Delete();
 
-			ChangeData pushScheme = new ChangeData("Тест_1", "Нормальная схема", "ФОЛ Тест_5", 1);
+			ChangeData pushScheme = new ChangeData("Тест_2", "Ремонт Тест_3", "ФОЛ Тест_1", true);
 			pushScheme.Insert();
 
-			ChangeData pushFactors = new ChangeData("Тест_1", "На Запад", "Фактор Тест_2", "2");
+			ChangeData pushFactors = new ChangeData("Тест_2", "на Восток", "Фактор Тест_2", "2");
 			pushFactors.Insert();
 
 		}
