@@ -15,10 +15,12 @@ namespace CatalogCreator
 		private List<(string, (string, bool)[])> _schemes = new List<(string, (string, bool)[])>();
 
 		/// <summary>
-		/// Конструктор класса с 2 параметрами
+		/// Коструктор класса с 4 параметрами
 		/// </summary>
 		/// <param name="path"></param>
 		/// <param name="rootName"></param>
+		/// <param name="Factors">Лист факторов со структурой (направление, (фактор, значение фактора[])[])</param>
+		/// <param name="Shemes">Лист схем со структурой (ремонтная схема, (возмущение, наличие противоаварийной автоматики)[])</param>
 		public CatalogCreator(string path, string rootName, List<(string, (string, string[])[])> Factors, List<(string, (string, bool)[])> Shemes)
 		{
 			_path = path;

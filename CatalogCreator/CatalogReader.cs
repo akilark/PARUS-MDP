@@ -11,82 +11,30 @@ namespace CatalogCreator
 	/// </summary>
 	public class CatalogReader
 	{
-		
-		private string _path;
 		private string _rootName;
 		private string[] _allScheme;
-		private List<(string, string[])> _factorsEast;
-		private List<(string, string[])> _factorsWest;
-		private List<(string, string[])> _factors;
-		private List<(string, string[])> _temperature = new List<(string,string[])>();
-		private string[] _directions;
-		public bool _reverseable;
+		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
+		private List<string> _temperature = new List<string>();
+
+		/// <summary>
+		/// Свойство хранящее имя сечения
+		/// </summary>
+		public string SectionName => _rootName;
 
 		/// <summary>
 		/// Свойство хранящее массив всех рассматриваемых схем
 		/// </summary>
-		public string[] AllScheme
-		{
-			get
-			{
-				return _allScheme;
-			}
-		}
-
-		/// <summary>
-		/// Свойство хранящее список влияющих факторов на восток
-		/// </summary>
-		public List<(string, string[])> FactorsEast
-		{
-			get
-			{
-				return _factorsEast;
-			}
-		}
-
-		/// <summary>
-		/// Свойство хранящее список влияющих факторов на запад
-		/// </summary>
-		public List<(string, string[])> FactorsWest
-		{
-			get
-			{
-				return _factorsWest;
-			}
-		}
+		public string[] AllScheme => _allScheme;
 
 		/// <summary>
 		/// Свойство хранящее список влияющих факторов без указания направления мощности
 		/// </summary>
-		public List<(string, string[])> Factors
-		{
-			get
-			{
-				return _factors;
-			}
-		}
-
-		/// <summary>
-		/// Свойство хранящее сведения о реверсивности для сечения
-		/// </summary>
-		public bool Reversable
-		{
-			get
-			{
-				return _reverseable;
-			}
-		}
+		public List<(string, (string, string[])[])> Factors => _factors;
 
 		/// <summary>
 		/// Свойство хранящее сведения о температурах
 		/// </summary>
-		public List<(string, string[])> Temperature
-		{
-			get
-			{
-				return _temperature;
-			}
-		}
+		public List<string> Temperature => _temperature;
 
 		/// <summary>
 		/// Конструктор класса с 1 параметром
@@ -94,10 +42,9 @@ namespace CatalogCreator
 		/// <param name="path">Путь к содержащий в себе корневую папку</param>
 		public CatalogReader(string path)
 		{
-			_path = path;
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			FindRootName(path);
-			ReversableCheck(path);
+			FindFactorsEachDirections(path);
 		}
 
 		/// <summary>
@@ -114,22 +61,13 @@ namespace CatalogCreator
 		/// проверка реверсивный ли переток
 		/// </summary>
 		/// <param name="path"></param>
-		private void ReversableCheck(string path)
+		private void FindFactorsEachDirections(string path)
 		{
 			var directorysArray = Directory.GetDirectories(path);
-			if (directorysArray.Length == 2)
+
+			for(int i = 0; i < directorysArray.Length; i++)
 			{
-				if ((directorysArray[0].Contains(_directions[0]) && 
-					directorysArray[1].Contains(_directions[1])))
-				{
-					_reverseable = true;
-					_factorsWest = FindFactors(FindSchemeName(directorysArray[0]));
-					_factorsEast = FindFactors(FindSchemeName(directorysArray[1]));
-				}
-			}
-			else
-			{
-				_factors = FindFactors(FindSchemeName(path));
+				_factors.Add((FolderName(directorysArray[i]), FindFactorsOneDirection(FindSchemeName(directorysArray[i]))));
 			}
 		}
 
@@ -154,22 +92,22 @@ namespace CatalogCreator
 		/// </summary>
 		/// <param name="schemePath">путь к папке для определенного сочетания факторов</param>
 		/// <returns> Список факторов</returns>
-		private List<(string, string[])> FindFactors(string schemePath)
+		private (string, string[])[] FindFactorsOneDirection(string schemePath)
 		{
 			var directoriesArray = Directory.GetDirectories(schemePath);
 			if (directoriesArray.Length != 0)
 			{
 				FindTemperature(directoriesArray[0]);
-				var factorsTmp = new List<(string, string[])>();
+				var factorsTmp = new (string, string[])[0];
 				for (int i = 0; i < directoriesArray.Length; i++)
 				{
 					directoriesArray[i] = FolderName(directoriesArray[i]);
 				}
 				var factorsArray = new List<string[]>();
-				string[] factorsAmount = directoriesArray[0].Split("_");
+				string[] factorsAmount = directoriesArray[0].Split("_[");
 				foreach (string directoryString in directoriesArray)
 				{
-					factorsArray.Add(directoryString.Split("_"));
+					factorsArray.Add(directoryString.Split("_["));
 				}
 				for (int factorsIndex = 0; factorsIndex < factorsAmount.Length; factorsIndex++)
 				{
@@ -197,7 +135,8 @@ namespace CatalogCreator
 							factorValue[factorValue.Length - 1] = factorValueTmp;
 						}
 					}
-					factorsTmp.Add((factorName, factorValue));
+					Array.Resize(ref factorsTmp, factorsTmp.Length + 1);
+					factorsTmp[factorsTmp.Length - 1] = (factorName, factorValue);
 				}
 				return factorsTmp;
 			}
@@ -209,42 +148,22 @@ namespace CatalogCreator
 			
 		}
 
+		//TODO: добавить проверку данных на листе
 		/// <summary>
 		/// Определения направления
 		/// </summary>
 		/// <param name="factorsPath">путь к нижней папке в каталоге</param>
 		private void FindTemperature(string factorsPath)
 		{
-			string direction = "без направления";
-			if(_reverseable)
-			{
-				foreach(string dir in _directions)
-				{
-					if (factorsPath.Contains(dir))
-					{
-						direction = dir;
-					}
-				}
-				
-			}
-			var directorysArray = Directory.GetFiles(factorsPath);
-			string[] temperature;
+			var directorysArray = Directory.GetFiles(factorsPath,@"*.xlsx");
 			if (directorysArray.Length != 0)
 			{
-
 				FileInfo fileInfo = new FileInfo(directorysArray[0]);
 				ExcelPackage excelPackage = new ExcelPackage(fileInfo);
-				temperature = new string[excelPackage.Workbook.Worksheets.Count];
 				for(int i = 0; i < excelPackage.Workbook.Worksheets.Count; i++)
 				{
-					temperature[i] = excelPackage.Workbook.Worksheets[i].Name;
+					_temperature.Add(excelPackage.Workbook.Worksheets[i].Name);
 				}
-				_temperature.Add((direction,temperature));
-			}
-			else
-			{
-				temperature = new string[0];
-				_temperature.Add((direction, temperature));
 			}
 		}
 		
