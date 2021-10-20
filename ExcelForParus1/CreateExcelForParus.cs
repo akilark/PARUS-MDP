@@ -115,7 +115,7 @@ namespace ExcelForParus
 					worksheet.Cells.AutoFitColumns();
 
 				}
-				FileInfo file = new FileInfo(_path + @"\Для Паруса.xlsx");
+				FileInfo file = new FileInfo(_path + @$"\Для Паруса {SectionName()}.xlsx");
 				excelPackage.SaveAs(file);
 			}
 		}

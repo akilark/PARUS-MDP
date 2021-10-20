@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkWithDataSource", "..\WorkWithDataSource1\WorkWithDataSource.csproj", "{35CCF381-D88A-4AA8-9D55-7782A0912497}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkWithDataSource", "..\WorkWithDataSource1\WorkWithDataSource.csproj", "{35CCF381-D88A-4AA8-9D55-7782A0912497}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{AE2B2E33-3904-4C97-A2D8-DF8CE915A08A}"
 EndProject
@@ -11,9 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BusinesLogicLayer", "Busine
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GUI", "GUI", "{477E4F47-9DC7-4C2B-A427-DED3648FE97F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkWithCatalog", "..\CatalogCreator1\WorkWithCatalog.csproj", "{8225C5C6-9FDD-49EA-BF68-04EE6077CD95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkWithCatalog", "..\CatalogCreator1\WorkWithCatalog.csproj", "{8225C5C6-9FDD-49EA-BF68-04EE6077CD95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelForParus", "..\ExcelForParus1\ExcelForParus.csproj", "{0AF074B8-461B-42ED-8A03-98A502A59F4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExcelForParus", "..\ExcelForParus1\ExcelForParus.csproj", "{0AF074B8-461B-42ED-8A03-98A502A59F4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutputFileStructure", "OutputFileStructure\OutputFileStructure.csproj", "{D85CEDA9-ECC6-47C8-B696-A28D86C75702}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{0AF074B8-461B-42ED-8A03-98A502A59F4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AF074B8-461B-42ED-8A03-98A502A59F4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0AF074B8-461B-42ED-8A03-98A502A59F4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D85CEDA9-ECC6-47C8-B696-A28D86C75702}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D85CEDA9-ECC6-47C8-B696-A28D86C75702}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D85CEDA9-ECC6-47C8-B696-A28D86C75702}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D85CEDA9-ECC6-47C8-B696-A28D86C75702}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -41,6 +47,7 @@ Global
 		{35CCF381-D88A-4AA8-9D55-7782A0912497} = {AE2B2E33-3904-4C97-A2D8-DF8CE915A08A}
 		{8225C5C6-9FDD-49EA-BF68-04EE6077CD95} = {A19A36C1-2176-4D94-836B-06D6CE17BB43}
 		{0AF074B8-461B-42ED-8A03-98A502A59F4D} = {A19A36C1-2176-4D94-836B-06D6CE17BB43}
+		{D85CEDA9-ECC6-47C8-B696-A28D86C75702} = {A19A36C1-2176-4D94-836B-06D6CE17BB43}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE0635B2-3910-4B34-84B2-D540A8692879}

@@ -19,13 +19,13 @@ namespace WorkWithDataSource
 
 			//ChangeData pushSection = new ChangeData("Камала- Красноярская");
 			//pushSection.Delete();
-
+			/*
 			ChangeData pushScheme = new ChangeData("Тест_2", "Ремонт Тест_3", "ФОЛ Тест_1", true);
 			pushScheme.Insert();
 
 			ChangeData pushFactors = new ChangeData("Тест_2", "на Восток", "Фактор Тест_2", "2");
 			pushFactors.Insert();
-
+			*/
 		}
 	}
 }
