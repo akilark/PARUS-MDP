@@ -18,11 +18,12 @@ namespace OutputFileStructure
 		private int _startRow;
 		private bool _temperatureDependence;
 
-		public Sample(string path, string samplePath)
+		public Sample(string path, string samplePath, bool temperatureDependence)
 		{
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			_path = path;
 			_samplePath = samplePath;
+			_temperatureDependence = temperatureDependence;
 			DownloadSample();
 			_catalogReader = new CatalogReader(_path);
 			_startRow = FindStartRow();
@@ -35,7 +36,6 @@ namespace OutputFileStructure
 		{
 			FileInfo fileInfo = new FileInfo(_samplePath);
 			_excelPackage = new ExcelPackage(fileInfo);
-
 		}
 
 		private int FindFirstOccurance()
@@ -64,6 +64,7 @@ namespace OutputFileStructure
 					}
 				}
 			}
+			
 		}
 
 
@@ -71,15 +72,39 @@ namespace OutputFileStructure
 		{
 			int columnNumberForDirection = 1;
 			int rowNumberForDirection = _startRow;
-
+			int amountFilledRows = 0;
 			for (int i = 0; i < _catalogReader.Factors.Count; i++)
 			{
-				
-				string[] factorList = GenerateFactorMatrix(CompareFolderAndSample(_catalogReader.Factors, i));
-				
+				FactorsCombinations factorsCombinations;
+				if (_temperatureDependence)
+				{
+					factorsCombinations = new FactorsCombinations(_catalogReader.Factors[i], 
+						FactorsInSample(), _catalogReader.Temperature);
+				}
+				else
+				{
+					factorsCombinations = new FactorsCombinations(_catalogReader.Factors[i],
+						FactorsInSample());
+				}
+				string[] factorList = factorsCombinations.FactorMixed;
+				amountFilledRows = amountFilledRows + factorList.Length * _catalogReader.AllScheme.Length;
 				_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForDirection, columnNumberForDirection].Value = _catalogReader.Factors[i].Item1;
 				rowNumberForDirection = FillScheme(columnNumberForDirection + 1, rowNumberForDirection, factorList);
-			}	
+			}
+
+			List<(string, (int, int))> factorsInSample = FactorsInSample();
+
+			for (int i = 0; i< factorsInSample[0].Item2.Item2 - columnNumberForDirection; i++)
+			{
+				TextDecor.FirstCellsUnion(_startRow, columnNumberForDirection + i,
+					amountFilledRows, _startRow, ref _excelPackage);
+			}
+
+			for (int i = 0 ; i < factorsInSample.Count; i++) 
+			{
+				TextDecor.FactorCellsUnion(_startRow, factorsInSample[0].Item2.Item2 + i,
+					_temperatureDependence, _catalogReader.Temperature.Count, ref _excelPackage);
+			}
 		}
 
 
@@ -97,7 +122,7 @@ namespace OutputFileStructure
 				rowNumberForScheme = FillFactors(columnNumberForScheme + 2, rowNumberForScheme, factors);
 
 			}
-			return rowNumberForScheme + 1;
+			return rowNumberForScheme;
 		}
 
 		private int FillFactors(int columnNumberForFactors, int rowNumberForFactor, string[] factors)
@@ -114,109 +139,7 @@ namespace OutputFileStructure
 			return rowNumberForFactor;
 		}
 
-		private List<(string, string[])> CompareFolderAndSample(List<(string, (string, string[])[])> factorsWithDirection, int indexDirection)
-		{
-			List<(string, (int, int))> factorsFromSample = FactorsInSample();
-			List<(string, string[])> factorList = new List<(string, string[])>();
-			foreach ((string, (int, int)) factorSample in factorsFromSample)
-			{
-				bool addFlag = false;
-				foreach((string,string[]) factorFolder in _catalogReader.Factors[indexDirection].Item2)
-				{
-					if (factorSample.Item1.ToLower().Trim() == factorFolder.Item1.ToLower().Trim())
-					{
-						factorList.Add(factorFolder);
-						addFlag = true;
-					}
-				}
-				if (!addFlag)
-				{
-					(string, string[]) emptyString = (factorSample.Item1, new string[] { "-" });
-					factorList.Add(emptyString);
-				}
-			}
-			if (_temperatureDependence)
-			{
-				string[] temperatureArray = new string[_catalogReader.Temperature.Count];
-				for (int i = 0; i < _catalogReader.Temperature.Count; i++)
-				{
-					temperatureArray[i] = _catalogReader.Temperature[i];
-				}
-
-				(string, string[]) temperatureString = ("Температура", temperatureArray);
-				factorList.Add(temperatureString);
-			}
-			return factorList;
-		}
-
-		private string[] GenerateFactorMatrix(List<(string, string[])> factors)
-		{
-			var amountFactorValues = AmountFactorsValueCalculate(factors);
-			var factorsMixedSize = 1;
-			//переделать убрать метод и сделать всё через item
-			for (int i = 0; i < amountFactorValues.Length; i++)
-			{
-				factorsMixedSize *= amountFactorValues[i];
-			}
-
-			var factorsMixed = new string[factorsMixedSize];
-			var delimer = 1;
-			var areaSize = factorsMixedSize;
-			for (int currentFactor = 0; currentFactor < factors.Count; currentFactor++)
-			{
-				if (currentFactor == 0)
-				{
-					delimer *= amountFactorValues[currentFactor];
-				}
-				else
-				{
-					delimer = delimer * amountFactorValues[currentFactor] / amountFactorValues[currentFactor - 1];
-				}
-				areaSize /= delimer;
-
-				var counterUnitInArea = 0;
-				var factorIndex = 0;
-				for (int areaIndex = 0; areaIndex < factorsMixedSize; areaIndex++)
-				{
-					if (counterUnitInArea == areaSize)
-					{
-						factorIndex++;
-						if (factorIndex == amountFactorValues[currentFactor])
-						{
-							factorIndex = 0;
-						}
-						counterUnitInArea = 0;
-					}
-
-					if (currentFactor == 0)
-					{
-						factorsMixed[areaIndex] =  factors[currentFactor].Item2[factorIndex] ;
-					}
-					else
-					{
-						factorsMixed[areaIndex] = factorsMixed[areaIndex] +
-							"_" + factors[currentFactor].Item2[factorIndex];
-					}
-					counterUnitInArea++;
-				}
-			}
-			return factorsMixed;
-		}
-
-		private int[] AmountFactorsValueCalculate(List<(string, string[])> factors)
-		{
-			var amountFactorValues = new int[0];
-			foreach ((string, string[]) factor in factors)
-			{
-				Array.Resize(ref amountFactorValues, amountFactorValues.Length + 1);
-				amountFactorValues[amountFactorValues.Length - 1] = factor.Item2.Length;
-
-			}
-			return amountFactorValues;
-		}
-
-
-
+		
 		private List<(string, (int,int))> FactorsInSample()
 		{
 			int rowWithData = FindFirstOccurance();
@@ -257,6 +180,8 @@ namespace OutputFileStructure
 			}
 			return outputFactors;
 		}
+
+		
 
 		private void SaveSampleWithStructure(ExcelPackage excelPackage)
 		{
