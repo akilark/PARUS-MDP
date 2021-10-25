@@ -7,7 +7,7 @@ namespace OutputFileStructure
 {
 	public static class TextDecor
 	{
-		public static void FactorCellsUnion(int row, int column,bool temperatureUse, int temperatureCount, ref ExcelPackage excelPackage)
+		public static void FactorCellsUnion(int row, int column,bool temperatureUse, int temperatureCount, int temperatureMerge, ref ExcelPackage excelPackage)
 		{
 			if(temperatureUse)
 			{
@@ -16,26 +16,37 @@ namespace OutputFileStructure
 					while (excelPackage.Workbook.Worksheets[0].Cells[row, column].Value != null)
 					{
 						ChangeTextStyle(row, column, ref excelPackage);
-						excelPackage.Workbook.Worksheets[0].Cells[row, column, row + temperatureCount - 1, column].Merge = true;
-						row = row + temperatureCount;
+						excelPackage.Workbook.Worksheets[0].Cells[row, column, row + temperatureCount * temperatureMerge - 1, column].Merge = true;
+						MediumLine(row, column, row + temperatureCount * temperatureMerge - 1, column, ref excelPackage);
+						row = row + temperatureCount * temperatureMerge;
 					}
+				}
+				else
+				{
+					while (excelPackage.Workbook.Worksheets[0].Cells[row, column].Value != null)
+					{
+						ChangeTextStyle(row, column, ref excelPackage);
+						excelPackage.Workbook.Worksheets[0].Cells[row, column, row + temperatureMerge - 1, column].Merge = true;
+						MediumLine(row, column, row + temperatureMerge - 1, column, ref excelPackage);
+						row = row + temperatureMerge;
+					}
+						
 				}
 			}
 			else
 			{
-				/*
 				while (excelPackage.Workbook.Worksheets[0].Cells[row, column].Value != null)
 				{
 					ChangeTextStyle(row, column, ref excelPackage);
-					excelPackage.Workbook.Worksheets[0].Cells[row, column, row + temperatureCount - 1, column].Merge = true;
-					row = row + temperatureCount;
+					excelPackage.Workbook.Worksheets[0].Cells[row, column, row + temperatureMerge - 1, column].Merge = true;
+					MediumLine(row, column, row + temperatureMerge - 1, column, ref excelPackage);
+					row = row + temperatureMerge;
 				}
-				*/
 			}
 			
 		}
 
-		public static void FirstCellsUnion(int row, int column, int amountFilledRows, int startRow, ref ExcelPackage excelPackage)
+		public static void FirstCellsUnion(int row, int column, int amountFilledRows, ref ExcelPackage excelPackage)
 		{
 			int nextTextIndex = FindNextTextInColumn(row, column, excelPackage);
 			while (nextTextIndex != row)
@@ -43,12 +54,20 @@ namespace OutputFileStructure
 				RotateText(row, column, ref excelPackage);
 				ChangeTextStyle(row, column, ref excelPackage);
 				excelPackage.Workbook.Worksheets[0].Cells[row, column, nextTextIndex, column].Merge = true;
+				MediumLine(row, column, nextTextIndex, column, ref excelPackage);
 				row = nextTextIndex + 1;
 				nextTextIndex = FindNextTextInColumn(row, column,excelPackage);
 			}
 			RotateText(row, column, ref excelPackage);
 			ChangeTextStyle(row, column, ref excelPackage);
-			excelPackage.Workbook.Worksheets[0].Cells[row, column, amountFilledRows + startRow - 1, column].Merge = true;
+			excelPackage.Workbook.Worksheets[0].Cells[row, column, amountFilledRows - 1, column].Merge = true;
+			MediumLine(row, column, amountFilledRows - 1, column, ref excelPackage);
+		}
+
+		private static void MediumLine(int rowStart, int columnStart, int rowEnd, int columnEnd, ref ExcelPackage excelPackage)
+		{
+			excelPackage.Workbook.Worksheets[0].Cells[rowStart, columnStart, rowEnd, columnEnd].
+					Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Medium);
 		}
 
 		private static void RotateText(int row, int column, ref ExcelPackage excelPackage)
@@ -66,7 +85,7 @@ namespace OutputFileStructure
 
 		private static int FindNextTextInColumn(int row, int column, ExcelPackage excelPackage)
 		{
-			for (int i = row + 1; i < 1000; i++)
+			for (int i = row + 1; i < row + 2000; i++)
 			{
 				if (excelPackage.Workbook.Worksheets[0].Cells[i, column].Value != null)
 				{

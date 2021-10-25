@@ -7,9 +7,10 @@ using System.Reflection;
 using OfficeOpenXml;
 
 
+
 namespace OutputFileStructure
 {
-	public class Sample
+	public class SampleSection
 	{
 		private CatalogReader _catalogReader;
 		private string _samplePath;
@@ -17,19 +18,20 @@ namespace OutputFileStructure
 		private ExcelPackage _excelPackage;
 		private int _startRow;
 		private bool _temperatureDependence;
+		private SampleControlActions _sampleControlActions;
 
-		public Sample(string path, string samplePath, bool temperatureDependence)
+		public SampleSection(string path, string samplePath, bool temperatureDependence)
 		{
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			_path = path;
 			_samplePath = samplePath;
 			_temperatureDependence = temperatureDependence;
 			DownloadSample();
+			_sampleControlActions = new SampleControlActions(_excelPackage);
 			_catalogReader = new CatalogReader(_path);
 			_startRow = FindStartRow();
 			FillDirection();
 			SaveSampleWithStructure(_excelPackage);
-			
 		}
 
 		private void DownloadSample()
@@ -72,57 +74,89 @@ namespace OutputFileStructure
 		{
 			int columnNumberForDirection = 1;
 			int rowNumberForDirection = _startRow;
-			int amountFilledRows = 0;
+			
 			for (int i = 0; i < _catalogReader.Factors.Count; i++)
-			{
-				FactorsCombinations factorsCombinations;
-				if (_temperatureDependence)
-				{
-					factorsCombinations = new FactorsCombinations(_catalogReader.Factors[i], 
-						FactorsInSample(), _catalogReader.Temperature);
-				}
-				else
-				{
-					factorsCombinations = new FactorsCombinations(_catalogReader.Factors[i],
-						FactorsInSample());
-				}
-				string[] factorList = factorsCombinations.FactorMixed;
-				amountFilledRows = amountFilledRows + factorList.Length * _catalogReader.AllScheme.Length;
+			{			
 				_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForDirection, columnNumberForDirection].Value = _catalogReader.Factors[i].Item1;
-				rowNumberForDirection = FillScheme(columnNumberForDirection + 1, rowNumberForDirection, factorList);
+				rowNumberForDirection = FillScheme(columnNumberForDirection + 1, rowNumberForDirection, _catalogReader.Factors[i]);
 			}
-
+			
 			List<(string, (int, int))> factorsInSample = FactorsInSample();
-
 			for (int i = 0; i< factorsInSample[0].Item2.Item2 - columnNumberForDirection; i++)
 			{
 				TextDecor.FirstCellsUnion(_startRow, columnNumberForDirection + i,
-					amountFilledRows, _startRow, ref _excelPackage);
+					rowNumberForDirection, ref _excelPackage);
 			}
-
-			for (int i = 0 ; i < factorsInSample.Count; i++) 
-			{
-				TextDecor.FactorCellsUnion(_startRow, factorsInSample[0].Item2.Item2 + i,
-					_temperatureDependence, _catalogReader.Temperature.Count, ref _excelPackage);
-			}
+		
 		}
 
 
-		private int FillScheme(int columnNumberForScheme, int rowNumberForScheme, string[] factors)
+		private int FillScheme(int columnNumberForScheme, int rowNumberForScheme, (string,(string,string[])[]) factors)
 		{
+			List<(string, (int, int))> factorsInSample = FactorsInSample();
+			int amountControlActions = _sampleControlActions.CountControlActions(factors.Item1);
+			List<(string, (string, bool)[])> schemeFromDataBase = _catalogReader.SchemeFromDataBase;
+
 			foreach (string scheme in _catalogReader.AllScheme)
 			{
 				string numberScheme = scheme.Substring(0, scheme.IndexOf("_"));
 				string nameScheme = scheme.Substring(scheme.IndexOf("_") + 1);
 				_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForScheme, columnNumberForScheme].Value = numberScheme;
 				_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForScheme, columnNumberForScheme + 1].Value = nameScheme;
-				
 				int rowNumberForFactor = rowNumberForScheme;
+				
+				FactorsCombinations factorsCombinations;
+				int temperatureMerge = CountTemperatureMerge(CountDisturbances(nameScheme, schemeFromDataBase), amountControlActions);
+				if (_temperatureDependence)
+				{
+					factorsCombinations = new FactorsCombinations(factors, factorsInSample, _catalogReader.Temperature,
+						temperatureMerge);
+				}
+				else
+				{
+					factorsCombinations = new FactorsCombinations(factors, factorsInSample,
+						temperatureMerge);
+				}
+				string[] factorList = factorsCombinations.FactorMixed;
 
-				rowNumberForScheme = FillFactors(columnNumberForScheme + 2, rowNumberForScheme, factors);
+				int rowNumberForFactors = rowNumberForScheme;
+
+				rowNumberForScheme = FillFactors(columnNumberForScheme + 2, rowNumberForScheme, factorList);
+
+				for (int i = 0; i < factorsInSample.Count; i++)
+				{
+					TextDecor.FactorCellsUnion(rowNumberForFactors, factorsInSample[0].Item2.Item2 + i,
+						_temperatureDependence, _catalogReader.Temperature.Count, temperatureMerge, ref _excelPackage);
+				}
 
 			}
 			return rowNumberForScheme;
+		}
+
+		private int CountDisturbances(string namescheme, List<(string, (string, bool)[])> schemesFromDataBase)
+		{
+			foreach((string,(string,bool)[]) schemeFromDataBase in schemesFromDataBase)
+			{
+				if (namescheme == schemeFromDataBase.Item1)
+				{
+					return schemeFromDataBase.Item2.Length;
+				}
+			}
+			return 0;
+		}
+
+		private int CountTemperatureMerge(int amountDisturbance, int amountControlActions)
+		{
+			int outputNumber;
+			if(amountControlActions>0)
+			{
+				outputNumber= amountDisturbance + 2 * amountControlActions + 4;
+			}
+			else
+			{
+				outputNumber = amountDisturbance + 3;
+			}
+			return outputNumber;
 		}
 
 		private int FillFactors(int columnNumberForFactors, int rowNumberForFactor, string[] factors)

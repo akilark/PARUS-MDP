@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using OfficeOpenXml;
+using WorkWithDataSource;
 
 namespace WorkWithCatalog
 {
@@ -11,8 +12,10 @@ namespace WorkWithCatalog
 	/// </summary>
 	public class CatalogReader
 	{
+		//TODO: Добавить проверку на наличие файла с моим расширением, если этот файл есть, то берем данные из него, если нет, пытаемся подключится к БД, если подключения нет, ошибка
 		private string _rootName;
 		private string[] _allScheme;
+		private List<(string, (string, bool)[])> _schemesFromDataBase;
 		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
 		private List<string> _temperature = new List<string>();
 
@@ -25,6 +28,8 @@ namespace WorkWithCatalog
 		/// Свойство хранящее массив всех рассматриваемых схем
 		/// </summary>
 		public string[] AllScheme => _allScheme;
+
+		public List<(string, (string, bool)[])> SchemeFromDataBase => _schemesFromDataBase;
 
 		/// <summary>
 		/// Свойство хранящее список влияющих факторов без указания направления мощности
@@ -45,6 +50,15 @@ namespace WorkWithCatalog
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			FindRootName(path);
 			FindFactorsEachDirections(path);
+
+			//проверка соединения (добавить)
+			PullData pullData = new PullData(_rootName);
+			pullData.PullSchemes();
+			bool dataBaseConected = true;
+			if(dataBaseConected)
+			{
+				_schemesFromDataBase = pullData.Shemes;
+			}
 		}
 
 		/// <summary>
