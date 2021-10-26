@@ -6,8 +6,8 @@ namespace OutputFileStructure
 {
 	public class FactorsCombinations
 	{
-		private string[] _factorsMixed;
-		private List<string> _temperature;
+		private string[,] _factorsMixed;
+		private string[] _temperature;
 
 		public FactorsCombinations((string, (string, string[])[]) factorsFromFolder, 
 			List<(string, (int, int))> factorsFromSample, int temperatureMerge)
@@ -16,13 +16,13 @@ namespace OutputFileStructure
 		}
 
 		public FactorsCombinations((string, (string, string[])[]) factorsFromFolder, 
-			List<(string, (int, int))> factorsFromSample, List<string> temperature, int temperatureMerge)
+			List<(string, (int, int))> factorsFromSample, string[] temperature, int temperatureMerge)
 		{
 			_temperature = temperature;
 			_factorsMixed = GenerateFactorMatrix(CompareFolderAndSample(factorsFromFolder, factorsFromSample, true), temperatureMerge);
 		}
 
-		public string[] FactorMixed => _factorsMixed;
+		public string[,] FactorMixed => _factorsMixed;
 
 		private List<(string, string[])> CompareFolderAndSample((string, (string, string[])[]) factorsFromFolder, 
 			List<(string, (int, int))> factorsFromSample, bool temperatureDependence)
@@ -51,19 +51,13 @@ namespace OutputFileStructure
 			}
 			if (temperatureDependence)
 			{
-				string[] temperatureArray = new string[_temperature.Count];
-				for (int i = 0; i < _temperature.Count; i++)
-				{
-					temperatureArray[i] = _temperature[i];
-				}
-
-				(string, string[]) temperatureString = ("Температура", temperatureArray);
+				(string, string[]) temperatureString = ("Температура", _temperature);
 				factorList.Add(temperatureString);
 			}
 			return factorList;
 		}
 
-		private string[] GenerateFactorMatrix(List<(string, string[])> factors, int temperatureMerge)
+		private string[,] GenerateFactorMatrix(List<(string, string[])> factors, int temperatureMerge)
 		{
 			var amountFactorValues = AmountFactorsValueCalculate(factors);
 			var factorsMixedSize = 1;
@@ -75,7 +69,7 @@ namespace OutputFileStructure
 			}
 			var areaSize = factorsMixedSize;
 			factorsMixedSize *= temperatureMerge;
-			var factorsMixed = new string[factorsMixedSize];
+			var factorsMixed = new string[factorsMixedSize,factors.Count];
 			var delimer = 1;
 			
 			for (int currentFactor = 0; currentFactor < factors.Count; currentFactor++)
@@ -105,23 +99,11 @@ namespace OutputFileStructure
 						counterUnitInArea = 0;
 					}
 
-					if (currentFactor == 0)
+					for(int i = 0; i < temperatureMerge; i++)
 					{
-						for(int i = 0; i < temperatureMerge; i++)
-						{
-							factorsMixed[addedLines + i] = factors[currentFactor].Item2[factorIndex];
-						}
+						factorsMixed[addedLines + i, currentFactor] = factors[currentFactor].Item2[factorIndex];
+					}
 						
-					}
-					else
-					{
-						for (int i = 0; i < temperatureMerge; i++)
-						{
-							factorsMixed[addedLines + i] = factorsMixed[addedLines + i] +
-							"_" + factors[currentFactor].Item2[factorIndex];
-						}
-							
-					}
 					counterUnitInArea++;
 					addedLines = addedLines + temperatureMerge;
 				}

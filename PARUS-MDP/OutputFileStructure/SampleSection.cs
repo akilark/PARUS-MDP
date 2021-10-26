@@ -13,30 +13,38 @@ namespace OutputFileStructure
 	public class SampleSection
 	{
 		private CatalogReader _catalogReader;
-		private string _samplePath;
-		private string _path;
 		private ExcelPackage _excelPackage;
 		private int _startRow;
+		private string[] _temperature;
 		private bool _temperatureDependence;
 		private SampleControlActions _sampleControlActions;
 
-		public SampleSection(string path, string samplePath, bool temperatureDependence)
+		public SampleSection(string path, string samplePath)
 		{
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-			_path = path;
-			_samplePath = samplePath;
-			_temperatureDependence = temperatureDependence;
-			DownloadSample();
-			_sampleControlActions = new SampleControlActions(_excelPackage);
-			_catalogReader = new CatalogReader(_path);
-			_startRow = FindStartRow();
-			FillDirection();
-			SaveSampleWithStructure(_excelPackage);
+			SampleFillInitiate(path, samplePath, false);
 		}
 
-		private void DownloadSample()
+		public SampleSection(string path, string samplePath, string[] temperature)
 		{
-			FileInfo fileInfo = new FileInfo(_samplePath);
+			_temperature = temperature;
+			SampleFillInitiate(path, samplePath, true);
+		}
+
+		private void SampleFillInitiate(string path, string samplePath, bool temperatureDependence)
+		{
+			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+			_temperatureDependence = temperatureDependence;
+			DownloadSample(samplePath);
+			_sampleControlActions = new SampleControlActions(_excelPackage);
+			_catalogReader = new CatalogReader(path);
+			_startRow = FindStartRow();
+			FillDirection();
+			SaveSampleWithStructure(path, _excelPackage);
+		}
+
+		private void DownloadSample(string samplePath)
+		{
+			FileInfo fileInfo = new FileInfo(samplePath);
 			_excelPackage = new ExcelPackage(fileInfo);
 		}
 
@@ -94,7 +102,7 @@ namespace OutputFileStructure
 		private int FillScheme(int columnNumberForScheme, int rowNumberForScheme, (string,(string,string[])[]) factors)
 		{
 			List<(string, (int, int))> factorsInSample = FactorsInSample();
-			int amountControlActions = _sampleControlActions.CountControlActions(factors.Item1);
+			int amountControlActions = _sampleControlActions.AmountControlActions(factors.Item1);
 			List<(string, (string, bool)[])> schemeFromDataBase = _catalogReader.SchemeFromDataBase;
 
 			foreach (string scheme in _catalogReader.AllScheme)
@@ -104,12 +112,12 @@ namespace OutputFileStructure
 				_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForScheme, columnNumberForScheme].Value = numberScheme;
 				_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForScheme, columnNumberForScheme + 1].Value = nameScheme;
 				int rowNumberForFactor = rowNumberForScheme;
+				int temperatureMerge = CountTemperatureMerge(CountDisturbances(nameScheme, schemeFromDataBase), amountControlActions);
 				
 				FactorsCombinations factorsCombinations;
-				int temperatureMerge = CountTemperatureMerge(CountDisturbances(nameScheme, schemeFromDataBase), amountControlActions);
 				if (_temperatureDependence)
 				{
-					factorsCombinations = new FactorsCombinations(factors, factorsInSample, _catalogReader.Temperature,
+					factorsCombinations = new FactorsCombinations(factors, factorsInSample, _temperature,
 						temperatureMerge);
 				}
 				else
@@ -117,17 +125,19 @@ namespace OutputFileStructure
 					factorsCombinations = new FactorsCombinations(factors, factorsInSample,
 						temperatureMerge);
 				}
-				string[] factorList = factorsCombinations.FactorMixed;
+				string[,] factorList = factorsCombinations.FactorMixed;
 
 				int rowNumberForFactors = rowNumberForScheme;
 
 				rowNumberForScheme = FillFactors(columnNumberForScheme + 2, rowNumberForScheme, factorList);
 
+				
 				for (int i = 0; i < factorsInSample.Count; i++)
 				{
 					TextDecor.FactorCellsUnion(rowNumberForFactors, factorsInSample[0].Item2.Item2 + i,
-						_temperatureDependence, _catalogReader.Temperature.Count, temperatureMerge, ref _excelPackage);
+						_temperatureDependence, _temperature.Length, temperatureMerge, ref _excelPackage);
 				}
+				
 
 			}
 			return rowNumberForScheme;
@@ -137,7 +147,7 @@ namespace OutputFileStructure
 		{
 			foreach((string,(string,bool)[]) schemeFromDataBase in schemesFromDataBase)
 			{
-				if (namescheme == schemeFromDataBase.Item1)
+				if (namescheme.Trim().ToLower() == schemeFromDataBase.Item1.Trim().ToLower())
 				{
 					return schemeFromDataBase.Item2.Length;
 				}
@@ -150,7 +160,7 @@ namespace OutputFileStructure
 			int outputNumber;
 			if(amountControlActions>0)
 			{
-				outputNumber= amountDisturbance + 2 * amountControlActions + 4;
+				outputNumber = amountDisturbance + 2 * amountControlActions + 4;
 			}
 			else
 			{
@@ -159,18 +169,17 @@ namespace OutputFileStructure
 			return outputNumber;
 		}
 
-		private int FillFactors(int columnNumberForFactors, int rowNumberForFactor, string[] factors)
+		private int FillFactors(int columnNumberForFactors, int rowNumberForFactor, string[,] factors)
 		{
-			foreach (string factorRow in factors)
+			for(int indexRow = 0; indexRow < factors.GetLength(0);indexRow++)
 			{
-				string[] factorsToCell = factorRow.Split("_");
-				for(int i=0; i< factorsToCell.Length;i++)
+				for(int indexColumn=0; indexColumn< factors.GetLength(1); indexColumn++)
 				{
-					_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForFactor, columnNumberForFactors + i].Value = factorsToCell[i];
+					_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForFactor+ indexRow, columnNumberForFactors + indexColumn].Value = factors[indexRow, indexColumn];
 				}
-				rowNumberForFactor = rowNumberForFactor + 1;
 			}
-			return rowNumberForFactor;
+
+			return rowNumberForFactor+ factors.GetLength(0);
 		}
 
 		
@@ -217,9 +226,9 @@ namespace OutputFileStructure
 
 		
 
-		private void SaveSampleWithStructure(ExcelPackage excelPackage)
+		private void SaveSampleWithStructure(string path, ExcelPackage excelPackage)
 		{
-			FileInfo file = new FileInfo(_path + @$"\Сформированная структура.xlsx");
+			FileInfo file = new FileInfo(path + @$"\Сформированная структура.xlsx");
 			excelPackage.SaveAs(file);
 		}
 	}

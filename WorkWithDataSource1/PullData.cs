@@ -199,6 +199,7 @@ namespace WorkWithDataSource
 					if (!firstSchemeFlag)
 					{
 						_schemes.Add((compareScheme, (disturbance)));
+						disturbance = new (string, bool)[0];
 					}
 					compareScheme = reader.GetString(0);
 				}

@@ -12,7 +12,7 @@ namespace OutputFileStructure
 		public SampleControlActions(ExcelPackage excelPackage)
 		{
 			_controlActionsWithDirections = new List<(string, List<(int, int)>)>();
-			countControlActions(excelPackage);
+			CountControlActions(excelPackage);
 		}
 
 		/// <summary>
@@ -21,7 +21,7 @@ namespace OutputFileStructure
 		/// </summary>
 		public List<(string, List<(int, int)>)> ControlActionsWithDirection => _controlActionsWithDirections;
 
-		private void countControlActions(ExcelPackage excelPackage)
+		private void CountControlActions(ExcelPackage excelPackage)
 		{
 			(int, int) firstCell = FindCellWithNeededText(excelPackage, "идентификатор");
 			(int, int) cellWithDirection = FindCellWithNeededText(excelPackage, "направление перетока");
@@ -86,7 +86,7 @@ namespace OutputFileStructure
 			throw new Exception("Вкладка УВ НБ шаблона не заполнена");
 		}
 
-		public int CountControlActions(string direction)
+		public int AmountControlActions(string direction)
 		{
 			foreach((string, List<(int, int)>) directionWithCells in ControlActionsWithDirection)
 			{
