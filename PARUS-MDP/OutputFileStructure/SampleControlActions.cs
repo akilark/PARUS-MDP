@@ -66,7 +66,7 @@ namespace OutputFileStructure
 			}
 
 		}
-		public (int,int) FindCellWithNeededText(ExcelPackage excelPackage, string text)
+		private (int,int) FindCellWithNeededText(ExcelPackage excelPackage, string text)
 		{
 			text = text.Trim().ToLower();
 			for (int rowIndex = 1; rowIndex < 10; rowIndex++)

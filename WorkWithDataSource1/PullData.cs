@@ -32,6 +32,9 @@ namespace WorkWithDataSource
 		{
 			_sectionName = sectionName;
 			_sqlConnectionString = new DataBaseAutentification();
+			PullSections();
+			PullFactors();
+			PullSchemes();
 		}
 
 		/// <summary>
@@ -52,7 +55,7 @@ namespace WorkWithDataSource
 		/// <summary>
 		/// Метод для заполнения списка факторов из БД
 		/// </summary>
-		public void PullFactors()
+		private void PullFactors()
 		{
 			string sqlExpression = @$"SELECT  Factors.Direction, Factors.Factor, Factors.FactorValue
 				FROM [dbo].[Sections], [dbo].[Factors]
@@ -63,7 +66,7 @@ namespace WorkWithDataSource
 		/// <summary>
 		/// Метод для заполнения списка контролируемых сечений из БД
 		/// </summary>
-		public void PullSections()
+		private void PullSections()
 		{
 			string sqlExpression = @$"SELECT Sections.Section FROM [dbo].[Sections]";
 			ConnectWithDataBase(sqlExpression, DataType.Section);
@@ -72,7 +75,7 @@ namespace WorkWithDataSource
 		/// <summary>
 		/// Метод для заполнения списка схем из БД
 		/// </summary>
-		public void PullSchemes()
+		private void PullSchemes()
 		{
 			string sqlExpression = @$"SELECT Schemes.Scheme, Schemes.Disturbance, Schemes.Automation
 				FROM [dbo].[Schemes],[dbo].[Sections]

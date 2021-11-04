@@ -11,10 +11,6 @@ namespace WorkWithDataSource
 		static void Main(string[] args)
 		{
 			PullData pull = new PullData("Тест_1");
-			pull.PullFactors();
-			pull.PullSchemes();
-			pull.PullSections();
-
 			List<string> sections = pull.Sections;
 
 			//ChangeData pushSection = new ChangeData("Камала- Красноярская");

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Text; 
 
 namespace OutputFileStructure
 {
@@ -8,54 +8,22 @@ namespace OutputFileStructure
 	{
 		private string[,] _factorsMixed;
 		private string[] _temperature;
-
+		
 		public FactorsCombinations((string, (string, string[])[]) factorsFromFolder, 
 			List<(string, (int, int))> factorsFromSample, int temperatureMerge)
 		{
-			_factorsMixed = GenerateFactorMatrix(CompareFolderAndSample(factorsFromFolder, factorsFromSample, false), temperatureMerge);
+			_factorsMixed = GenerateFactorMatrix(Comparator.CompareFactors(factorsFromFolder, factorsFromSample, false ,new string[0]), temperatureMerge);
 		}
 
 		public FactorsCombinations((string, (string, string[])[]) factorsFromFolder, 
 			List<(string, (int, int))> factorsFromSample, string[] temperature, int temperatureMerge)
 		{
 			_temperature = temperature;
-			_factorsMixed = GenerateFactorMatrix(CompareFolderAndSample(factorsFromFolder, factorsFromSample, true), temperatureMerge);
+			_factorsMixed = GenerateFactorMatrix(Comparator.CompareFactors(factorsFromFolder, factorsFromSample, true, temperature), temperatureMerge);
 		}
 
 		public string[,] FactorMixed => _factorsMixed;
 
-		private List<(string, string[])> CompareFolderAndSample((string, (string, string[])[]) factorsFromFolder, 
-			List<(string, (int, int))> factorsFromSample, bool temperatureDependence)
-		{
-			List<(string, string[])> factorList = new List<(string, string[])>();
-			for (int i = 0; i < factorsFromSample.Count; i++)
-			{
-				bool addFlag = false;
-				foreach ((string, string[]) factorFolder in factorsFromFolder.Item2)
-				{
-					if (factorsFromSample[i].Item1.ToLower().Trim() == factorFolder.Item1.ToLower().Trim())
-					{
-						factorList.Add(factorFolder);
-						addFlag = true;
-					}
-				}
-				if (temperatureDependence && i == factorsFromSample.Count - 1)
-				{
-					break;
-				}
-				if (!addFlag)
-				{
-					(string, string[]) emptyString = (factorsFromSample[i].Item1, new string[] { "-" });
-					factorList.Add(emptyString);
-				}
-			}
-			if (temperatureDependence)
-			{
-				(string, string[]) temperatureString = ("Температура", _temperature);
-				factorList.Add(temperatureString);
-			}
-			return factorList;
-		}
 
 		private string[,] GenerateFactorMatrix(List<(string, string[])> factors, int temperatureMerge)
 		{
@@ -101,7 +69,15 @@ namespace OutputFileStructure
 
 					for(int i = 0; i < temperatureMerge; i++)
 					{
-						factorsMixed[addedLines + i, currentFactor] = factors[currentFactor].Item2[factorIndex];
+						if(i == 0)
+						{
+							factorsMixed[addedLines + i, currentFactor] = factors[currentFactor].Item2[factorIndex];
+						}
+						else
+						{
+							factorsMixed[addedLines + i, currentFactor] = "";
+						}
+						
 					}
 						
 					counterUnitInArea++;

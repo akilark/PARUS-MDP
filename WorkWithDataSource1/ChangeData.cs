@@ -16,7 +16,7 @@ namespace WorkWithDataSource
 		private string _disturbance;
 		private int _automatics;
 		private DataType _dataType;
-		private DataBaseAutentification _sqlConnectionString;
+		private DataBaseAutentification _sqlConnection;
 
 		/// <summary>
 		/// Конструктор класса для добавления/удаления сечения в БД
@@ -26,7 +26,7 @@ namespace WorkWithDataSource
 		{
 			_sectionName = SectionName;
 			_dataType = DataType.Section;
-			_sqlConnectionString = new DataBaseAutentification();
+			_sqlConnection = new DataBaseAutentification();
 		}
 
 		/// <summary>
@@ -47,7 +47,7 @@ namespace WorkWithDataSource
 			_factor = Factor;
 			_factorValue = FactorValue;
 			_dataType = DataType.Factor;
-			_sqlConnectionString = new DataBaseAutentification();
+			_sqlConnection = new DataBaseAutentification();
 		}
 
 		/// <summary>
@@ -76,7 +76,7 @@ namespace WorkWithDataSource
 				_automatics = 0;
 			}
 			_dataType = DataType.Scheme;
-			_sqlConnectionString = new DataBaseAutentification();
+			_sqlConnection = new DataBaseAutentification();
 		}
 
 		/// <summary>
@@ -86,7 +86,7 @@ namespace WorkWithDataSource
 		/// <returns>Численное значение</returns>
 		private int ConnectWithDataBaseID(string sqlExpression)
 		{
-			using (SqlConnection connection = new SqlConnection(_sqlConnectionString.GetStringForConnect()))
+			using (SqlConnection connection = new SqlConnection(_sqlConnection.GetStringForConnect()))
 			{
 				connection.Open();
 				SqlCommand command = new SqlCommand(sqlExpression, connection);
@@ -276,7 +276,7 @@ namespace WorkWithDataSource
 		/// <param name="sqlExpression">SQL запрос</param>
 		private void ExecuteExpression(string sqlExpression)
 		{
-			using (SqlConnection connection = new SqlConnection(_sqlConnectionString.GetStringForConnect()))
+			using (SqlConnection connection = new SqlConnection(_sqlConnection.GetStringForConnect()))
 			{
 				connection.Open();
 				SqlCommand command = new SqlCommand(sqlExpression, connection);

@@ -17,7 +17,7 @@ namespace WorkWithCatalog
 		private string[] _allScheme;
 		private List<(string, (string, bool)[])> _schemesFromDataBase;
 		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
-		private List<string> _temperature = new List<string>();
+		private string[] _temperature = new string[0];
 
 		/// <summary>
 		/// Свойство хранящее имя сечения
@@ -39,7 +39,7 @@ namespace WorkWithCatalog
 		/// <summary>
 		/// Свойство хранящее сведения о температурах
 		/// </summary>
-		public List<string> Temperature => _temperature;
+		public string[] Temperature => _temperature;
 
 		/// <summary>
 		/// Конструктор класса с 1 параметром
@@ -53,7 +53,6 @@ namespace WorkWithCatalog
 
 			//проверка соединения (добавить)
 			PullData pullData = new PullData(_rootName);
-			pullData.PullSchemes();
 			bool dataBaseConected = true;
 			if(dataBaseConected)
 			{
@@ -170,14 +169,15 @@ namespace WorkWithCatalog
 		/// <param name="factorsPath">путь к нижней папке в каталоге</param>
 		private void FindTemperature(string factorsPath)
 		{
-			var directorysArray = Directory.GetFiles(factorsPath, @"*.xlsx");
-			if (directorysArray.Length != 0)
+			var filesArray = Directory.GetFiles(factorsPath, @"*.xlsx");
+			if (filesArray.Length != 0)
 			{
-				FileInfo fileInfo = new FileInfo(directorysArray[0]);
+				FileInfo fileInfo = new FileInfo(filesArray[0]);
 				ExcelPackage excelPackage = new ExcelPackage(fileInfo);
+				_temperature = new string[excelPackage.Workbook.Worksheets.Count];
 				for (int i = 0; i < excelPackage.Workbook.Worksheets.Count; i++)
 				{
-					_temperature.Add(excelPackage.Workbook.Worksheets[i].Name);
+					_temperature[i] = (excelPackage.Workbook.Worksheets[i].Name);
 				}
 			}
 		}

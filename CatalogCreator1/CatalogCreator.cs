@@ -266,7 +266,7 @@ namespace WorkWithCatalog
 			foreach (string factorValue in factors[0].Item2)
 			{
 				var pathFactor = Path.Combine(pathDirection,
-					"[" + factorValue + "]" + " " + factors[0].Item1);
+					"[" + factorValue + "]" + factors[0].Item1);
 				Directory.CreateDirectory(pathFactor);
 			}
 		}
