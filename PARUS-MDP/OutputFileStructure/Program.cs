@@ -10,6 +10,7 @@ namespace OutputFileStructure
 	{
 		static void Main(string[] args)
 		{
+			/*
 			SampleSection sample = new SampleSection(@"C:\test\Тест_1", @"C:\test\Тест_1\Шаблон для теста2.xlsx", new string[] {"20","15","10","5"});
 			FileInfo fileInfo = new FileInfo(@"C:\test\Тест_1\Сформированная структура.xlsx");
 			var excelPackage = new ExcelPackage(fileInfo);
@@ -17,6 +18,17 @@ namespace OutputFileStructure
 			new string[] { "20", "15", "10", "5" });
 			var pad = CG.PathAndDislocation;
 			Console.WriteLine(pad[0].Item1);
+			*/
+
+			FileInfo fileInfo = new FileInfo(@"C:\test\доки после\Вариант 1.xlsx");
+			var excelPackage = new ExcelPackage(fileInfo);
+			WorkSheetInfo workSheetInfo = new WorkSheetInfo(0, excelPackage);
+			string[] tmp = workSheetInfo.AssignedValues;
+			Console.WriteLine(tmp[1]);
+			
+
+			
+			
 		}
 	}
 }

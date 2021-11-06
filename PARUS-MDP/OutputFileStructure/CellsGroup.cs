@@ -9,20 +9,20 @@ namespace OutputFileStructure
 	public class CellsGroup
 	{
 		private string[] _temperature;
-		private List<(string[], (int, int))> _pathAndDislocation;
+		private List<(string[], string, (int, int))> _pathAndDislocation;
 
 		public CellsGroup(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample)
 		{
-			_pathAndDislocation = new List<(string[], (int, int))>();
+			_pathAndDislocation = new List<(string[], string, (int, int))>();
 			JuxtaposePathAndCells(foldersPath, excelPackage, FactorsInSample, false);
 		}
 		public CellsGroup(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample, string[] Temperature)
 		{
-			_pathAndDislocation = new List<(string[], (int, int))>();
+			_pathAndDislocation = new List<(string[], string, (int, int))>();
 			_temperature = Temperature;
 			JuxtaposePathAndCells(foldersPath, excelPackage, FactorsInSample, true);
 		}
-		public List<(string[], (int, int))> PathAndDislocation => _pathAndDislocation;
+		public List<(string[], string, (int, int))> PathAndDislocation => _pathAndDislocation;
 
 		private void JuxtaposePathAndCells(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample,
 			bool temperatureDependence)
@@ -34,17 +34,10 @@ namespace OutputFileStructure
 			while (true)
 			{
 				rowIndex = nextRowIndex;
-				if (temperatureDependence)
-				{
-					int indexTmp = findNextRowForFactors(rowIndex,
-						FactorsInSample[FactorsInSample.Count - substractor].Item2.Item2, excelPackage);
-					nextRowIndex = (indexTmp - rowIndex) * _temperature.Length + rowIndex;
-				}
-				else
-				{
-					nextRowIndex = findNextRowForFactors(rowIndex,
-						FactorsInSample[FactorsInSample.Count - substractor].Item2.Item2, excelPackage);
-				}
+				
+				nextRowIndex = findNextRowForFactors(rowIndex,
+					FactorsInSample[FactorsInSample.Count - substractor].Item2.Item2, excelPackage);
+				
 				if(nextRowIndex == rowIndex)
 				{
 					break;
@@ -62,12 +55,13 @@ namespace OutputFileStructure
 				}
 				Permutation(factors.ToArray(), 0, ref factors);
 
+				string schemeName = FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 1, excelPackage);
+				//TODO добавть Try catch.
 				string[] xlsxFilesFolder = FindFolderForCellsGroup(foldersPath,
 					FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 3, excelPackage),
-					FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 2, excelPackage) + "_" +
-					FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 1, excelPackage),
+					FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 2, excelPackage) + "_" + schemeName,
 					factors);
-				_pathAndDislocation.Add((xlsxFilesFolder,(rowIndex, FactorsInSample[FactorsInSample.Count - 1].Item2.Item2 + 1)));
+				_pathAndDislocation.Add((xlsxFilesFolder, schemeName, (rowIndex, FactorsInSample[FactorsInSample.Count - 1].Item2.Item2 + 1)));
 			}
 		}
 
