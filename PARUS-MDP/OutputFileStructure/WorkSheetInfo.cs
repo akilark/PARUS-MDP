@@ -7,196 +7,165 @@ namespace OutputFileStructure
 {
 	public class WorkSheetInfo
 	{
-		private string[] _maximumAllowPowerFlow;
-		private List<string[]> _maximumAllowPowerFlowNonBalance;
-		private List<float> _equationNonBalance;
+		private MaximumAllowPowerFlow _maximumAllowPowerFlow;
+		private List<Imbalance> _maximumAllowPowerFlowNonBalance;
+		private AllowPowerOverflows _allowPowerOverflow;
 
-		public WorkSheetInfo(int workSheetNumber, string repairScheme, string[] nonBalances, ExcelPackage excelPackagePARUS)
+		public WorkSheetInfo(string repairScheme, int noRegularOscilation, List<ControlAction> controlActionInSample, ExcelWorksheet excelWorksheetPARUS)
 		{
 			Inizialize();
-			int startRow = FindScheme(repairScheme, workSheetNumber, excelPackagePARUS) + 1;
-			MaximumAllowPowerFlowDefine(startRow, workSheetNumber, nonBalances, excelPackagePARUS);
+			int startRow = FindScheme(repairScheme, excelWorksheetPARUS) + 1;
+			MainMethod(startRow, controlActionInSample, noRegularOscilation, excelWorksheetPARUS);
 		}
-		public WorkSheetInfo(int workSheetNumber, string[] nonBalances, ExcelPackage excelPackagePARUS)
+		public WorkSheetInfo(int noRegularOscilation, List<ControlAction> controlActionInSample, ExcelWorksheet excelWorksheetPARUS)
 		{
 			Inizialize();
 			int startRow = 9;
-			MaximumAllowPowerFlowDefine(startRow, workSheetNumber,nonBalances, excelPackagePARUS);
+			MainMethod(startRow, controlActionInSample, noRegularOscilation, excelWorksheetPARUS);
 		}
-		/// <summary>
-		/// 0- Значение МДП без ПА;
-		/// 1- Критерий определения МДП без ПА;
-		/// 2- Значение АДП;
-		/// 3- Критерий определения АДП без ПА;
-		/// </summary>
-		public string[] MaximumAllowPowerFlow => _maximumAllowPowerFlow;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public List<string[]> MaximumAllowPowerFlowNonBalance => _maximumAllowPowerFlowNonBalance;
+		public MaximumAllowPowerFlow MaximumAllowPowerFlow => _maximumAllowPowerFlow;
 
-		public List<float> EquationNonBalance => _equationNonBalance;
+
+		public List<Imbalance> MaximumAllowPowerFlowNonBalance => _maximumAllowPowerFlowNonBalance;
+
 
 		private void Inizialize()
 		{
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 		}
 
-		private void MaximumAllowPowerFlowDefine(int startRow, int workSheetNumber, string[] nonBalances, ExcelPackage excelPackagePARUS)
+		private void MainMethod(int startRow, List<ControlAction> controlActionInSample,
+			int noRegularOscilation, ExcelWorksheet excelWorksheetPARUS)
 		{
-			_maximumAllowPowerFlow = new string[4];
-			var normal = NormalSchemeResults(startRow, workSheetNumber, excelPackagePARUS);
-			_maximumAllowPowerFlow[2] = normal[6];
-			_maximumAllowPowerFlow[3] = "8% P исходная схема";
-
+			_allowPowerOverflow = NormalSchemeResults(startRow, excelWorksheetPARUS);
 			int headRow = startRow + 3;
-			if (excelPackagePARUS.Workbook.Worksheets[workSheetNumber].Cells[headRow, 1].Value != null)
+			if (excelWorksheetPARUS.Cells[headRow, 1].Value != null)
 			{
-				var bodyRowsAfterFault = FindBodyRowAfterFault(headRow, workSheetNumber, excelPackagePARUS);
-				List<(string, List<int>)> maximumAllowFlow = new List<(string, List<int>)>();
+				var bodyRowsAfterFault = FindBodyRowDisconnectionLineFact(headRow, excelWorksheetPARUS);
+				List<(string, List<int>)> disconnectionLineFacts = new List<(string, List<int>)>();
+				List<(string, List<int>)> disconnectionLineFactsWithControlAction = new List<(string, List<int>)>();
 				for (int i = 0; i < bodyRowsAfterFault.Count; i++)
 				{
-					if (!IsInSample(bodyRowsAfterFault[i].Item1, nonBalances))
+					if (IsInSample(bodyRowsAfterFault[i].Item1, controlActionInSample))
 					{
-						maximumAllowFlow.Add(bodyRowsAfterFault[i]);
-					}
-				}
-				foreach ((string, List<int>) bodyRow in maximumAllowFlow)
-				{
-					var emergency = MaximumAllowPowerFlowDefinition(headRow, workSheetNumber,bodyRow, nonBalances, excelPackagePARUS);
-
-					List<string> criteria = new List<string> { emergency[0], emergency[2], emergency[3], normal[2] };
-					for(int i = 0; i < criteria.Count; i ++)
-					{
-						if (int.TryParse(criteria[i], out int criterion))
-						{
-							if(criterion > 0)
-							{
-								if (_maximumAllowPowerFlow[0] == null)
-								{
-									_maximumAllowPowerFlow[0] = criterion.ToString();
-									_maximumAllowPowerFlow[1] = DefiningCriteria(i, emergency[1], bodyRow.Item1);
-								}
-								else
-								{
-									if (int.Parse(_maximumAllowPowerFlow[0]) > criterion)
-									{
-										_maximumAllowPowerFlow[0] = criterion.ToString();
-										_maximumAllowPowerFlow[1] = DefiningCriteria(i, emergency[1], bodyRow.Item1);
-									}
-								}
-							}
-						}
-					}
-				}
-			}				
-		}
-
-		private void MaximumAllowPowerFlowNonBalanceDefine(int startRow, int workSheetNumber, 
-			string[] nonBalances, int noRegularOscilation, ExcelPackage excelPackagePARUS, List<(string, int, int)> nonBalanceInSample, ExcelPackage excelPackageSample)
-		{
-			_maximumAllowPowerFlowNonBalance = new List<string[]>();
-			int headRow = startRow + 3;
-			if (excelPackagePARUS.Workbook.Worksheets[workSheetNumber].Cells[headRow, 1].Value != null)
-			{
-				var bodyRowsAfterFault = FindBodyRowAfterFault(headRow, workSheetNumber, excelPackagePARUS);
-				List<(string, List<int>)> maximumAllowFlowNonBalance = new List<(string, List<int>)>();
-				for (int i = 0; i < bodyRowsAfterFault.Count; i++)
-				{
-					if (IsInSample(bodyRowsAfterFault[i].Item1, nonBalances))
-					{
-						maximumAllowFlowNonBalance.Add(bodyRowsAfterFault[i]);
-					}
-				}
-
-				foreach ((string, List<int>) bodyRow in maximumAllowFlowNonBalance)
-				{
-					int nonBalanceValue=0;
-					string nonBalanceCriterion ="";
-					if (maximumAllowFlowNonBalance.Count == nonBalances.Length)
-					{
-						var emergency = MaximumAllowPowerFlowDefinition(headRow, workSheetNumber, bodyRow, nonBalances, excelPackagePARUS);
-						List<string> criteria = new List<string> { emergency[0], emergency[2], emergency[3] };
-						for (int i = 0; i < criteria.Count; i++)
-						{
-							if (int.TryParse(criteria[i], out int criterion))
-							{
-								if (criterion > 0)
-								{
-									if (nonBalanceValue == 0)
-									{
-										nonBalanceValue = criterion;
-										nonBalanceCriterion = DefiningCriteria(i, emergency[1], bodyRow.Item1);
-									}
-									else
-									{
-										if (nonBalanceValue > criterion)
-										{
-											nonBalanceValue = criterion;
-											nonBalanceCriterion = DefiningCriteria(i, emergency[1], bodyRow.Item1);
-										}
-									}
-								}
-							}
-						}
+						disconnectionLineFactsWithControlAction.Add(bodyRowsAfterFault[i]);
 					}
 					else
 					{
-						var normal = NormalSchemeResults(startRow, workSheetNumber, excelPackagePARUS);
-
-						nonBalanceValue = int.Parse(normal[6]) - noRegularOscilation;
-						nonBalanceCriterion = $"8%P ПАР '{bodyRow.Item1}'";
+						disconnectionLineFacts.Add(bodyRowsAfterFault[i]);
 					}
-
-					var efficiencyCoefficient = DefiningEfficiencyCoefficient(nonBalanceInSample, bodyRow.Item1, excelPackageSample);
-					if (CompareAllowPowerFlowWithNonBalanceEquation(
-						efficiencyCoefficient,
-						nonBalanceValue,
-						int.Parse(MaximumAllowPowerFlow[0])))
-					{
-						string[] outputArray = new string[]
-						{ nonBalanceValue.ToString() + "-" + efficiencyCoefficient.Item1.ToString() + "*" + bodyRow.Item1,
-								nonBalanceCriterion };
-						_maximumAllowPowerFlowNonBalance.Add(outputArray);
-					}
-
 				}
-				
+				MaximumAllowPowerFlowDefine(headRow, disconnectionLineFacts, excelWorksheetPARUS);
+				MaximumAllowPowerFlowControlActionDefine(headRow, noRegularOscilation,
+					controlActionInSample, disconnectionLineFactsWithControlAction, excelWorksheetPARUS);
 			}
 		}
 
-		private bool CompareAllowPowerFlowWithNonBalanceEquation((float, int) efficiencyCoefficient, int nonBalanceValue, int maximumAllowPowerFlow)
+		private void MaximumAllowPowerFlowDefine(int headRow, List<(string, List<int>)> disconnectionLineFacts, 
+			ExcelWorksheet excelWorksheetPARUS)
 		{
-			float equationResult = nonBalanceValue - efficiencyCoefficient.Item2 * efficiencyCoefficient.Item1;
-			_equationNonBalance.Add(equationResult);
+			_maximumAllowPowerFlow = new MaximumAllowPowerFlow();
+			_maximumAllowPowerFlow.EmergencyAllowPowerFlowValue = _allowPowerOverflow.EmergencyAllowPowerOverflow;
+			_maximumAllowPowerFlow.EmergencyAllowPowerCriterion = "8% P исходная схема";
+						
+			foreach ((string, List<int>) disconnectionLineFact in disconnectionLineFacts)
+			{
+				//заменить
+				var emergency = MaximumAllowPowerFlowDefinition(headRow, disconnectionLineFact, excelWorksheetPARUS);
+
+				List<int> criteria = new List<int> { emergency.CurrentLoadLinesValue,
+						emergency.StaticStabilityPostEmergency, emergency.StabilityVoltageValue, _allowPowerOverflow.StaticStabilityNormal };
+				for(int i = 0; i < criteria.Count; i ++)
+				{
+					if(criteria[i] > 0)
+					{
+						if (_maximumAllowPowerFlow.MaximumAllowPowerFlowValue == 0 || 
+							_maximumAllowPowerFlow.MaximumAllowPowerFlowValue > criteria[i])
+						{
+							_maximumAllowPowerFlow.MaximumAllowPowerFlowValue = criteria[i];
+							_maximumAllowPowerFlow.MaximumAllowPowerCriterion = DefiningCriteria(i, emergency.CurrentLoadLinesCriterion, disconnectionLineFact.Item1);
+						}
+					}
+				}
+			}		
+		}
+
+		private void MaximumAllowPowerFlowControlActionDefine(int headRow, int noRegularOscilation, 
+			List<ControlAction> controlActionsInSample, List<(string, List<int>)> disconnectionLineFactsWithControlAction,
+			ExcelWorksheet excelWorksheetPARUS)
+		{
+			_maximumAllowPowerFlowNonBalance = new List<Imbalance>();
+
+			foreach ((string, List<int>) bodyRow in disconnectionLineFactsWithControlAction)
+			{
+				Imbalance imbalance = new Imbalance();
+
+				if (disconnectionLineFactsWithControlAction.Count == controlActionsInSample.Count)
+				{
+					var emergency = MaximumAllowPowerFlowDefinition(headRow, bodyRow, excelWorksheetPARUS);
+					List<int> criteria = new List<int> { emergency.CurrentLoadLinesValue, 
+						emergency.StaticStabilityPostEmergency, emergency.StabilityVoltageValue };
+					for (int i = 0; i < criteria.Count; i++)
+					{
+						
+						if (criteria[i] > 0)
+						{
+							if (imbalance.ImbalanceValue == 0 || imbalance.ImbalanceValue > criteria[i])
+							{
+								imbalance.ImbalanceValue = criteria[i];
+								imbalance.ImbalanceCriterion = DefiningCriteria(i, emergency.CurrentLoadLinesCriterion, bodyRow.Item1);
+							}
+						}
+					}
+				}
+				else
+				{
+					imbalance.ImbalanceValue = _allowPowerOverflow.EmergencyAllowPowerOverflow - noRegularOscilation;
+					imbalance.ImbalanceCriterion = $"8%P ПАР '{bodyRow.Item1}'";
+				}
+
+				var controlAction = FindRightControlAction(controlActionsInSample, bodyRow.Item1);
+				imbalance.ImbalanceCoefficient = controlAction.CoefficientEfficiency;
+				imbalance.MaximumImbalance = controlAction.ActivePowerControlActionMax;
+				var compare = CompareAllowPowerFlowWithImbalanceEquation(controlAction.CoefficientEfficiency,
+					controlAction.ActivePowerControlActionMax, imbalance.ImbalanceValue, _maximumAllowPowerFlow.MaximumAllowPowerFlowValue);
+				imbalance.EquationValue = compare.Item2;
+				if (compare.Item1)
+				{
+					imbalance.Equation = imbalance.ImbalanceValue.ToString() + "-" + 
+						controlAction.CoefficientEfficiency.ToString() + "*" + bodyRow.Item1;
+					
+					_maximumAllowPowerFlowNonBalance.Add(imbalance);
+				}
+			}
+		}
+
+		private (bool, float) CompareAllowPowerFlowWithImbalanceEquation(float coefficientEfficiency,
+			int activePowerControlActionMax, int nonBalanceValue, int maximumAllowPowerFlow)
+		{
+			float equationResult = nonBalanceValue - activePowerControlActionMax * coefficientEfficiency;
+			
 			if(maximumAllowPowerFlow > equationResult)
 			{
-				return true;
+				return (true, equationResult);
 			}
 			else
 			{
-				return false;
+				return (false, equationResult);
 			}
 		}
 
-		private (float, int) DefiningEfficiencyCoefficient(List<(string, int, int)> nonBalanceInSample, string disconnectionLineFact, 
-			ExcelPackage excelPackageSample)
+		private ControlAction FindRightControlAction(List<ControlAction> controlActions, string disconnectionLineFact)
 		{
-			var worksheet = excelPackageSample.Workbook.Worksheets[1];
-			float coefficientNonBalance = 0;
-			int activePoverNonBalanceMax = 0;
-			for (int i = 0; i < nonBalanceInSample.Count; i++)
+			for (int i = 0; i < controlActions.Count; i++)
 			{
-				if(nonBalanceInSample[i].Item1 == disconnectionLineFact)
+				if(disconnectionLineFact == controlActions[i].ParamID)
 				{
-					coefficientNonBalance = 
-						float.Parse(worksheet.Cells[nonBalanceInSample[i].Item2, nonBalanceInSample[i].Item3 + 3].Value.ToString());
-					activePoverNonBalanceMax = 
-						int.Parse(worksheet.Cells[nonBalanceInSample[i].Item2, nonBalanceInSample[i].Item3 + 2].Value.ToString());
+					return controlActions[i];
 				}
 			}
-			return (coefficientNonBalance, activePoverNonBalanceMax);
+			throw new Exception($"УВ {disconnectionLineFact} нет в файле шаблона ");
 		}
 
 		private string DefiningCriteria(int index, string currentCriteria, string disconectionLineFactName)
@@ -227,121 +196,150 @@ namespace OutputFileStructure
 		}
 
 
-		private string[] NormalSchemeResults(int startRow, int workSheetNumber, ExcelPackage excelPackagePARUS)
+		private AllowPowerOverflows NormalSchemeResults(int startRow, ExcelWorksheet excelWorksheetPARUS)
 		{
 
 			string[] columnsNameBeforeFault =
 				new string[] { "Рсеч-Рно, МВт", "Перегружаемый элемент", "Рпред*0,8-Pно", "Р(Uкр/0.85)-Рно", "Узел", "Рпред" };
 			string[] assignedValuesBeforeFault = new string[columnsNameBeforeFault.Length + 1];
 
-			for (int columnBefore = 0; columnBefore < columnsNameBeforeFault.Length; columnBefore++)
-			{
-				try
-				{
-					assignedValuesBeforeFault[columnBefore] = RoundAndMultiply(
-					FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[columnBefore], workSheetNumber, excelPackagePARUS),
-					1);
-				}
-				catch
-				{
-
-				}
-			}
 			assignedValuesBeforeFault[assignedValuesBeforeFault.Length - 1] =
 				RoundAndMultiply(assignedValuesBeforeFault[assignedValuesBeforeFault.Length - 2], 0.92);
+			AllowPowerOverflows allowPowerOverflows = new AllowPowerOverflows();
+			//переделать во что-то красивое
+			try
+			{
+				allowPowerOverflows.CurrentLoadLinesValue = int.Parse(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[0], excelWorksheetPARUS));
+			}
+			catch { }
+			try
+			{
+				allowPowerOverflows.CurrentLoadLinesCriterion = FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[1], excelWorksheetPARUS);
+			}
+			catch { }
+			try
+			{
+				allowPowerOverflows.StaticStabilityNormal = int.Parse(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[2], excelWorksheetPARUS));
+			}
+			catch { }
+			try
+			{
+				allowPowerOverflows.StabilityVoltageValue = int.Parse(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[3], excelWorksheetPARUS));
+			}
+			catch { }
+			try
+			{
+				allowPowerOverflows.StabilityVoltageCriterion = FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[4], excelWorksheetPARUS);
+			}
+			catch { }
+			try
+			{
+				allowPowerOverflows.CriticalValue = int.Parse(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[5], excelWorksheetPARUS));
+			}
+			catch { }
+			
+			allowPowerOverflows.EmergencyAllowPowerOverflow = int.Parse((allowPowerOverflows.CriticalValue * 0.92).ToString());
 
-			return assignedValuesBeforeFault;
+			return allowPowerOverflows;
 		}
 
-		private string[] MaximumAllowPowerFlowDefinition(int headRow, int workSheetNumber, 
-			(string, List<int>) bodyRowAfterFault, string[] paramIdentificator, ExcelPackage excelPackagePARUS)
+		private AllowPowerOverflows MaximumAllowPowerFlowDefinition(int headRow,
+			(string, List<int>) bodyRowAfterFault, ExcelWorksheet excelWorksheetPARUS)
 		{
-			var outputArray = DisconnectionLineFact(headRow, workSheetNumber, bodyRowAfterFault.Item2, excelPackagePARUS);
-			Array.Resize(ref outputArray, outputArray.Length + 1);
-			outputArray[outputArray.Length - 1] = bodyRowAfterFault.Item1;
+			var outputArray = DisconnectionLineFact(headRow, bodyRowAfterFault.Item2, excelWorksheetPARUS);
+			outputArray.DisconnectionLineFact = bodyRowAfterFault.Item1;
 			return outputArray;
 		}
 
-		private string[] DisconnectionLineFact(int headRow, int workSheetNumber,
-			List<int> bodyRowAfterFault, ExcelPackage excelPackagePARUS)
+		private AllowPowerOverflows DisconnectionLineFact(int headRow,
+			List<int> bodyRowAfterFault, ExcelWorksheet excelWorksheetPARUS)
 		{
 			string[] columnsNameAfterFault =
 				new string[] { "Рсеч-Рно, МВт", "Перегружаемый элемент", "Рдоав8%-Pно", "Рда(Uкр/0.9)-Рно", "Примечание" };
 
-			string[] valuesAfterFault = new string[columnsNameAfterFault.Length];
+			AllowPowerOverflows valuesAfterFault = new AllowPowerOverflows();
 
 			for (int valueNumber = 0; valueNumber < bodyRowAfterFault.Count; valueNumber++)
 			{
-				string[] valuesAfterFaultTmp = new string[columnsNameAfterFault.Length];
-				for (int columnAfter = 0; columnAfter < columnsNameAfterFault.Length; columnAfter++)
+				AllowPowerOverflows valuesAfterFaultTmp = new AllowPowerOverflows();
+				try
+				{
+					valuesAfterFaultTmp.StaticStabilityPostEmergency = int.Parse(FindCellValue(headRow, bodyRowAfterFault[valueNumber],
+							columnsNameAfterFault[2], excelWorksheetPARUS));
+					if (valuesAfterFault.StaticStabilityPostEmergency > valuesAfterFaultTmp.StaticStabilityPostEmergency ||
+						valuesAfterFault.StaticStabilityPostEmergency == 0)
+					{
+						valuesAfterFault.StaticStabilityPostEmergency = valuesAfterFaultTmp.StaticStabilityPostEmergency;
+					}
+				}
+				catch { }
+				try
+				{
+					valuesAfterFaultTmp.StabilityVoltageValue = int.Parse(FindCellValue(headRow, bodyRowAfterFault[valueNumber],
+							columnsNameAfterFault[3], excelWorksheetPARUS));
+					if (valuesAfterFault.StabilityVoltageValue > valuesAfterFaultTmp.StabilityVoltageValue ||
+						valuesAfterFault.StabilityVoltageValue == 0)
+					{
+						valuesAfterFault.StabilityVoltageValue = valuesAfterFaultTmp.StabilityVoltageValue;
+					}
+				}
+				catch { }
+				try
+				{
+					valuesAfterFaultTmp.Note = FindCellValue(headRow, bodyRowAfterFault[valueNumber],
+							columnsNameAfterFault[4], excelWorksheetPARUS);
+				}
+				catch { }
+				try
+				{
+					valuesAfterFaultTmp.CurrentLoadLinesCriterion = FindCellValue(headRow, bodyRowAfterFault[valueNumber],
+													columnsNameAfterFault[1], excelWorksheetPARUS);
+				}
+				catch { }
+
+				if (valuesAfterFaultTmp.Note != "АОПО" &&
+					valuesAfterFaultTmp.CurrentLoadLinesCriterion != "Токовых перегрузов нет")
 				{
 					try
 					{
-						valuesAfterFaultTmp[columnAfter] = FindCellValue(headRow, bodyRowAfterFault[valueNumber],
-							columnsNameAfterFault[columnAfter], workSheetNumber, excelPackagePARUS);
-					}
-					catch
-					{
-
-					}
-					
-				}
-				
-				for (int i = 0; i < columnsNameAfterFault.Length; i++)
-				{
-					if (i == 0 && (valuesAfterFaultTmp[4] == "АОПО" ||
-						valuesAfterFaultTmp[1] == "Токовых перегрузов нет"))
-					{
-						continue;
-					}
-					if (valuesAfterFault[i] == null)
-					{
-						valuesAfterFault[i] = RoundAndMultiply(valuesAfterFaultTmp[i], 1);
-					}
-
-					int valueTmp;
-					if (!int.TryParse(RoundAndMultiply(valuesAfterFaultTmp[i], 1), out valueTmp))
-					{
-						continue;
-					}
-					if (int.Parse(valuesAfterFault[i]) > valueTmp)
-					{
-						valuesAfterFault[i] = valuesAfterFaultTmp[i];
-						if (i == 0)
+						valuesAfterFaultTmp.CurrentLoadLinesValue = int.Parse(FindCellValue(headRow, bodyRowAfterFault[valueNumber],
+								columnsNameAfterFault[0], excelWorksheetPARUS));
+						if (valuesAfterFault.CurrentLoadLinesValue > valuesAfterFaultTmp.CurrentLoadLinesValue ||
+							valuesAfterFault.CurrentLoadLinesValue == 0)
 						{
-							valuesAfterFault[1] = valuesAfterFaultTmp[1];
+							valuesAfterFault.CurrentLoadLinesValue = valuesAfterFaultTmp.CurrentLoadLinesValue;
+							valuesAfterFault.CurrentLoadLinesCriterion = valuesAfterFaultTmp.CurrentLoadLinesCriterion;
 						}
 					}
+					catch { }
 				}
 			}
-			Array.Resize(ref valuesAfterFault, valuesAfterFault.Length - 1);
+
 			return valuesAfterFault;
 		}
 
-		private string FindCellValue(int headRow, int bodyRow, string columnName, int workSheetNumber, ExcelPackage excelPackagePARUS)
+		private string FindCellValue(int headRow, int bodyRow, string columnName, ExcelWorksheet excelWorksheetPARUS)
 		{
-			var workSheet = excelPackagePARUS.Workbook.Worksheets[workSheetNumber];
-			var columnIndex = FindColumn(headRow, columnName, workSheetNumber, excelPackagePARUS);
+			var columnIndex = FindColumn(headRow, columnName, excelWorksheetPARUS);
 	
 
-			if (workSheet.Cells[bodyRow, columnIndex].Value == null)
+			if (excelWorksheetPARUS.Cells[bodyRow, columnIndex].Value == null)
 			{
-				throw new Exception($"Данные в ячейке {workSheet.Cells[bodyRow, columnIndex]} отсутствуют");
+				throw new Exception($"Данные в ячейке {excelWorksheetPARUS.Cells[bodyRow, columnIndex]} отсутствуют");
 			}
 
-			return workSheet.Cells[bodyRow, columnIndex].Value.ToString();
+			return excelWorksheetPARUS.Cells[bodyRow, columnIndex].Value.ToString();
 				
 					
 		}
 
-		private int FindColumn(int headRow, string columnName, int workSheetNumber, ExcelPackage excelPackagePARUS)
+		private int FindColumn(int headRow, string columnName, ExcelWorksheet excelWorksheetPARUS)
 		{
-			var workSheet = excelPackagePARUS.Workbook.Worksheets[workSheetNumber];
 			for (int i = 2; i < 50; i++)
 			{
-				if (workSheet.Cells[headRow, i].Value != null)
+				if (excelWorksheetPARUS.Cells[headRow, i].Value != null)
 				{
-					if (workSheet.Cells[headRow, i].Value.ToString() == columnName)
+					if (excelWorksheetPARUS.Cells[headRow, i].Value.ToString() == columnName)
 					{
 						return i;
 					}
@@ -350,7 +348,7 @@ namespace OutputFileStructure
 			throw new Exception($"В строке {headRow} нет ячейки с текстом {columnName}");
 		}
 
-		private int FindScheme(string repairScheme, int workSheetNumber, ExcelPackage excelPackagePARUS)
+		private int FindScheme(string repairScheme, ExcelWorksheet excelWorksheetPARUS)
 		{
 			string[] textSeparators = new string[] { "ремонт ", "ремонта " };
 			repairScheme.Trim();
@@ -363,24 +361,24 @@ namespace OutputFileStructure
 					schemeName = repairSchemeSplit[repairSchemeSplit.Length - 1];
 				}
 			}
-			int rowNumber = FindRow("Схема Ремонта", 9, 1, workSheetNumber, excelPackagePARUS);
+			int rowNumber = FindRow("Схема Ремонта", 9, 1, excelWorksheetPARUS);
 			while(rowNumber != 0)
 			{
-				object CellValue = excelPackagePARUS.Workbook.Worksheets[workSheetNumber].Cells[rowNumber, 1].Value;
+				object CellValue = excelWorksheetPARUS.Cells[rowNumber, 1].Value;
 				if (CellValue.ToString().ToLower().Contains(schemeName))
 				{
 					return rowNumber;
 				}
-				rowNumber = FindRow("Схема Ремонта", rowNumber, 1, workSheetNumber, excelPackagePARUS);
+				rowNumber = FindRow("Схема Ремонта", rowNumber, 1, excelWorksheetPARUS);
 			}
-			throw new Exception($"Схемы {schemeName} на листе {excelPackagePARUS.Workbook.Worksheets[workSheetNumber].Name} нет");
+			throw new Exception($"Схемы {schemeName} на листе {excelWorksheetPARUS.Name} нет");
 		}
 
-		private int FindRow(string textInColumn, int startRow, int column, int workSheetNumber, ExcelPackage excelPackagePARUS)
+		private int FindRow(string textInColumn, int startRow, int column, ExcelWorksheet excelWorksheetPARUS)
 		{
 			for (int i = startRow + 1; i < startRow + 1000; i++)
 			{
-				object CellValue = excelPackagePARUS.Workbook.Worksheets[workSheetNumber].Cells[i, column].Value;
+				object CellValue = excelWorksheetPARUS.Cells[i, column].Value;
 				if (CellValue != null)
 				{
 					if (CellValue.ToString().Contains(textInColumn))
@@ -406,15 +404,15 @@ namespace OutputFileStructure
 			
 		}
 
-		private List<(string, List<int>)> FindBodyRowAfterFault(int headRow, int workSheetNumber, ExcelPackage excelPackagePARUS)
+		private List<(string, List<int>)> FindBodyRowDisconnectionLineFact(int headRow, ExcelWorksheet excelWorksheetPARUS)
 		{
 			var outputList = new List<(string, List<int>)>();
 
-			if (excelPackagePARUS.Workbook.Worksheets[workSheetNumber].Cells[headRow, 1].Value.ToString() != "Послеаварийный режим")
+			if (excelWorksheetPARUS.Cells[headRow, 1].Value.ToString() != "Послеаварийный режим")
 			{
 				return outputList;
 			}
-			object cellValue = excelPackagePARUS.Workbook.Worksheets[workSheetNumber].Cells[headRow + 1, 1].Value;
+			object cellValue = excelWorksheetPARUS.Cells[headRow + 1, 1].Value;
 			int index = 1;
 			while (cellValue !=null)
 			{
@@ -428,19 +426,19 @@ namespace OutputFileStructure
 				outputList[outputList.Count - 1].Item2.Add(headRow + index);
 
 				index += 1;
-				cellValue = excelPackagePARUS.Workbook.Worksheets[workSheetNumber].Cells[headRow + index, 1].Value;
+				cellValue = excelWorksheetPARUS.Cells[headRow + index, 1].Value;
 				if(cellValue == null)
 				{
-					int overlodedElementColumn = FindColumn(headRow, "Перегружаемый элемент", workSheetNumber, excelPackagePARUS);
+					int overlodedElementColumn = FindColumn(headRow, "Перегружаемый элемент", excelWorksheetPARUS);
 					object overlodedElementValue =
-						excelPackagePARUS.Workbook.Worksheets[workSheetNumber].Cells[headRow + index, overlodedElementColumn].Value;
+						excelWorksheetPARUS.Cells[headRow + index, overlodedElementColumn].Value;
 					while (overlodedElementValue != null && cellValue == null)
 					{
 						outputList[outputList.Count - 1].Item2.Add(headRow + index);
 						index += 1;
 						overlodedElementValue =
-							excelPackagePARUS.Workbook.Worksheets[workSheetNumber].Cells[headRow + index, overlodedElementColumn].Value;
-						cellValue = excelPackagePARUS.Workbook.Worksheets[workSheetNumber].Cells[headRow + index, 1].Value;
+							excelWorksheetPARUS.Cells[headRow + index, overlodedElementColumn].Value;
+						cellValue = excelWorksheetPARUS.Cells[headRow + index, 1].Value;
 
 					}
 				}
@@ -448,11 +446,11 @@ namespace OutputFileStructure
 			return outputList;
 		}
 
-		private bool IsInSample(string afterFault, string[] paramIdentificatorSample)
+		private bool IsInSample(string afterFault, List<ControlAction> controlActionInSample)
 		{
-			foreach(string paramIdentificator in paramIdentificatorSample)
+			foreach(ControlAction controlAction in controlActionInSample)
 			{
-				if(afterFault == paramIdentificator)
+				if(controlAction.ParamID == afterFault)
 				{
 					return true;
 				}

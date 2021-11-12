@@ -8,10 +8,10 @@ namespace OutputFileStructure
 	public class SampleControlActions
 	{
 
-		private List<(string, List<(string,int,int)>)> _controlActionsWithDirections;
+		private List<(string, List<ControlAction>)> _controlActionsWithDirections;
 		public SampleControlActions(ExcelPackage excelPackage)
 		{
-			_controlActionsWithDirections = new List<(string, List<(string, int, int)>)>();
+			_controlActionsWithDirections = new List<(string, List<ControlAction>)>();
 			CountControlActions(excelPackage);
 		}
 
@@ -19,10 +19,12 @@ namespace OutputFileStructure
 		/// Получение списка управляющих воздействий в следующем формате 
 		/// List<(Направление перетока,List<(строка,столбец с направлением перетока)>)>
 		/// </summary>
-		public List<(string, List<(string,int, int)>)> ControlActionsWithDirection => _controlActionsWithDirections;
+		public List<(string, List<ControlAction>)> ControlActionsWithDirection => _controlActionsWithDirections;
+
 
 		private void CountControlActions(ExcelPackage excelPackage)
 		{
+			var worksheet = excelPackage.Workbook.Worksheets[1];
 			(int, int) firstCell = FindCellWithNeededText(excelPackage, "идентификатор");
 			(int, int) cellWithDirection = FindCellWithNeededText(excelPackage, "направление перетока");
 			bool endTable = false;  
@@ -30,15 +32,22 @@ namespace OutputFileStructure
 			while(!endTable)
 			{
 				index = index + 1;
-				if(excelPackage.Workbook.Worksheets[1].Cells[cellWithDirection.Item1 + index,cellWithDirection.Item2].Value != null)
+				if(worksheet.Cells[cellWithDirection.Item1 + index,cellWithDirection.Item2].Value != null)
 				{
-					string direction = excelPackage.Workbook.Worksheets[1].Cells[cellWithDirection.Item1 + index, cellWithDirection.Item2].
+					ControlAction controlAction = new ControlAction();
+					string direction = worksheet.Cells[cellWithDirection.Item1 + index, cellWithDirection.Item2].
 						Value.ToString().Trim();
-					string param = excelPackage.Workbook.Worksheets[1].Cells[cellWithDirection.Item1 + index, firstCell.Item2].
+					controlAction.ParamID = worksheet.Cells[cellWithDirection.Item1 + index, firstCell.Item2].
 						Value.ToString().Trim();
+					controlAction.CoefficientEfficiency = float.Parse(
+						worksheet.Cells[cellWithDirection.Item1 + index, cellWithDirection.Item2 + 3].Value.ToString());
+					controlAction.ActivePowerControlActionMax = int.Parse(
+						worksheet.Cells[cellWithDirection.Item1 + index, cellWithDirection.Item2 + 2].Value.ToString());
+					
+
 					if (_controlActionsWithDirections.Count == 0)
 					{
-						_controlActionsWithDirections.Add((direction,new List<(string, int, int)>()));
+						_controlActionsWithDirections.Add((direction,new List<ControlAction>()));
 						
 					}
 					bool uniqueFlag = true;
@@ -47,13 +56,15 @@ namespace OutputFileStructure
 						if(direction == _controlActionsWithDirections[i].Item1)
 						{
 							uniqueFlag = false;
-							_controlActionsWithDirections[i].Item2.Add((param, cellWithDirection.Item1 + index, cellWithDirection.Item2));
+							controlAction.IDCell = (cellWithDirection.Item1 + index, firstCell.Item2);
+							_controlActionsWithDirections[i].Item2.Add(controlAction);
 						}
 					}
 					if (uniqueFlag)
 					{
-						_controlActionsWithDirections.Add((direction, new List<(string, int, int)>()));
-						_controlActionsWithDirections[_controlActionsWithDirections.Count-1].Item2.Add((param,cellWithDirection.Item1 + index, cellWithDirection.Item2));
+						controlAction.IDCell = (cellWithDirection.Item1 + index, firstCell.Item2);
+						_controlActionsWithDirections.Add((direction, new List<ControlAction>()));
+						_controlActionsWithDirections[_controlActionsWithDirections.Count-1].Item2.Add(controlAction);
 					}
 					
 				}
@@ -90,7 +101,7 @@ namespace OutputFileStructure
 
 		public int AmountControlActions(string direction)
 		{
-			foreach((string, List<(string, int, int)>) directionWithCells in ControlActionsWithDirection)
+			foreach((string, List<ControlAction>) directionWithCells in ControlActionsWithDirection)
 			{
 				if(direction.Trim().ToLower() == directionWithCells.Item1.Trim().ToLower())
 				{

@@ -22,7 +22,7 @@ namespace OutputFileStructure
 
 			FileInfo fileInfo = new FileInfo(@"C:\test\доки после\Вариант 1.xlsx");
 			var excelPackage = new ExcelPackage(fileInfo);
-			WorkSheetInfo workSheetInfo = new WorkSheetInfo(0, new string[] {"ВЛ 3"}, excelPackage);
+			
 		
 			
 		}
