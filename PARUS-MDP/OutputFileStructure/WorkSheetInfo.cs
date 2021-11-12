@@ -14,13 +14,16 @@ namespace OutputFileStructure
 		public WorkSheetInfo(string repairScheme, int noRegularOscilation, List<ControlAction> controlActionInSample, ExcelWorksheet excelWorksheetPARUS)
 		{
 			Inizialize();
-			int startRow = FindScheme(repairScheme, excelWorksheetPARUS) + 1;
-			MainMethod(startRow, controlActionInSample, noRegularOscilation, excelWorksheetPARUS);
-		}
-		public WorkSheetInfo(int noRegularOscilation, List<ControlAction> controlActionInSample, ExcelWorksheet excelWorksheetPARUS)
-		{
-			Inizialize();
-			int startRow = 9;
+			int startRow;
+			if (repairScheme == "Нормальная схема")
+			{
+				startRow = 9;
+			}
+			else
+			{
+				startRow = FindScheme(repairScheme, excelWorksheetPARUS) + 1;
+			}
+			
 			MainMethod(startRow, controlActionInSample, noRegularOscilation, excelWorksheetPARUS);
 		}
 
@@ -29,6 +32,7 @@ namespace OutputFileStructure
 
 		public List<Imbalance> MaximumAllowPowerFlowNonBalance => _maximumAllowPowerFlowNonBalance;
 
+		public AllowPowerOverflows AllowPowerOverflow => _allowPowerOverflow;
 
 		private void Inizialize()
 		{
@@ -71,7 +75,7 @@ namespace OutputFileStructure
 						
 			foreach ((string, List<int>) disconnectionLineFact in disconnectionLineFacts)
 			{
-				//заменить
+				
 				var emergency = MaximumAllowPowerFlowDefinition(headRow, disconnectionLineFact, excelWorksheetPARUS);
 
 				List<int> criteria = new List<int> { emergency.CurrentLoadLinesValue,
@@ -100,7 +104,7 @@ namespace OutputFileStructure
 			foreach ((string, List<int>) bodyRow in disconnectionLineFactsWithControlAction)
 			{
 				Imbalance imbalance = new Imbalance();
-
+				//Проверка несостоятельная заменить на поэлементное сравнение
 				if (disconnectionLineFactsWithControlAction.Count == controlActionsInSample.Count)
 				{
 					var emergency = MaximumAllowPowerFlowDefinition(headRow, bodyRow, excelWorksheetPARUS);

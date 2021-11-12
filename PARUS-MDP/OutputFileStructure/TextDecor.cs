@@ -5,6 +5,7 @@ using OfficeOpenXml;
 
 namespace OutputFileStructure
 {
+	//убрать или сделать не статичным
 	public static class TextDecor
 	{
 		public static void FactorCellsUnion(int row, int column,bool temperatureUse, int temperatureCount, int temperatureMerge, ref ExcelPackage excelPackage)
