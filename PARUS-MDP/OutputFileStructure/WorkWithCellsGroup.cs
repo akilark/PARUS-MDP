@@ -58,14 +58,20 @@ namespace OutputFileStructure
 				Permutation(factors.ToArray(), 0, ref factors);
 
 				string schemeName = FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 1, excelPackage);
+				string direction = FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 3, excelPackage);
 				cellsGroup.SchemeName = schemeName;
+				cellsGroup.Direction = direction;
+				if(temperatureDependence)
+				{
+					cellsGroup.Temperature = int.Parse(FindPreviousText(rowIndex, FactorsInSample[FactorsInSample.Count - 1].Item2.Item2, excelPackage));
+				}
 				//TODO добавть Try catch.
-				string[] xlsxFilesFolder = FindFolderForCellsGroup(foldersPath,
-					FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 3, excelPackage),
+				string[] xlsxFilesFolder = FindFolderForCellsGroup(foldersPath, direction,
 					FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 2, excelPackage) + "_" + schemeName,
 					factors);
 				cellsGroup.Folders = xlsxFilesFolder;
 				cellsGroup.StartID = (rowIndex, FactorsInSample[FactorsInSample.Count - 1].Item2.Item2 + 1);
+				
 				int size = FindNextRowForFactors(nextRowIndex,
 					FactorsInSample[FactorsInSample.Count - substractor].Item2.Item2, excelPackage) - nextRowIndex -1;
 				if(size == 0)

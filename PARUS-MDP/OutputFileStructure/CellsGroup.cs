@@ -18,5 +18,7 @@ namespace OutputFileStructure
 		public int SizeCellsArea { get; set; }
 		
 		public (int, int) StartID { get; set; }
+
+		public int Temperature { get; set; }
 	}
 }

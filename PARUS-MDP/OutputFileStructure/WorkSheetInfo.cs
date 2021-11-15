@@ -104,7 +104,7 @@ namespace OutputFileStructure
 			foreach ((string, List<int>) bodyRow in disconnectionLineFactsWithControlAction)
 			{
 				Imbalance imbalance = new Imbalance();
-				//Проверка несостоятельная заменить на поэлементное сравнение
+				
 				if (disconnectionLineFactsWithControlAction.Count == controlActionsInSample.Count)
 				{
 					var emergency = MaximumAllowPowerFlowDefinition(headRow, bodyRow, excelWorksheetPARUS);
@@ -213,7 +213,8 @@ namespace OutputFileStructure
 			//переделать во что-то красивое
 			try
 			{
-				allowPowerOverflows.CurrentLoadLinesValue = int.Parse(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[0], excelWorksheetPARUS));
+				
+				allowPowerOverflows.CurrentLoadLinesValue = int.Parse(RoundAndMultiply(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[0], excelWorksheetPARUS),1));
 			}
 			catch { }
 			try
@@ -223,12 +224,12 @@ namespace OutputFileStructure
 			catch { }
 			try
 			{
-				allowPowerOverflows.StaticStabilityNormal = int.Parse(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[2], excelWorksheetPARUS));
+				allowPowerOverflows.StaticStabilityNormal = int.Parse(RoundAndMultiply(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[2], excelWorksheetPARUS),1));
 			}
 			catch { }
 			try
 			{
-				allowPowerOverflows.StabilityVoltageValue = int.Parse(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[3], excelWorksheetPARUS));
+				allowPowerOverflows.StabilityVoltageValue = int.Parse(RoundAndMultiply(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[3], excelWorksheetPARUS),1));
 			}
 			catch { }
 			try
@@ -238,11 +239,11 @@ namespace OutputFileStructure
 			catch { }
 			try
 			{
-				allowPowerOverflows.CriticalValue = int.Parse(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[5], excelWorksheetPARUS));
+				allowPowerOverflows.CriticalValue = int.Parse(RoundAndMultiply(FindCellValue(startRow, startRow + 1, columnsNameBeforeFault[5], excelWorksheetPARUS),1));
 			}
 			catch { }
 			
-			allowPowerOverflows.EmergencyAllowPowerOverflow = int.Parse((allowPowerOverflows.CriticalValue * 0.92).ToString());
+			allowPowerOverflows.EmergencyAllowPowerOverflow = int.Parse(RoundAndMultiply((allowPowerOverflows.CriticalValue).ToString(),0.92));
 
 			return allowPowerOverflows;
 		}
@@ -268,8 +269,9 @@ namespace OutputFileStructure
 				AllowPowerOverflows valuesAfterFaultTmp = new AllowPowerOverflows();
 				try
 				{
-					valuesAfterFaultTmp.StaticStabilityPostEmergency = int.Parse(FindCellValue(headRow, bodyRowAfterFault[valueNumber],
-							columnsNameAfterFault[2], excelWorksheetPARUS));
+					
+					valuesAfterFaultTmp.StaticStabilityPostEmergency = int.Parse(RoundAndMultiply(FindCellValue(headRow, bodyRowAfterFault[valueNumber],
+							columnsNameAfterFault[2], excelWorksheetPARUS),1));
 					if (valuesAfterFault.StaticStabilityPostEmergency > valuesAfterFaultTmp.StaticStabilityPostEmergency ||
 						valuesAfterFault.StaticStabilityPostEmergency == 0)
 					{
@@ -279,8 +281,8 @@ namespace OutputFileStructure
 				catch { }
 				try
 				{
-					valuesAfterFaultTmp.StabilityVoltageValue = int.Parse(FindCellValue(headRow, bodyRowAfterFault[valueNumber],
-							columnsNameAfterFault[3], excelWorksheetPARUS));
+					valuesAfterFaultTmp.StabilityVoltageValue = int.Parse(RoundAndMultiply(FindCellValue(headRow, bodyRowAfterFault[valueNumber],
+							columnsNameAfterFault[3], excelWorksheetPARUS),1));
 					if (valuesAfterFault.StabilityVoltageValue > valuesAfterFaultTmp.StabilityVoltageValue ||
 						valuesAfterFault.StabilityVoltageValue == 0)
 					{
@@ -306,8 +308,8 @@ namespace OutputFileStructure
 				{
 					try
 					{
-						valuesAfterFaultTmp.CurrentLoadLinesValue = int.Parse(FindCellValue(headRow, bodyRowAfterFault[valueNumber],
-								columnsNameAfterFault[0], excelWorksheetPARUS));
+						valuesAfterFaultTmp.CurrentLoadLinesValue = int.Parse(RoundAndMultiply(FindCellValue(headRow, bodyRowAfterFault[valueNumber],
+								columnsNameAfterFault[0], excelWorksheetPARUS),1));
 						if (valuesAfterFault.CurrentLoadLinesValue > valuesAfterFaultTmp.CurrentLoadLinesValue ||
 							valuesAfterFault.CurrentLoadLinesValue == 0)
 						{

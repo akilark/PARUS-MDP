@@ -10,21 +10,27 @@ namespace OutputFileStructure
 	{
 		static void Main(string[] args)
 		{
-			/*
-			SampleSection sample = new SampleSection(@"C:\test\Тест_1", @"C:\test\Тест_1\Шаблон для теста2.xlsx", new string[] {"20","15","10","5"});
-			FileInfo fileInfo = new FileInfo(@"C:\test\Тест_1\Сформированная структура.xlsx");
+			SampleSection sampleSection = new SampleSection(@"C:\test\Тест_1", @"C:\test\Тест_1\Шаблон для теста2.xlsx", new string[] {"35", "30", "25", "20", "15" });
+			FileInfo fileInfo = new FileInfo(@"C:\test\Тест_1\Шаблон для теста2.xlsx");
 			var excelPackage = new ExcelPackage(fileInfo);
-			CellsGroup CG = new CellsGroup(@"C:\test\Тест_1\", excelPackage, sample.FactorsInSample(),
-			new string[] { "20", "15", "10", "5" });
-			var pad = CG.PathAndDislocation;
-			Console.WriteLine(pad[0].Item1);
-			*/
+			FileInfo fileInfo2 = new FileInfo(@"C:\test\Тест_1\Сформированная структура.xlsx");
+			var excelPackage2 = new ExcelPackage(fileInfo2);
+			WorkWithCellsGroup wwcg = new WorkWithCellsGroup(@"C:\test\Тест_1", excelPackage2, sampleSection.FactorsInSample(), new string[] { "35", "30", "25", "20", "15" });
+			List<CellsGroup> cellsGroups = new List<CellsGroup>();
+			for (int i = 0; i< 5; i ++)
+			{
+				cellsGroups.Add(wwcg.PathAndDislocation[i]);
+			}
+			SampleControlActions sampleControlActions = new SampleControlActions(excelPackage);
 
-			FileInfo fileInfo = new FileInfo(@"C:\test\доки после\Вариант 1.xlsx");
-			var excelPackage = new ExcelPackage(fileInfo);
 			
-		
-			
+
+			InfoFromParusFile infoFromParusFile = new InfoFromParusFile(cellsGroups, sampleControlActions.ControlActionsWithDirection[0].Item2, ref excelPackage2);
+
+
+			FileInfo file = new FileInfo(@$"C:\test\Тест_1\Сформированная структура2.xlsx");
+			excelPackage2.SaveAs(file);
+
 		}
 	}
 }
