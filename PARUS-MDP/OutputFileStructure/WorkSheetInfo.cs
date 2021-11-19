@@ -5,13 +5,15 @@ using OfficeOpenXml;
 
 namespace OutputFileStructure
 {
-	public class WorkSheetInfo
+	public class WorksheetInfo
 	{
 		private MaximumAllowPowerFlow _maximumAllowPowerFlow;
 		private List<Imbalance> _maximumAllowPowerFlowNonBalance;
 		private AllowPowerOverflows _allowPowerOverflow;
+		private MaximumAllowPowerFlowPA _maximumAllowPowerFlowPA;
 
-		public WorkSheetInfo(string repairScheme, int noRegularOscilation, List<ControlAction> controlActionInSample, ExcelWorksheet excelWorksheetPARUS)
+		public WorksheetInfo(string repairScheme, int noRegularOscilation, List<ControlAction> controlActionInSample, 
+			List<ControlAction> AOPOinSample, ExcelWorksheet excelWorksheetPARUS)
 		{
 			Inizialize();
 			int startRow;
@@ -63,7 +65,136 @@ namespace OutputFileStructure
 				MaximumAllowPowerFlowDefine(headRow, disconnectionLineFacts, excelWorksheetPARUS);
 				MaximumAllowPowerFlowControlActionDefine(headRow, noRegularOscilation,
 					controlActionInSample, disconnectionLineFactsWithControlAction, excelWorksheetPARUS);
+				//Для последнего нужен без контролэкшен
 			}
+		}
+
+		private void MaximumAllowPowerFlowDefineWithPA(int headRow, List<(string, List<int>)> disconnectionLineFacts, 
+			List<ControlAction> AOPOinSample, ExcelWorksheet excelWorksheetPARUS)
+		{
+			//убрать глобальную переменную, _maximumAllowPowerFlowPA переделать в List и добавлять в конце цикла это всё.
+			_maximumAllowPowerFlowPA = new MaximumAllowPowerFlowPA();
+			AllowPowerOverflows allowPowerOverflowsLAPNY = new AllowPowerOverflows();
+			AllowPowerOverflows allowPowerOverflowsMDPwithPA = new AllowPowerOverflows();
+			_maximumAllowPowerFlowPA.ValueWithPA = _allowPowerOverflow.StaticStabilityNormal;
+			_maximumAllowPowerFlowPA.CriteriumValueWithPA = "20% P исходная схема";
+			foreach ((string, List<int>) disconnectionLineFact in disconnectionLineFacts)
+			{
+				var emergency = MaximumAllowPowerFlowDefinition(headRow, disconnectionLineFact, excelWorksheetPARUS);
+
+				for (int valueNumber = 0; valueNumber < disconnectionLineFact.Item2.Count; valueNumber++)
+				{
+					string equpmentOverloadingOrVoltageLimiting = FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber],
+								"АОПО/АОСН №", excelWorksheetPARUS);
+					string textValue = DefineTextValue(equpmentOverloadingOrVoltageLimiting);
+					if (textValue == FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber],
+								"Перегружаемый элемент", excelWorksheetPARUS))
+					{
+						if (equpmentOverloadingOrVoltageLimiting.Contains("АОПО"))
+						{
+							if (FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Примечание", excelWorksheetPARUS) != "АОПО" &&
+								FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Примечание", excelWorksheetPARUS) != "Токовых перегрузов нет")
+							{
+								int currentValueTmp = int.Parse(RoundAndMultiply(
+									FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Рсеч-Рно, МВт", excelWorksheetPARUS), 1));
+								if (_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA == 0 ||
+									(_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA > currentValueTmp && currentValueTmp > 0))
+								{
+									_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA = currentValueTmp;
+									_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithoutPA = FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber],
+																	"Перегружаемый элемент", excelWorksheetPARUS);
+									_maximumAllowPowerFlowPA.DisconnectionLineFactEqupmentOverloading = disconnectionLineFact.Item1;
+									_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithtPA = $"АДТН '{_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithoutPA}'" +
+										$" ПАР '{_maximumAllowPowerFlowPA.DisconnectionLineFactEqupmentOverloading}' с учетом объема УВ";
+								}
+
+							}
+
+
+						}
+						else if (equpmentOverloadingOrVoltageLimiting.Contains("АОСН"))
+						{
+							if (FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Примечание", excelWorksheetPARUS) != "АОПО" &&
+								FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Рда(Uкр/0.9)-Рно", excelWorksheetPARUS) != "Критерий по U не достижим")
+							{
+								int voltageValueTmp = int.Parse(RoundAndMultiply(
+								FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Рда(Uкр/0.9)-Рно", excelWorksheetPARUS), 1));
+								if (_maximumAllowPowerFlowPA.VoltageLimitingWithoutPA == 0 ||
+									(_maximumAllowPowerFlowPA.VoltageLimitingWithoutPA > voltageValueTmp && voltageValueTmp > 0))
+								{
+									_maximumAllowPowerFlowPA.VoltageLimitingWithoutPA = voltageValueTmp;
+									_maximumAllowPowerFlowPA.DisconnectionLineFactVoltageLimiting = disconnectionLineFact.Item1;
+									_maximumAllowPowerFlowPA.CriteriumVoltageLimitingWithtPA = $"10% U ПАР '{_maximumAllowPowerFlowPA.DisconnectionLineFactVoltageLimiting}'" +
+										$" с учетом объема УВ";
+								}
+							}
+						}
+					}
+
+					bool flagAOPO = false;
+					foreach(ControlAction controlAction in AOPOinSample)
+					{
+						if (controlAction.ParamID == textValue)
+						{
+							flagAOPO = true;
+							break;
+						}
+					}
+
+					if(flagAOPO)
+					{
+						List<int> criteria = new List<int> { emergency.CurrentLoadLinesValue,
+						emergency.StaticStabilityPostEmergency, emergency.StabilityVoltageValue };
+						for (int i = 0; i < criteria.Count; i++)
+						{
+							if (criteria[i] > 0)
+							{
+								if (_maximumAllowPowerFlowPA.LocalAutomaticValueWitoutPA == 0 ||
+									_maximumAllowPowerFlowPA.LocalAutomaticValueWitoutPA > criteria[i])
+								{
+									_maximumAllowPowerFlowPA.LocalAutomaticValueWitoutPA = criteria[i];
+									_maximumAllowPowerFlowPA.CriteriumLocalAutomaticValueWithoutPA = 
+										DefiningCriteria(i, emergency.CurrentLoadLinesCriterion, disconnectionLineFact.Item1) + " с учетом объема УВ";
+								}
+							}
+						}
+					}
+					else
+					{
+						List<int> criteria = new List<int> { emergency.CurrentLoadLinesValue,
+						emergency.StaticStabilityPostEmergency, emergency.StabilityVoltageValue, emergency.StaticStabilityNormal };
+						for (int i = 0; i < criteria.Count; i++)
+						{
+							if (criteria[i] > 0)
+							{
+								if (_maximumAllowPowerFlowPA.ValueWithPA == 0 ||
+									_maximumAllowPowerFlowPA.ValueWithPA > criteria[i])
+								{
+									_maximumAllowPowerFlowPA.ValueWithPA = criteria[i];
+									_maximumAllowPowerFlowPA.CriteriumValueWithPA = DefiningCriteria(i, emergency.CurrentLoadLinesCriterion, disconnectionLineFact.Item1);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private void MaximumAllowPowerFlowControlActionPADefine(int headRow, int noRegularOscilation,
+			List<ControlAction> controlActionsInSample, List<(string, List<int>)> disconnectionLineFactsWithControlAction,
+			ExcelWorksheet excelWorksheetPARUS)
+		{
+
+		}
+
+		private string DefineTextValue(string equpmentOverloadingOrVoltageLimiting)
+		{
+			int start = equpmentOverloadingOrVoltageLimiting.IndexOf("АО");
+			if(start <= 0)
+			{
+				return "";
+			}
+			return equpmentOverloadingOrVoltageLimiting.Substring(start + 4).Trim();
 		}
 
 		private void MaximumAllowPowerFlowDefine(int headRow, List<(string, List<int>)> disconnectionLineFacts, 
@@ -251,9 +382,9 @@ namespace OutputFileStructure
 		private AllowPowerOverflows MaximumAllowPowerFlowDefinition(int headRow,
 			(string, List<int>) bodyRowAfterFault, ExcelWorksheet excelWorksheetPARUS)
 		{
-			var outputArray = DisconnectionLineFact(headRow, bodyRowAfterFault.Item2, excelWorksheetPARUS);
-			outputArray.DisconnectionLineFact = bodyRowAfterFault.Item1;
-			return outputArray;
+			var outputValue = DisconnectionLineFact(headRow, bodyRowAfterFault.Item2, excelWorksheetPARUS);
+			outputValue.DisconnectionLineFact = bodyRowAfterFault.Item1;
+			return outputValue;
 		}
 
 		private AllowPowerOverflows DisconnectionLineFact(int headRow,
@@ -327,14 +458,15 @@ namespace OutputFileStructure
 		private string FindCellValue(int headRow, int bodyRow, string columnName, ExcelWorksheet excelWorksheetPARUS)
 		{
 			var columnIndex = FindColumn(headRow, columnName, excelWorksheetPARUS);
-	
 
-			if (excelWorksheetPARUS.Cells[bodyRow, columnIndex].Value == null)
+			string outputValue ="";
+
+			if (excelWorksheetPARUS.Cells[bodyRow, columnIndex].Value != null)
 			{
-				throw new Exception($"Данные в ячейке {excelWorksheetPARUS.Cells[bodyRow, columnIndex]} отсутствуют");
+				outputValue = excelWorksheetPARUS.Cells[bodyRow, columnIndex].Value.ToString();
 			}
 
-			return excelWorksheetPARUS.Cells[bodyRow, columnIndex].Value.ToString();
+			return outputValue;
 				
 					
 		}

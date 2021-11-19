@@ -11,7 +11,7 @@ namespace OutputFileStructure
 	{
 		private int _nonRegularOscilation;
 
-		public InfoFromParusFile(List<CellsGroup> cellsGroupManyTemperature, List<ControlAction> sampleControlActions, ref ExcelPackage excelPackageOutputFile)
+		public InfoFromParusFile(List<CellsGroup> cellsGroupManyTemperature, List<ControlAction> sampleControlActions, List<ControlAction> AOPOinSample, ref ExcelPackage excelPackageOutputFile)
 		{
 			var worksheet = excelPackageOutputFile.Workbook.Worksheets[0];
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -28,8 +28,8 @@ namespace OutputFileStructure
 						if(excelPackage.Workbook.Worksheets[i].Name == $"T= {cellsGroupOneTemperature.Temperature}")
 						{
 							flag = true;
-							WorkSheetInfo workSheetInfoTMP = new WorkSheetInfo(cellsGroupOneTemperature.SchemeName, NonRegularOscilation,
-							sampleControlActions, excelPackage.Workbook.Worksheets[i]);
+							WorksheetInfo workSheetInfoTMP = new WorksheetInfo(cellsGroupOneTemperature.SchemeName, NonRegularOscilation,
+							sampleControlActions, AOPOinSample, excelPackage.Workbook.Worksheets[i]);
 							
 							int nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 
@@ -94,7 +94,7 @@ namespace OutputFileStructure
 					Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Medium);
 		}
 
-		private void NeedForControl(WorkSheetInfo workSheetInfo, (int,int) startID, int sizeCellsArea, ref ExcelPackage excelPackageOutputFile)
+		private void NeedForControl(WorksheetInfo workSheetInfo, (int,int) startID, int sizeCellsArea, ref ExcelPackage excelPackageOutputFile)
 		{
 			if (CompareWithImbalance(workSheetInfo.MaximumAllowPowerFlowNonBalance,
 				workSheetInfo.AllowPowerOverflow.StabilityVoltageValue, 

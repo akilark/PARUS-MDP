@@ -8,10 +8,12 @@ namespace OutputFileStructure
 	public class SampleControlActions
 	{
 
-		private List<(string, List<ControlAction>)> _controlActionsWithDirections;
+		private List<(string, List<ControlAction>)> _NBinSample;
+		private List<(string, List<ControlAction>)> _AOPOinSample;
 		public SampleControlActions(ExcelPackage excelPackage)
 		{
-			_controlActionsWithDirections = new List<(string, List<ControlAction>)>();
+			_NBinSample = new List<(string, List<ControlAction>)>();
+			_AOPOinSample = new List<(string, List<ControlAction>)>();
 			CountControlActions(excelPackage);
 		}
 
@@ -19,8 +21,9 @@ namespace OutputFileStructure
 		/// Получение списка управляющих воздействий в следующем формате 
 		/// List<(Направление перетока,List<(строка,столбец с направлением перетока)>)>
 		/// </summary>
-		public List<(string, List<ControlAction>)> ControlActionsWithDirection => _controlActionsWithDirections;
+		public List<(string, List<ControlAction>)> ImbalanceInSample => _NBinSample;
 
+		public List<(string, List<ControlAction>)> AOPOinSample => _AOPOinSample;
 
 		private void CountControlActions(ExcelPackage excelPackage)
 		{
@@ -34,39 +37,14 @@ namespace OutputFileStructure
 				index = index + 1;
 				if(worksheet.Cells[cellWithDirection.Item1 + index,cellWithDirection.Item2].Value != null)
 				{
-					ControlAction controlAction = new ControlAction();
-					string direction = worksheet.Cells[cellWithDirection.Item1 + index, cellWithDirection.Item2].
-						Value.ToString().Trim();
-					controlAction.ParamID = worksheet.Cells[cellWithDirection.Item1 + index, firstCell.Item2].
-						Value.ToString().Trim();
-					controlAction.CoefficientEfficiency = float.Parse(
-						worksheet.Cells[cellWithDirection.Item1 + index, cellWithDirection.Item2 + 3].Value.ToString());
-					controlAction.ActivePowerControlActionMax = int.Parse(
-						worksheet.Cells[cellWithDirection.Item1 + index, cellWithDirection.Item2 + 2].Value.ToString());
-					
-
-					if (_controlActionsWithDirections.Count == 0)
+					if(worksheet.Cells[firstCell.Item1 + index, firstCell.Item2 + 4].Value.ToString().ToLower().Contains("нб"))
 					{
-						_controlActionsWithDirections.Add((direction,new List<ControlAction>()));
-						
+						InfoFromSample((firstCell.Item1 + index, firstCell.Item2),_NBinSample,worksheet);
 					}
-					bool uniqueFlag = true;
-					for(int i = 0; i < _controlActionsWithDirections.Count; i++)
+					if(worksheet.Cells[firstCell.Item1 + index, firstCell.Item2 + 4].Value.ToString().ToLower().Contains("лапну"))
 					{
-						if(direction == _controlActionsWithDirections[i].Item1)
-						{
-							uniqueFlag = false;
-							controlAction.IDCell = (cellWithDirection.Item1 + index, firstCell.Item2);
-							_controlActionsWithDirections[i].Item2.Add(controlAction);
-						}
+						InfoFromSample((firstCell.Item1 + index, firstCell.Item2),_AOPOinSample, worksheet);
 					}
-					if (uniqueFlag)
-					{
-						controlAction.IDCell = (cellWithDirection.Item1 + index, firstCell.Item2);
-						_controlActionsWithDirections.Add((direction, new List<ControlAction>()));
-						_controlActionsWithDirections[_controlActionsWithDirections.Count-1].Item2.Add(controlAction);
-					}
-					
 				}
 				else
 				{
@@ -79,6 +57,43 @@ namespace OutputFileStructure
 			}
 
 		}
+
+		private void InfoFromSample((int, int) firstCell, List<(string, List<ControlAction>)> infoInSample,  ExcelWorksheet worksheet)
+		{
+			
+			ControlAction controlAction = new ControlAction();
+			string direction = worksheet.Cells[firstCell.Item1, firstCell.Item2 + 5].
+				Value.ToString().Trim();
+			controlAction.ParamID = worksheet.Cells[firstCell.Item1, firstCell.Item2].
+				Value.ToString().Trim();
+			controlAction.CoefficientEfficiency = float.Parse(
+				worksheet.Cells[firstCell.Item1, firstCell.Item2 + 8].Value.ToString());
+			controlAction.ActivePowerControlActionMax = int.Parse(
+				worksheet.Cells[firstCell.Item1, firstCell.Item2 + 7].Value.ToString());
+
+			if (infoInSample.Count == 0)
+			{
+				infoInSample.Add((direction, new List<ControlAction>()));
+			}
+			bool uniqueFlag = true;
+			for (int i = 0; i < infoInSample.Count; i++)
+			{
+				if (direction == infoInSample[i].Item1)
+				{
+					uniqueFlag = false;
+					controlAction.IDCell = (firstCell.Item1, firstCell.Item2);
+					infoInSample[i].Item2.Add(controlAction);
+				}
+			}
+			if (uniqueFlag)
+			{
+				controlAction.IDCell = (firstCell.Item1, firstCell.Item2);
+				infoInSample.Add((direction, new List<ControlAction>()));
+				infoInSample[infoInSample.Count - 1].Item2.Add(controlAction);
+			}
+		}
+
+
 		private (int,int) FindCellWithNeededText(ExcelPackage excelPackage, string text)
 		{
 			text = text.Trim().ToLower();
@@ -101,7 +116,7 @@ namespace OutputFileStructure
 
 		public int AmountControlActions(string direction)
 		{
-			foreach((string, List<ControlAction>) directionWithCells in ControlActionsWithDirection)
+			foreach((string, List<ControlAction>) directionWithCells in ImbalanceInSample)
 			{
 				if(direction.Trim().ToLower() == directionWithCells.Item1.Trim().ToLower())
 				{
