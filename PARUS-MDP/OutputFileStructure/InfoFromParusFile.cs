@@ -11,7 +11,7 @@ namespace OutputFileStructure
 	{
 		private int _nonRegularOscilation;
 
-		public InfoFromParusFile(List<CellsGroup> cellsGroupManyTemperature, List<ControlAction> sampleControlActions, List<ControlAction> AOPOinSample, ref ExcelPackage excelPackageOutputFile)
+		public InfoFromParusFile(List<CellsGroup> cellsGroupManyTemperature, List<ControlAction> NBinSample, List<ControlAction> LAPNYinSample, ref ExcelPackage excelPackageOutputFile)
 		{
 			var worksheet = excelPackageOutputFile.Workbook.Worksheets[0];
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -28,8 +28,8 @@ namespace OutputFileStructure
 						if(excelPackage.Workbook.Worksheets[i].Name == $"T= {cellsGroupOneTemperature.Temperature}")
 						{
 							flag = true;
-							WorksheetInfo workSheetInfoTMP = new WorksheetInfo(cellsGroupOneTemperature.SchemeName, NonRegularOscilation,
-							sampleControlActions, AOPOinSample, excelPackage.Workbook.Worksheets[i]);
+							WorksheetInfoWithoutPA workSheetInfoTMP = new WorksheetInfoWithoutPA(cellsGroupOneTemperature.SchemeName, NonRegularOscilation,
+							NBinSample, excelPackage.Workbook.Worksheets[i]);
 							
 							int nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 
@@ -47,7 +47,7 @@ namespace OutputFileStructure
 							MergeColumn((cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea + 1),
 								cellsGroupOneTemperature.StartID.Item2 + 5, ref excelPackageOutputFile);
 							
-							foreach(Imbalance imbalance in workSheetInfoTMP.MaximumAllowPowerFlowNonBalance)
+							foreach(ImbalanceAndAutomatics imbalance in workSheetInfoTMP.MaximumAllowPowerFlowNonBalance)
 							{
 								nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 								InsertText(imbalance.Equation, (nextRow, cellsGroupOneTemperature.StartID.Item2), ref excelPackageOutputFile);
@@ -94,7 +94,7 @@ namespace OutputFileStructure
 					Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Medium);
 		}
 
-		private void NeedForControl(WorksheetInfo workSheetInfo, (int,int) startID, int sizeCellsArea, ref ExcelPackage excelPackageOutputFile)
+		private void NeedForControl(WorksheetInfoWithoutPA workSheetInfo, (int,int) startID, int sizeCellsArea, ref ExcelPackage excelPackageOutputFile)
 		{
 			if (CompareWithImbalance(workSheetInfo.MaximumAllowPowerFlowNonBalance,
 				workSheetInfo.AllowPowerOverflow.StabilityVoltageValue, 
@@ -149,7 +149,7 @@ namespace OutputFileStructure
 			MergeColumn((startID.Item1, startID.Item1 + sizeCellsArea+1), startID.Item2 + 8, ref excelPackageOutputFile);
 		}
 
-		private bool CompareWithImbalance(List<Imbalance> imbalances, int criterium, int maximumAllowPowerFlow, int compareValue)
+		private bool CompareWithImbalance(List<ImbalanceAndAutomatics> imbalances, int criterium, int maximumAllowPowerFlow, int compareValue)
 		{
 			if (compareValue == 0)
 			{

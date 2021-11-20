@@ -10,6 +10,9 @@ namespace OutputFileStructure
 
 		private List<(string, List<ControlAction>)> _NBinSample;
 		private List<(string, List<ControlAction>)> _AOPOinSample;
+		private List<(string, List<ControlAction>)> _ARPMinSample;
+		private List<(string, List<ControlAction>)> _AOCNinSample;
+		private List<(string, List<ControlAction>)> _LAPNYinSample;
 		public SampleControlActions(ExcelPackage excelPackage)
 		{
 			_NBinSample = new List<(string, List<ControlAction>)>();
@@ -24,6 +27,12 @@ namespace OutputFileStructure
 		public List<(string, List<ControlAction>)> ImbalanceInSample => _NBinSample;
 
 		public List<(string, List<ControlAction>)> AOPOinSample => _AOPOinSample;
+
+		public List<(string, List<ControlAction>)> ARPMinSample => _ARPMinSample;
+
+		public List<(string, List<ControlAction>)> AOCNinSample => _AOCNinSample;
+
+		public List<(string, List<ControlAction>)> LAPNYinSample => _LAPNYinSample;
 
 		private void CountControlActions(ExcelPackage excelPackage)
 		{
@@ -43,7 +52,19 @@ namespace OutputFileStructure
 					}
 					if(worksheet.Cells[firstCell.Item1 + index, firstCell.Item2 + 4].Value.ToString().ToLower().Contains("лапну"))
 					{
-						InfoFromSample((firstCell.Item1 + index, firstCell.Item2),_AOPOinSample, worksheet);
+						InfoFromSample((firstCell.Item1 + index, firstCell.Item2),_LAPNYinSample, worksheet);
+					}
+					if (worksheet.Cells[firstCell.Item1 + index, firstCell.Item2 + 4].Value.ToString().ToLower().Contains("аопо"))
+					{
+						InfoFromSample((firstCell.Item1 + index, firstCell.Item2), _AOPOinSample, worksheet);
+					}
+					if (worksheet.Cells[firstCell.Item1 + index, firstCell.Item2 + 4].Value.ToString().ToLower().Contains("арпм"))
+					{
+						InfoFromSample((firstCell.Item1 + index, firstCell.Item2), _ARPMinSample, worksheet);
+					}
+					if (worksheet.Cells[firstCell.Item1 + index, firstCell.Item2 + 4].Value.ToString().ToLower().Contains("аосн"))
+					{
+						InfoFromSample((firstCell.Item1 + index, firstCell.Item2), _AOCNinSample, worksheet);
 					}
 				}
 				else
@@ -70,6 +91,9 @@ namespace OutputFileStructure
 				worksheet.Cells[firstCell.Item1, firstCell.Item2 + 8].Value.ToString());
 			controlAction.ActivePowerControlActionMax = int.Parse(
 				worksheet.Cells[firstCell.Item1, firstCell.Item2 + 7].Value.ToString());
+			controlAction.IDCell = (firstCell.Item1, firstCell.Item2);
+			controlAction.ParamSign = worksheet.Cells[firstCell.Item1, firstCell.Item2 + 4].
+				Value.ToString().Trim();
 
 			if (infoInSample.Count == 0)
 			{
@@ -81,13 +105,11 @@ namespace OutputFileStructure
 				if (direction == infoInSample[i].Item1)
 				{
 					uniqueFlag = false;
-					controlAction.IDCell = (firstCell.Item1, firstCell.Item2);
 					infoInSample[i].Item2.Add(controlAction);
 				}
 			}
 			if (uniqueFlag)
 			{
-				controlAction.IDCell = (firstCell.Item1, firstCell.Item2);
 				infoInSample.Add((direction, new List<ControlAction>()));
 				infoInSample[infoInSample.Count - 1].Item2.Add(controlAction);
 			}

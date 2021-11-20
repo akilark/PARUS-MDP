@@ -27,7 +27,7 @@ namespace OutputFileStructure
 			
 
 			InfoFromParusFile infoFromParusFile = new InfoFromParusFile(cellsGroups, sampleControlActions.ImbalanceInSample[0].Item2,
-				sampleControlActions.AOPOinSample[0].Item2, ref excelPackage2);
+				sampleControlActions.LAPNYinSample[0].Item2, ref excelPackage2);
 
 
 			FileInfo file = new FileInfo(@$"C:\test\Тест_1\Сформированная структура2.xlsx");

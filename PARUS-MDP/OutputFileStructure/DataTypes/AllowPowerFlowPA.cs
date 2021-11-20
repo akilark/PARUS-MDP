@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OutputFileStructure
 {
-	public class MaximumAllowPowerFlowPA
+	public class AllowPowerFlowPA
 	{
 		public int ValueWithPA { get; set; }
 		public int LocalAutomaticValueWitoutPA { get; set; }

@@ -13,5 +13,7 @@ namespace OutputFileStructure
 		public int ActivePowerControlActionMax { get; set; }
 		
 		public (int,int) IDCell { get; set; }
+
+		public string ParamSign { get; set; }
 	}
 }

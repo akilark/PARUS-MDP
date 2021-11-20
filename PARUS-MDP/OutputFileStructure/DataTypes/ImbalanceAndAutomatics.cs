@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OutputFileStructure
 {
-	public class Imbalance
+	public class ImbalanceAndAutomatics
 	{
 		public int ImbalanceValue { get; set; }
 		public string ImbalanceCriterion { get; set; }

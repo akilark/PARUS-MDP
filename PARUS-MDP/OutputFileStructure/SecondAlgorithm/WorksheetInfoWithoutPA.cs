@@ -5,15 +5,14 @@ using OfficeOpenXml;
 
 namespace OutputFileStructure
 {
-	public class WorksheetInfo
+	public class WorksheetInfoWithoutPA
 	{
 		private MaximumAllowPowerFlow _maximumAllowPowerFlow;
-		private List<Imbalance> _maximumAllowPowerFlowNonBalance;
+		private List<ImbalanceAndAutomatics> _maximumAllowPowerFlowNonBalance;
 		private AllowPowerOverflows _allowPowerOverflow;
-		private MaximumAllowPowerFlowPA _maximumAllowPowerFlowPA;
 
-		public WorksheetInfo(string repairScheme, int noRegularOscilation, List<ControlAction> controlActionInSample, 
-			List<ControlAction> AOPOinSample, ExcelWorksheet excelWorksheetPARUS)
+		public WorksheetInfoWithoutPA(string repairScheme, int noRegularOscilation, List<ControlAction> NBinSample, 
+			ExcelWorksheet excelWorksheetPARUS)
 		{
 			Inizialize();
 			int startRow;
@@ -26,13 +25,13 @@ namespace OutputFileStructure
 				startRow = FindScheme(repairScheme, excelWorksheetPARUS) + 1;
 			}
 			
-			MainMethod(startRow, controlActionInSample, noRegularOscilation, excelWorksheetPARUS);
+			MainMethod(startRow, NBinSample, noRegularOscilation, excelWorksheetPARUS);
 		}
 
 		public MaximumAllowPowerFlow MaximumAllowPowerFlow => _maximumAllowPowerFlow;
 
 
-		public List<Imbalance> MaximumAllowPowerFlowNonBalance => _maximumAllowPowerFlowNonBalance;
+		public List<ImbalanceAndAutomatics> MaximumAllowPowerFlowNonBalance => _maximumAllowPowerFlowNonBalance;
 
 		public AllowPowerOverflows AllowPowerOverflow => _allowPowerOverflow;
 
@@ -41,7 +40,7 @@ namespace OutputFileStructure
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 		}
 
-		private void MainMethod(int startRow, List<ControlAction> controlActionInSample,
+		private void MainMethod(int startRow, List<ControlAction> NBinSample,
 			int noRegularOscilation, ExcelWorksheet excelWorksheetPARUS)
 		{
 			_allowPowerOverflow = NormalSchemeResults(startRow, excelWorksheetPARUS);
@@ -53,7 +52,7 @@ namespace OutputFileStructure
 				List<(string, List<int>)> disconnectionLineFactsWithControlAction = new List<(string, List<int>)>();
 				for (int i = 0; i < bodyRowsAfterFault.Count; i++)
 				{
-					if (IsInSample(bodyRowsAfterFault[i].Item1, controlActionInSample))
+					if (IsInSample(bodyRowsAfterFault[i].Item1, NBinSample))
 					{
 						disconnectionLineFactsWithControlAction.Add(bodyRowsAfterFault[i]);
 					}
@@ -64,137 +63,8 @@ namespace OutputFileStructure
 				}
 				MaximumAllowPowerFlowDefine(headRow, disconnectionLineFacts, excelWorksheetPARUS);
 				MaximumAllowPowerFlowControlActionDefine(headRow, noRegularOscilation,
-					controlActionInSample, disconnectionLineFactsWithControlAction, excelWorksheetPARUS);
-				//Для последнего нужен без контролэкшен
+					NBinSample, disconnectionLineFactsWithControlAction, excelWorksheetPARUS);
 			}
-		}
-
-		private void MaximumAllowPowerFlowDefineWithPA(int headRow, List<(string, List<int>)> disconnectionLineFacts, 
-			List<ControlAction> AOPOinSample, ExcelWorksheet excelWorksheetPARUS)
-		{
-			//убрать глобальную переменную, _maximumAllowPowerFlowPA переделать в List и добавлять в конце цикла это всё.
-			_maximumAllowPowerFlowPA = new MaximumAllowPowerFlowPA();
-			AllowPowerOverflows allowPowerOverflowsLAPNY = new AllowPowerOverflows();
-			AllowPowerOverflows allowPowerOverflowsMDPwithPA = new AllowPowerOverflows();
-			_maximumAllowPowerFlowPA.ValueWithPA = _allowPowerOverflow.StaticStabilityNormal;
-			_maximumAllowPowerFlowPA.CriteriumValueWithPA = "20% P исходная схема";
-			foreach ((string, List<int>) disconnectionLineFact in disconnectionLineFacts)
-			{
-				var emergency = MaximumAllowPowerFlowDefinition(headRow, disconnectionLineFact, excelWorksheetPARUS);
-
-				for (int valueNumber = 0; valueNumber < disconnectionLineFact.Item2.Count; valueNumber++)
-				{
-					string equpmentOverloadingOrVoltageLimiting = FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber],
-								"АОПО/АОСН №", excelWorksheetPARUS);
-					string textValue = DefineTextValue(equpmentOverloadingOrVoltageLimiting);
-					if (textValue == FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber],
-								"Перегружаемый элемент", excelWorksheetPARUS))
-					{
-						if (equpmentOverloadingOrVoltageLimiting.Contains("АОПО"))
-						{
-							if (FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Примечание", excelWorksheetPARUS) != "АОПО" &&
-								FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Примечание", excelWorksheetPARUS) != "Токовых перегрузов нет")
-							{
-								int currentValueTmp = int.Parse(RoundAndMultiply(
-									FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Рсеч-Рно, МВт", excelWorksheetPARUS), 1));
-								if (_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA == 0 ||
-									(_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA > currentValueTmp && currentValueTmp > 0))
-								{
-									_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA = currentValueTmp;
-									_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithoutPA = FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber],
-																	"Перегружаемый элемент", excelWorksheetPARUS);
-									_maximumAllowPowerFlowPA.DisconnectionLineFactEqupmentOverloading = disconnectionLineFact.Item1;
-									_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithtPA = $"АДТН '{_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithoutPA}'" +
-										$" ПАР '{_maximumAllowPowerFlowPA.DisconnectionLineFactEqupmentOverloading}' с учетом объема УВ";
-								}
-
-							}
-
-
-						}
-						else if (equpmentOverloadingOrVoltageLimiting.Contains("АОСН"))
-						{
-							if (FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Примечание", excelWorksheetPARUS) != "АОПО" &&
-								FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Рда(Uкр/0.9)-Рно", excelWorksheetPARUS) != "Критерий по U не достижим")
-							{
-								int voltageValueTmp = int.Parse(RoundAndMultiply(
-								FindCellValue(headRow, disconnectionLineFact.Item2[valueNumber], "Рда(Uкр/0.9)-Рно", excelWorksheetPARUS), 1));
-								if (_maximumAllowPowerFlowPA.VoltageLimitingWithoutPA == 0 ||
-									(_maximumAllowPowerFlowPA.VoltageLimitingWithoutPA > voltageValueTmp && voltageValueTmp > 0))
-								{
-									_maximumAllowPowerFlowPA.VoltageLimitingWithoutPA = voltageValueTmp;
-									_maximumAllowPowerFlowPA.DisconnectionLineFactVoltageLimiting = disconnectionLineFact.Item1;
-									_maximumAllowPowerFlowPA.CriteriumVoltageLimitingWithtPA = $"10% U ПАР '{_maximumAllowPowerFlowPA.DisconnectionLineFactVoltageLimiting}'" +
-										$" с учетом объема УВ";
-								}
-							}
-						}
-					}
-
-					bool flagAOPO = false;
-					foreach(ControlAction controlAction in AOPOinSample)
-					{
-						if (controlAction.ParamID == textValue)
-						{
-							flagAOPO = true;
-							break;
-						}
-					}
-
-					if(flagAOPO)
-					{
-						List<int> criteria = new List<int> { emergency.CurrentLoadLinesValue,
-						emergency.StaticStabilityPostEmergency, emergency.StabilityVoltageValue };
-						for (int i = 0; i < criteria.Count; i++)
-						{
-							if (criteria[i] > 0)
-							{
-								if (_maximumAllowPowerFlowPA.LocalAutomaticValueWitoutPA == 0 ||
-									_maximumAllowPowerFlowPA.LocalAutomaticValueWitoutPA > criteria[i])
-								{
-									_maximumAllowPowerFlowPA.LocalAutomaticValueWitoutPA = criteria[i];
-									_maximumAllowPowerFlowPA.CriteriumLocalAutomaticValueWithoutPA = 
-										DefiningCriteria(i, emergency.CurrentLoadLinesCriterion, disconnectionLineFact.Item1) + " с учетом объема УВ";
-								}
-							}
-						}
-					}
-					else
-					{
-						List<int> criteria = new List<int> { emergency.CurrentLoadLinesValue,
-						emergency.StaticStabilityPostEmergency, emergency.StabilityVoltageValue, emergency.StaticStabilityNormal };
-						for (int i = 0; i < criteria.Count; i++)
-						{
-							if (criteria[i] > 0)
-							{
-								if (_maximumAllowPowerFlowPA.ValueWithPA == 0 ||
-									_maximumAllowPowerFlowPA.ValueWithPA > criteria[i])
-								{
-									_maximumAllowPowerFlowPA.ValueWithPA = criteria[i];
-									_maximumAllowPowerFlowPA.CriteriumValueWithPA = DefiningCriteria(i, emergency.CurrentLoadLinesCriterion, disconnectionLineFact.Item1);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		private void MaximumAllowPowerFlowControlActionPADefine(int headRow, int noRegularOscilation,
-			List<ControlAction> controlActionsInSample, List<(string, List<int>)> disconnectionLineFactsWithControlAction,
-			ExcelWorksheet excelWorksheetPARUS)
-		{
-
-		}
-
-		private string DefineTextValue(string equpmentOverloadingOrVoltageLimiting)
-		{
-			int start = equpmentOverloadingOrVoltageLimiting.IndexOf("АО");
-			if(start <= 0)
-			{
-				return "";
-			}
-			return equpmentOverloadingOrVoltageLimiting.Substring(start + 4).Trim();
 		}
 
 		private void MaximumAllowPowerFlowDefine(int headRow, List<(string, List<int>)> disconnectionLineFacts, 
@@ -230,11 +100,11 @@ namespace OutputFileStructure
 			List<ControlAction> controlActionsInSample, List<(string, List<int>)> disconnectionLineFactsWithControlAction,
 			ExcelWorksheet excelWorksheetPARUS)
 		{
-			_maximumAllowPowerFlowNonBalance = new List<Imbalance>();
+			_maximumAllowPowerFlowNonBalance = new List<ImbalanceAndAutomatics>();
 
 			foreach ((string, List<int>) bodyRow in disconnectionLineFactsWithControlAction)
 			{
-				Imbalance imbalance = new Imbalance();
+				ImbalanceAndAutomatics imbalance = new ImbalanceAndAutomatics();
 				
 				if (disconnectionLineFactsWithControlAction.Count == controlActionsInSample.Count)
 				{
@@ -291,11 +161,12 @@ namespace OutputFileStructure
 			}
 		}
 
+
 		private ControlAction FindRightControlAction(List<ControlAction> controlActions, string disconnectionLineFact)
 		{
 			for (int i = 0; i < controlActions.Count; i++)
 			{
-				if(disconnectionLineFact == controlActions[i].ParamID)
+				if (disconnectionLineFact == controlActions[i].ParamID)
 				{
 					return controlActions[i];
 				}
@@ -308,25 +179,25 @@ namespace OutputFileStructure
 			switch (index)
 			{
 				case 0:
-				{
-					return $"АДТН '{currentCriteria}' ПАР '{disconectionLineFactName}'";
-				}
+					{
+						return $"АДТН '{currentCriteria}' ПАР '{disconectionLineFactName}'";
+					}
 				case 1:
-				{
-					return $"8%P ПАР '{disconectionLineFactName}'";
-				}
+					{
+						return $"8%P ПАР '{disconectionLineFactName}'";
+					}
 				case 2:
-				{
-					return $"10%U ПАР '{disconectionLineFactName}'";
-				}
+					{
+						return $"10%U ПАР '{disconectionLineFactName}'";
+					}
 				case 3:
-				{
-					return "20% исходная схема";
-				}
+					{
+						return "20% исходная схема";
+					}
 				default:
-				{
-					throw new Exception("Сравнение критериев не удалось");
-				}
+					{
+						throw new Exception("Сравнение критериев не удалось");
+					}
 			}
 		}
 
