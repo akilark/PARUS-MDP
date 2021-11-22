@@ -17,6 +17,9 @@ namespace OutputFileStructure
 		{
 			_NBinSample = new List<(string, List<ControlAction>)>();
 			_AOPOinSample = new List<(string, List<ControlAction>)>();
+			_AOCNinSample = new List<(string, List<ControlAction>)>();
+			_ARPMinSample = new List<(string, List<ControlAction>)>();
+			_LAPNYinSample = new List<(string, List<ControlAction>)>();
 			CountControlActions(excelPackage);
 		}
 

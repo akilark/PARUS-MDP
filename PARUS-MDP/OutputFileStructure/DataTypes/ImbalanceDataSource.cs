@@ -11,5 +11,7 @@ namespace OutputFileStructure.DataTypes
 		public string ARPMName { get; set; }
 		public ImbalanceAndAutomatics Imbalance { get; set; }
 		public ImbalanceAndAutomatics ARPM { get; set; }
+
+		public ControlAction ControlAction { get; set; }
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using OfficeOpenXml;
-
+using OutputFileStructure.DataTypes;
 
 namespace OutputFileStructure
 {
@@ -11,7 +11,8 @@ namespace OutputFileStructure
 	{
 		private int _nonRegularOscilation;
 
-		public InfoFromParusFile(List<CellsGroup> cellsGroupManyTemperature, List<ControlAction> NBinSample, List<ControlAction> LAPNYinSample, ref ExcelPackage excelPackageOutputFile)
+		public InfoFromParusFile(List<CellsGroup> cellsGroupManyTemperature, List<ControlAction> NBinSample,
+			List<ImbalanceDataSource> imbalanceDataSources, List<ControlAction> LAPNYinSample, ref ExcelPackage excelPackageOutputFile)
 		{
 			var worksheet = excelPackageOutputFile.Workbook.Worksheets[0];
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -29,7 +30,7 @@ namespace OutputFileStructure
 						{
 							flag = true;
 							WorksheetInfoWithoutPA workSheetInfoTMP = new WorksheetInfoWithoutPA(cellsGroupOneTemperature.SchemeName, NonRegularOscilation,
-							NBinSample, excelPackage.Workbook.Worksheets[i]);
+							NBinSample, imbalanceDataSources, excelPackage.Workbook.Worksheets[i]);
 							
 							int nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 

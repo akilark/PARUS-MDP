@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using OfficeOpenXml;
+using OutputFileStructure.DataTypes;
 
 namespace OutputFileStructure
 {
@@ -24,10 +25,10 @@ namespace OutputFileStructure
 			}
 			SampleControlActions sampleControlActions = new SampleControlActions(excelPackage);
 
-			
+			var imbalancesDataSource = new List<ImbalanceDataSource>();
 
 			InfoFromParusFile infoFromParusFile = new InfoFromParusFile(cellsGroups, sampleControlActions.ImbalanceInSample[0].Item2,
-				sampleControlActions.LAPNYinSample[0].Item2, ref excelPackage2);
+				imbalancesDataSource, sampleControlActions.LAPNYinSample[0].Item2, ref excelPackage2);
 
 
 			FileInfo file = new FileInfo(@$"C:\test\Тест_1\Сформированная структура2.xlsx");

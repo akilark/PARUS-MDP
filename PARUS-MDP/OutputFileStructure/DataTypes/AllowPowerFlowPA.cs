@@ -26,5 +26,11 @@ namespace OutputFileStructure
 		public string DisconnectionLineFactVoltageLimiting { get; set; }
 
 		public string CriteriumVoltageLimitingWithtPA { get; set; }
+
+		public List<ControlAction> ControlActionsLAPNY { get; set; }
+
+		public ControlAction ControlActionAOPO { get; set; }
+
+		public ControlAction ControlActionAOCN { get; set; }
 	}
 }

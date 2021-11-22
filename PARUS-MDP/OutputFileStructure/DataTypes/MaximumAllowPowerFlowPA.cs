@@ -21,6 +21,8 @@ namespace OutputFileStructure
 		public string MDPwithPa { get; set; }
 
 		public string CriteriumMDPwithPa { get; set; }
+		
+
 
 
 	}

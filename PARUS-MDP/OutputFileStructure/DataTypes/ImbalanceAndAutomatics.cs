@@ -6,6 +6,7 @@ namespace OutputFileStructure
 {
 	public class ImbalanceAndAutomatics
 	{
+		public string ImbalanceID { get; set; }
 		public int ImbalanceValue { get; set; }
 		public string ImbalanceCriterion { get; set; }
 		public string Equation { get; set; }

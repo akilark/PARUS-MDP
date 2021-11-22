@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using OfficeOpenXml;
+using OutputFileStructure.DataTypes;
 
 namespace OutputFileStructure
 {
@@ -11,8 +12,8 @@ namespace OutputFileStructure
 		private List<ImbalanceAndAutomatics> _maximumAllowPowerFlowNonBalance;
 		private AllowPowerOverflows _allowPowerOverflow;
 
-		public WorksheetInfoWithoutPA(string repairScheme, int noRegularOscilation, List<ControlAction> NBinSample, 
-			ExcelWorksheet excelWorksheetPARUS)
+		public WorksheetInfoWithoutPA(string repairScheme, int noRegularOscilation, List<ControlAction> NBinSample,
+			List<ImbalanceDataSource> imbalanceDataSources,	ExcelWorksheet excelWorksheetPARUS)
 		{
 			Inizialize();
 			int startRow;
@@ -25,7 +26,7 @@ namespace OutputFileStructure
 				startRow = FindScheme(repairScheme, excelWorksheetPARUS) + 1;
 			}
 			
-			MainMethod(startRow, NBinSample, noRegularOscilation, excelWorksheetPARUS);
+			MainMethod(startRow, NBinSample, imbalanceDataSources, noRegularOscilation, excelWorksheetPARUS);
 		}
 
 		public MaximumAllowPowerFlow MaximumAllowPowerFlow => _maximumAllowPowerFlow;
@@ -40,44 +41,44 @@ namespace OutputFileStructure
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 		}
 
-		private void MainMethod(int startRow, List<ControlAction> NBinSample,
-			int noRegularOscilation, ExcelWorksheet excelWorksheetPARUS)
+		private void MainMethod(int startRow, List<ControlAction> NBinSample, 
+			List<ImbalanceDataSource> imbalanceDataSources,	int noRegularOscilation, ExcelWorksheet excelWorksheetPARUS)
 		{
 			_allowPowerOverflow = NormalSchemeResults(startRow, excelWorksheetPARUS);
 			int headRow = startRow + 3;
 			if (excelWorksheetPARUS.Cells[headRow, 1].Value != null)
 			{
-				var bodyRowsAfterFault = FindBodyRowDisconnectionLineFact(headRow, excelWorksheetPARUS);
-				List<(string, List<int>)> disconnectionLineFacts = new List<(string, List<int>)>();
-				List<(string, List<int>)> disconnectionLineFactsWithControlAction = new List<(string, List<int>)>();
+				var bodyRowsAfterFault = FindBodyRowDisturbance(headRow, excelWorksheetPARUS);
+				List<(string, List<int>)> disturbances = new List<(string, List<int>)>();
+				List<(string, List<int>)> disturbancesWithControlAction = new List<(string, List<int>)>();
 				for (int i = 0; i < bodyRowsAfterFault.Count; i++)
 				{
-					if (IsInSample(bodyRowsAfterFault[i].Item1, NBinSample))
+					if (IsDisturbanceConsiderImbalance(bodyRowsAfterFault[i].Item1, NBinSample, imbalanceDataSources))
 					{
-						disconnectionLineFactsWithControlAction.Add(bodyRowsAfterFault[i]);
+						disturbancesWithControlAction.Add(bodyRowsAfterFault[i]);
 					}
 					else
 					{
-						disconnectionLineFacts.Add(bodyRowsAfterFault[i]);
+						disturbances.Add(bodyRowsAfterFault[i]);
 					}
 				}
-				MaximumAllowPowerFlowDefine(headRow, disconnectionLineFacts, excelWorksheetPARUS);
+				MaximumAllowPowerFlowDefine(headRow, disturbances, excelWorksheetPARUS);
 				MaximumAllowPowerFlowControlActionDefine(headRow, noRegularOscilation,
-					NBinSample, disconnectionLineFactsWithControlAction, excelWorksheetPARUS);
+					NBinSample, disturbancesWithControlAction, imbalanceDataSources, excelWorksheetPARUS);
 			}
 		}
 
-		private void MaximumAllowPowerFlowDefine(int headRow, List<(string, List<int>)> disconnectionLineFacts, 
+		private void MaximumAllowPowerFlowDefine(int headRow, List<(string, List<int>)> disturbances, 
 			ExcelWorksheet excelWorksheetPARUS)
 		{
 			_maximumAllowPowerFlow = new MaximumAllowPowerFlow();
 			_maximumAllowPowerFlow.EmergencyAllowPowerFlowValue = _allowPowerOverflow.EmergencyAllowPowerOverflow;
 			_maximumAllowPowerFlow.EmergencyAllowPowerCriterion = "8% P исходная схема";
 						
-			foreach ((string, List<int>) disconnectionLineFact in disconnectionLineFacts)
+			foreach ((string, List<int>) disturbance in disturbances)
 			{
 				
-				var emergency = MaximumAllowPowerFlowDefinition(headRow, disconnectionLineFact, excelWorksheetPARUS);
+				var emergency = MaximumAllowPowerFlowDefinition(headRow, disturbance, excelWorksheetPARUS);
 
 				List<int> criteria = new List<int> { emergency.CurrentLoadLinesValue,
 						emergency.StaticStabilityPostEmergency, emergency.StabilityVoltageValue, _allowPowerOverflow.StaticStabilityNormal };
@@ -89,7 +90,7 @@ namespace OutputFileStructure
 							_maximumAllowPowerFlow.MaximumAllowPowerFlowValue > criteria[i])
 						{
 							_maximumAllowPowerFlow.MaximumAllowPowerFlowValue = criteria[i];
-							_maximumAllowPowerFlow.MaximumAllowPowerCriterion = DefiningCriteria(i, emergency.CurrentLoadLinesCriterion, disconnectionLineFact.Item1);
+							_maximumAllowPowerFlow.MaximumAllowPowerCriterion = DefiningCriteria(i, emergency.CurrentLoadLinesCriterion, disturbance.Item1);
 						}
 					}
 				}
@@ -97,16 +98,17 @@ namespace OutputFileStructure
 		}
 
 		private void MaximumAllowPowerFlowControlActionDefine(int headRow, int noRegularOscilation, 
-			List<ControlAction> controlActionsInSample, List<(string, List<int>)> disconnectionLineFactsWithControlAction,
-			ExcelWorksheet excelWorksheetPARUS)
+			List<ControlAction> controlActionsInSample, List<(string, List<int>)> disturbanceWithControlAction,
+			List<ImbalanceDataSource> imbalanceDataSource,ExcelWorksheet excelWorksheetPARUS)
 		{
 			_maximumAllowPowerFlowNonBalance = new List<ImbalanceAndAutomatics>();
 
-			foreach ((string, List<int>) bodyRow in disconnectionLineFactsWithControlAction)
+			foreach ((string, List<int>) bodyRow in disturbanceWithControlAction)
 			{
 				ImbalanceAndAutomatics imbalance = new ImbalanceAndAutomatics();
-				
-				if (disconnectionLineFactsWithControlAction.Count == controlActionsInSample.Count)
+				imbalance.ImbalanceID = bodyRow.Item1;
+				//нужна другая проверка
+				if (disturbanceWithControlAction.Count == controlActionsInSample.Count)
 				{
 					var emergency = MaximumAllowPowerFlowDefinition(headRow, bodyRow, excelWorksheetPARUS);
 					List<int> criteria = new List<int> { emergency.CurrentLoadLinesValue, 
@@ -130,7 +132,7 @@ namespace OutputFileStructure
 					imbalance.ImbalanceCriterion = $"8%P ПАР '{bodyRow.Item1}'";
 				}
 
-				var controlAction = FindRightControlAction(controlActionsInSample, bodyRow.Item1);
+				var controlAction = FindRightControlAction(imbalanceDataSource, bodyRow.Item1);
 				imbalance.ImbalanceCoefficient = controlAction.CoefficientEfficiency;
 				imbalance.MaximumImbalance = controlAction.ActivePowerControlActionMax;
 				var compare = CompareAllowPowerFlowWithImbalanceEquation(controlAction.CoefficientEfficiency,
@@ -162,33 +164,33 @@ namespace OutputFileStructure
 		}
 
 
-		private ControlAction FindRightControlAction(List<ControlAction> controlActions, string disconnectionLineFact)
+		private ControlAction FindRightControlAction(List<ImbalanceDataSource> imbalanceDataSource, string disturbance)
 		{
-			for (int i = 0; i < controlActions.Count; i++)
+			for (int i = 0; i < imbalanceDataSource.Count; i++)
 			{
-				if (disconnectionLineFact == controlActions[i].ParamID)
+				if (disturbance == imbalanceDataSource[i].LineName)
 				{
-					return controlActions[i];
+					return imbalanceDataSource[i].ControlAction;
 				}
 			}
-			throw new Exception($"УВ {disconnectionLineFact} нет в файле шаблона ");
+			throw new Exception($"УВ {disturbance} нет в файле шаблона ");
 		}
 
-		private string DefiningCriteria(int index, string currentCriteria, string disconectionLineFactName)
+		private string DefiningCriteria(int index, string currentCriteria, string disturbanceName)
 		{
 			switch (index)
 			{
 				case 0:
 					{
-						return $"АДТН '{currentCriteria}' ПАР '{disconectionLineFactName}'";
+						return $"АДТН '{currentCriteria}' ПАР '{disturbanceName}'";
 					}
 				case 1:
 					{
-						return $"8%P ПАР '{disconectionLineFactName}'";
+						return $"8%P ПАР '{disturbanceName}'";
 					}
 				case 2:
 					{
-						return $"10%U ПАР '{disconectionLineFactName}'";
+						return $"10%U ПАР '{disturbanceName}'";
 					}
 				case 3:
 					{
@@ -413,7 +415,7 @@ namespace OutputFileStructure
 			
 		}
 
-		private List<(string, List<int>)> FindBodyRowDisconnectionLineFact(int headRow, ExcelWorksheet excelWorksheetPARUS)
+		private List<(string, List<int>)> FindBodyRowDisturbance(int headRow, ExcelWorksheet excelWorksheetPARUS)
 		{
 			var outputList = new List<(string, List<int>)>();
 
@@ -455,13 +457,20 @@ namespace OutputFileStructure
 			return outputList;
 		}
 
-		private bool IsInSample(string afterFault, List<ControlAction> controlActionInSample)
+		private bool IsDisturbanceConsiderImbalance(string afterFault, List<ControlAction> controlActionInSample, 
+			List<ImbalanceDataSource> imbalanceDataSources)
 		{
-			foreach(ControlAction controlAction in controlActionInSample)
+			foreach(ImbalanceDataSource imbalance in imbalanceDataSources)
 			{
-				if(controlAction.ParamID == afterFault)
+				if(imbalance.LineName == afterFault)
 				{
-					return true;
+					foreach(ControlAction controlAction in controlActionInSample)
+					{
+						if (imbalance.ImbalanceName == controlAction.ParamID)
+						{
+							return true;
+						}
+					}
 				}
 			}
 			return false;
