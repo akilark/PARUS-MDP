@@ -8,18 +8,10 @@ namespace OutputFileStructure
 	public class SampleControlActions
 	{
 
-		private List<(string, List<ControlAction>)> _NBinSample;
-		private List<(string, List<ControlAction>)> _AOPOinSample;
-		private List<(string, List<ControlAction>)> _ARPMinSample;
-		private List<(string, List<ControlAction>)> _AOCNinSample;
-		private List<(string, List<ControlAction>)> _LAPNYinSample;
+		private List<ControlActionRow> _controlActionRows;
 		public SampleControlActions(ExcelPackage excelPackage)
 		{
-			_NBinSample = new List<(string, List<ControlAction>)>();
-			_AOPOinSample = new List<(string, List<ControlAction>)>();
-			_AOCNinSample = new List<(string, List<ControlAction>)>();
-			_ARPMinSample = new List<(string, List<ControlAction>)>();
-			_LAPNYinSample = new List<(string, List<ControlAction>)>();
+			_controlActionRows = new List<ControlActionRow>();
 			CountControlActions(excelPackage);
 		}
 
@@ -27,15 +19,7 @@ namespace OutputFileStructure
 		/// Получение списка управляющих воздействий в следующем формате 
 		/// List<(Направление перетока,List<(строка,столбец с направлением перетока)>)>
 		/// </summary>
-		public List<(string, List<ControlAction>)> ImbalanceInSample => _NBinSample;
-
-		public List<(string, List<ControlAction>)> AOPOinSample => _AOPOinSample;
-
-		public List<(string, List<ControlAction>)> ARPMinSample => _ARPMinSample;
-
-		public List<(string, List<ControlAction>)> AOCNinSample => _AOCNinSample;
-
-		public List<(string, List<ControlAction>)> LAPNYinSample => _LAPNYinSample;
+		public List<ControlActionRow> ControlActionRows => _controlActionRows;
 
 		private void CountControlActions(ExcelPackage excelPackage)
 		{
@@ -49,26 +33,7 @@ namespace OutputFileStructure
 				index = index + 1;
 				if(worksheet.Cells[cellWithDirection.Item1 + index,cellWithDirection.Item2].Value != null)
 				{
-					if(worksheet.Cells[firstCell.Item1 + index, firstCell.Item2 + 4].Value.ToString().ToLower().Contains("нб"))
-					{
-						InfoFromSample((firstCell.Item1 + index, firstCell.Item2),_NBinSample,worksheet);
-					}
-					if(worksheet.Cells[firstCell.Item1 + index, firstCell.Item2 + 4].Value.ToString().ToLower().Contains("лапну"))
-					{
-						InfoFromSample((firstCell.Item1 + index, firstCell.Item2),_LAPNYinSample, worksheet);
-					}
-					if (worksheet.Cells[firstCell.Item1 + index, firstCell.Item2 + 4].Value.ToString().ToLower().Contains("аопо"))
-					{
-						InfoFromSample((firstCell.Item1 + index, firstCell.Item2), _AOPOinSample, worksheet);
-					}
-					if (worksheet.Cells[firstCell.Item1 + index, firstCell.Item2 + 4].Value.ToString().ToLower().Contains("арпм"))
-					{
-						InfoFromSample((firstCell.Item1 + index, firstCell.Item2), _ARPMinSample, worksheet);
-					}
-					if (worksheet.Cells[firstCell.Item1 + index, firstCell.Item2 + 4].Value.ToString().ToLower().Contains("аосн"))
-					{
-						InfoFromSample((firstCell.Item1 + index, firstCell.Item2), _AOCNinSample, worksheet);
-					}
+					InfoFromSample((firstCell.Item1 + index, firstCell.Item2),worksheet);
 				}
 				else
 				{
@@ -82,40 +47,21 @@ namespace OutputFileStructure
 
 		}
 
-		private void InfoFromSample((int, int) firstCell, List<(string, List<ControlAction>)> infoInSample,  ExcelWorksheet worksheet)
+		private void InfoFromSample((int, int) firstCell,  ExcelWorksheet worksheet)
 		{
 			
-			ControlAction controlAction = new ControlAction();
-			string direction = worksheet.Cells[firstCell.Item1, firstCell.Item2 + 5].
-				Value.ToString().Trim();
+			ControlActionRow controlAction = new ControlActionRow();
 			controlAction.ParamID = worksheet.Cells[firstCell.Item1, firstCell.Item2].
 				Value.ToString().Trim();
 			controlAction.CoefficientEfficiency = float.Parse(
 				worksheet.Cells[firstCell.Item1, firstCell.Item2 + 8].Value.ToString());
-			controlAction.ActivePowerControlActionMax = int.Parse(
+			controlAction.MaxValue = int.Parse(
 				worksheet.Cells[firstCell.Item1, firstCell.Item2 + 7].Value.ToString());
-			controlAction.IDCell = (firstCell.Item1, firstCell.Item2);
 			controlAction.ParamSign = worksheet.Cells[firstCell.Item1, firstCell.Item2 + 4].
 				Value.ToString().Trim();
-
-			if (infoInSample.Count == 0)
-			{
-				infoInSample.Add((direction, new List<ControlAction>()));
-			}
-			bool uniqueFlag = true;
-			for (int i = 0; i < infoInSample.Count; i++)
-			{
-				if (direction == infoInSample[i].Item1)
-				{
-					uniqueFlag = false;
-					infoInSample[i].Item2.Add(controlAction);
-				}
-			}
-			if (uniqueFlag)
-			{
-				infoInSample.Add((direction, new List<ControlAction>()));
-				infoInSample[infoInSample.Count - 1].Item2.Add(controlAction);
-			}
+			controlAction.Direction = worksheet.Cells[firstCell.Item1, firstCell.Item2 + 5].
+				Value.ToString().Trim();
+			_controlActionRows.Add(controlAction);
 		}
 
 
@@ -141,14 +87,27 @@ namespace OutputFileStructure
 
 		public int AmountControlActions(string direction)
 		{
-			foreach((string, List<ControlAction>) directionWithCells in ImbalanceInSample)
+			int outputValue = 0;
+			foreach(ControlActionRow row in ControlActionRows)
 			{
-				if(direction.Trim().ToLower() == directionWithCells.Item1.Trim().ToLower())
+				if(direction.Trim().ToLower() == row.Direction.Trim().ToLower())
 				{
-					return directionWithCells.Item2.Count;
+					outputValue += 1;
 				}
 			}
-			return 0;
+			return outputValue;
+		}
+		public List<ControlActionRow> ControlActionsForNeedDirection(string direction)
+		{
+			var outputValue = new List<ControlActionRow>();
+			foreach (ControlActionRow row in ControlActionRows)
+			{
+				if (direction.Trim().ToLower() == row.Direction.Trim().ToLower())
+				{
+					outputValue.Add(row);
+				}
+			}
+			return outputValue;
 		}
 
 	}

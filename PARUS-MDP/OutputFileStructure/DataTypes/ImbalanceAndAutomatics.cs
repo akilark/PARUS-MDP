@@ -13,5 +13,6 @@ namespace OutputFileStructure
 		public float EquationValue { get; set; }
 		public float ImbalanceCoefficient { get; set; }
 		public int MaximumImbalance { get; set; }
+
 	}
 }

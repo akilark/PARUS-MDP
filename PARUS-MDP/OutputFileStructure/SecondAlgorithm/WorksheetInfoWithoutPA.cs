@@ -12,7 +12,9 @@ namespace OutputFileStructure
 		private List<ImbalanceAndAutomatics> _maximumAllowPowerFlowNonBalance;
 		private AllowPowerOverflows _allowPowerOverflow;
 
-		public WorksheetInfoWithoutPA(string repairScheme, int noRegularOscilation, List<ControlAction> NBinSample,
+		//TODO: После переноса imbalanceDataSource на imbalance 
+		//не будет необходимости в NBinSample и imbalanceDataSources
+		public WorksheetInfoWithoutPA(string repairScheme, int noRegularOscilation, List<ControlActionRow> NBinSample,
 			List<ImbalanceDataSource> imbalanceDataSources,	ExcelWorksheet excelWorksheetPARUS)
 		{
 			Inizialize();
@@ -41,7 +43,7 @@ namespace OutputFileStructure
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 		}
 
-		private void MainMethod(int startRow, List<ControlAction> NBinSample, 
+		private void MainMethod(int startRow, List<ControlActionRow> NBinSample, 
 			List<ImbalanceDataSource> imbalanceDataSources,	int noRegularOscilation, ExcelWorksheet excelWorksheetPARUS)
 		{
 			_allowPowerOverflow = NormalSchemeResults(startRow, excelWorksheetPARUS);
@@ -53,6 +55,8 @@ namespace OutputFileStructure
 				List<(string, List<int>)> disturbancesWithControlAction = new List<(string, List<int>)>();
 				for (int i = 0; i < bodyRowsAfterFault.Count; i++)
 				{
+					//TODO: После переноса imbalanceDataSource на imbalance получаем
+					//набор имен и контрол экшенов, тут нужно изменить метод Is DisturbanceConsiderImbalance для поиска по Line Name
 					if (IsDisturbanceConsiderImbalance(bodyRowsAfterFault[i].Item1, NBinSample, imbalanceDataSources))
 					{
 						disturbancesWithControlAction.Add(bodyRowsAfterFault[i]);
@@ -97,8 +101,10 @@ namespace OutputFileStructure
 			}		
 		}
 
+		//TODO: После переноса imbalanceDataSource на imbalance 
+		//Этот класс будет требовать существенной переработки
 		private void MaximumAllowPowerFlowControlActionDefine(int headRow, int noRegularOscilation, 
-			List<ControlAction> controlActionsInSample, List<(string, List<int>)> disturbanceWithControlAction,
+			List<ControlActionRow> controlActionsInSample, List<(string, List<int>)> disturbanceWithControlAction,
 			List<ImbalanceDataSource> imbalanceDataSource,ExcelWorksheet excelWorksheetPARUS)
 		{
 			_maximumAllowPowerFlowNonBalance = new List<ImbalanceAndAutomatics>();
@@ -134,9 +140,9 @@ namespace OutputFileStructure
 
 				var controlAction = FindRightControlAction(imbalanceDataSource, bodyRow.Item1);
 				imbalance.ImbalanceCoefficient = controlAction.CoefficientEfficiency;
-				imbalance.MaximumImbalance = controlAction.ActivePowerControlActionMax;
+				imbalance.MaximumImbalance = controlAction.MaxValue;
 				var compare = CompareAllowPowerFlowWithImbalanceEquation(controlAction.CoefficientEfficiency,
-					controlAction.ActivePowerControlActionMax, imbalance.ImbalanceValue, _maximumAllowPowerFlow.MaximumAllowPowerFlowValue);
+					controlAction.MaxValue, imbalance.ImbalanceValue, _maximumAllowPowerFlow.MaximumAllowPowerFlowValue);
 				imbalance.EquationValue = compare.Item2;
 				if (compare.Item1)
 				{
@@ -163,14 +169,15 @@ namespace OutputFileStructure
 			}
 		}
 
-
-		private ControlAction FindRightControlAction(List<ImbalanceDataSource> imbalanceDataSource, string disturbance)
+		//TODO: После переноса imbalanceDataSource на imbalance 
+		//этот класс будет не нужен
+		private ControlActionRow FindRightControlAction(List<ImbalanceDataSource> imbalanceDataSource, string disturbance)
 		{
 			for (int i = 0; i < imbalanceDataSource.Count; i++)
 			{
 				if (disturbance == imbalanceDataSource[i].LineName)
 				{
-					return imbalanceDataSource[i].ControlAction;
+					return imbalanceDataSource[i].ImbalanceValue;
 				}
 			}
 			throw new Exception($"УВ {disturbance} нет в файле шаблона ");
@@ -457,14 +464,17 @@ namespace OutputFileStructure
 			return outputList;
 		}
 
-		private bool IsDisturbanceConsiderImbalance(string afterFault, List<ControlAction> controlActionInSample, 
+
+		private bool IsDisturbanceConsiderImbalance(string afterFault, List<ControlActionRow> controlActionInSample, 
 			List<ImbalanceDataSource> imbalanceDataSources)
 		{
 			foreach(ImbalanceDataSource imbalance in imbalanceDataSources)
 			{
 				if(imbalance.LineName == afterFault)
 				{
-					foreach(ControlAction controlAction in controlActionInSample)
+					//TODO: После переноса imbalanceDataSource на imbalance 
+					// эту часть можно удалить и не нужно сюда передавать controlactionInSample
+					foreach (ControlActionRow controlAction in controlActionInSample)
 					{
 						if (imbalance.ImbalanceName == controlAction.ParamID)
 						{

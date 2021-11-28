@@ -4,11 +4,11 @@ using System.Text;
 
 namespace OutputFileStructure.DataTypes
 {
-	public class AutomaticDataSource
+	public class Imbalance
 	{
 		public string LineName { get; set; }
-		public List<string> AutomaticsName { get; set; }
+		public ControlActionRow ImbalanceValue { get; set; }
 
-		public List<ImbalanceAndAutomatics> Automatics {get;set;}
+		public ControlActionRow ARPM { get; set; }
 	}
 }

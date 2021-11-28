@@ -27,8 +27,13 @@ namespace OutputFileStructure
 
 			var imbalancesDataSource = new List<ImbalanceDataSource>();
 
-			InfoFromParusFile infoFromParusFile = new InfoFromParusFile(cellsGroups, sampleControlActions.ImbalanceInSample[0].Item2,
-				imbalancesDataSource, sampleControlActions.LAPNYinSample[0].Item2, ref excelPackage2);
+			string[] directions = new string[] { "На запад", "На восток" };
+
+			var ControlActionWithNeedDirection = sampleControlActions.ControlActionsForNeedDirection(directions[0]);
+			
+
+			InfoFromParusFile infoFromParusFile = new InfoFromParusFile(cellsGroups, ControlActionWithNeedDirection,
+				imbalancesDataSource, ref excelPackage2);
 
 
 			FileInfo file = new FileInfo(@$"C:\test\Тест_1\Сформированная структура2.xlsx");

@@ -11,7 +11,7 @@ namespace OutputFileStructure
 		private AllowPowerFlowPA _maximumAllowPowerFlowPA;
 		private List<ImbalanceAndAutomatics> _maximumAllowPowerFlowNonBalancePA;
 
-		public WorksheetInfoWithtPA(string repairScheme, int noRegularOscilation, AllowPowerOverflows allowPowerOverflow, List<ControlAction> NBinSample,
+		public WorksheetInfoWithtPA(string repairScheme, int noRegularOscilation, AllowPowerOverflows allowPowerOverflow, List<ControlActionRow> NBinSample,
 			List<ImbalanceDataSource> imbalanceDataSource, ExcelWorksheet excelWorksheetPARUS, List<ImbalanceAndAutomatics> firstAlghorithmResult)
 		{
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -30,14 +30,14 @@ namespace OutputFileStructure
 				startRow = FindScheme(repairScheme, excelWorksheetPARUS) + 1;
 			}
 
-			MainMethod(startRow, NBinSample, imbalanceDataSource,noRegularOscilation, allowPowerOverflow, excelWorksheetPARUS);
+			MainMethod(startRow, NBinSample, imbalanceDataSource,noRegularOscilation, allowPowerOverflow, excelWorksheetPARUS, firstAlghorithmResult);
 		}
 
 		public AllowPowerFlowPA AllowPowerFlowPA => _maximumAllowPowerFlowPA;
 		public List<ImbalanceAndAutomatics> imbalances => _maximumAllowPowerFlowNonBalancePA;
 
-		private void MainMethod(int startRow, List<ControlAction> NBinSample,
-			List<ImbalanceDataSource> imbalanceDataSource,	int noRegularOscilation, AllowPowerOverflows allowPowerOverflow, ExcelWorksheet excelWorksheetPARUS)
+		private void MainMethod(int startRow, List<ControlActionRow> NBinSample,
+			List<ImbalanceDataSource> imbalanceDataSource,	int noRegularOscilation, AllowPowerOverflows allowPowerOverflow, ExcelWorksheet excelWorksheetPARUS, List<ImbalanceAndAutomatics> firstAlghorithmResult)
 		{
 			int headRow = startRow + 3;
 			if (excelWorksheetPARUS.Cells[headRow, 1].Value != null)
@@ -47,6 +47,8 @@ namespace OutputFileStructure
 				List<(string, List<int>)> disturbancesWithControlAction = new List<(string, List<int>)>();
 				for (int i = 0; i < bodyRowsAfterFault.Count; i++)
 				{
+					//TODO: После переноса imbalanceDataSource на imbalance 
+					//Аналогично WithoutPA
 					if (IsDisturbanceConsiderImbalance(bodyRowsAfterFault[i].Item1, NBinSample, imbalanceDataSource))
 					{
 						disturbancesWithControlAction.Add(bodyRowsAfterFault[i]);
@@ -57,11 +59,14 @@ namespace OutputFileStructure
 					}
 				}
 				MaximumAllowPowerFlowDefineWithPA(headRow, disturbances, imbalanceDataSource, excelWorksheetPARUS);
-
+				MaximumAllowPowerFlowControlActionDefineWithPA(headRow, noRegularOscilation, disturbancesWithControlAction, imbalanceDataSource,
+					allowPowerOverflow, firstAlghorithmResult, excelWorksheetPARUS);
 
 			}
 		}
 
+		//TODO: После переноса imbalanceDataSource на imbalance 
+		//Нужно будет передавать дополнительно AOPO и АОСН
 		private void MaximumAllowPowerFlowDefineWithPA(int headRow, List<(string, List<int>)> disturbances,
 			List<ImbalanceDataSource> imbalanceDataSource, ExcelWorksheet excelWorksheetPARUS)
 		{
@@ -72,36 +77,53 @@ namespace OutputFileStructure
 
 				for (int valueNumber = 0; valueNumber < disturbance.Item2.Count; valueNumber++)
 				{
-					if (FindCellValue(headRow, disturbance.Item2[valueNumber], "Примечание", excelWorksheetPARUS) == "АОПО")
+					try
 					{
-						continue;
-					}
-					string textValueCurrent = FindCellValue(headRow, disturbance.Item2[valueNumber],
-								"Перегружаемый элемент", excelWorksheetPARUS);
-					var controlActionAOPO = ControlActionsForAutomatic(textValueCurrent, imbalanceDataSource, "АОПО");
-					if (controlActionAOPO.Count > 0)
-					{
-						if (FindCellValue(headRow, disturbance.Item2[valueNumber], "Примечание", excelWorksheetPARUS) != "Токовых перегрузов нет")
+						if (FindCellValue(headRow, disturbance.Item2[valueNumber], "Примечание", excelWorksheetPARUS) == "АОПО")
 						{
-							int currentValueTmp = int.Parse(RoundAndMultiply(
-								FindCellValue(headRow, disturbance.Item2[valueNumber], "Рсеч-Рно, МВт", excelWorksheetPARUS), 1));
-							if (_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA == 0 ||
-								(_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA > currentValueTmp && currentValueTmp > 0))
+							continue;
+						}
+					}
+					catch
+					{
+
+					}
+					try
+					{
+						string textValueCurrent = FindCellValue(headRow, disturbance.Item2[valueNumber],
+														"Перегружаемый элемент", excelWorksheetPARUS);
+						var controlActionAOPO = ControlActionsForAutomatic(textValueCurrent, imbalanceDataSource, "АОПО");
+						if (controlActionAOPO.Count > 0)
+						{
+							if (FindCellValue(headRow, disturbance.Item2[valueNumber], "Примечание", excelWorksheetPARUS) != "Токовых перегрузов нет")
 							{
-								_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA = currentValueTmp;
-								_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithoutPA = FindCellValue(headRow, disturbance.Item2[valueNumber],
-																"Перегружаемый элемент", excelWorksheetPARUS);
-								_maximumAllowPowerFlowPA.DisconnectionLineFactEqupmentOverloading = disturbance.Item1;
-								_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithtPA = $"АДТН '{_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithoutPA}'" +
-									$" ПАР '{_maximumAllowPowerFlowPA.DisconnectionLineFactEqupmentOverloading}' с учетом объема УВ";
-								_maximumAllowPowerFlowPA.ControlActionAOPO = controlActionAOPO[0];
+								int currentValueTmp = int.Parse(RoundAndMultiply(
+									FindCellValue(headRow, disturbance.Item2[valueNumber], "Рсеч-Рно, МВт", excelWorksheetPARUS), 1));
+								if (_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA == 0 ||
+									(_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA > currentValueTmp && currentValueTmp > 0))
+								{
+									_maximumAllowPowerFlowPA.EqupmentOverloadingWithoutPA = currentValueTmp;
+									_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithoutPA = FindCellValue(headRow, disturbance.Item2[valueNumber],
+																	"Перегружаемый элемент", excelWorksheetPARUS);
+									_maximumAllowPowerFlowPA.DisconnectionLineFactEqupmentOverloading = disturbance.Item1;
+									_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithPA = $"АДТН '{_maximumAllowPowerFlowPA.CriteriumEqupmentOverloadingWithoutPA}'" +
+										$" ПАР '{_maximumAllowPowerFlowPA.DisconnectionLineFactEqupmentOverloading}' с учетом объема УВ";
+									_maximumAllowPowerFlowPA.ControlActionAOPO = controlActionAOPO[0];
+								}
 							}
 						}
 					}
-					string textValueVoltage = FindCellValue(headRow, disturbance.Item2[valueNumber],
-							"Узел", excelWorksheetPARUS);
-					var controlActionAOCN = ControlActionsForAutomatic(textValueVoltage, imbalanceDataSource, "АОСН");
-					if (controlActionAOCN.Count > 0)
+					catch
+					{
+
+					}
+
+					try
+					{
+						string textValueVoltage = FindCellValue(headRow, disturbance.Item2[valueNumber],
+													"Узел", excelWorksheetPARUS);
+						var controlActionAOCN = ControlActionsForAutomatic(textValueVoltage, imbalanceDataSource, "АОСН");
+						if (controlActionAOCN.Count > 0)
 						{
 							if (FindCellValue(headRow, disturbance.Item2[valueNumber], "Рда(Uкр/0.9)-Рно", excelWorksheetPARUS) != "Критерий по U не достижим")
 							{
@@ -112,11 +134,16 @@ namespace OutputFileStructure
 								{
 									_maximumAllowPowerFlowPA.VoltageLimitingWithoutPA = voltageValueTmp;
 									_maximumAllowPowerFlowPA.DisconnectionLineFactVoltageLimiting = disturbance.Item1;
-									_maximumAllowPowerFlowPA.CriteriumVoltageLimitingWithtPA = $"10% U ПАР '{_maximumAllowPowerFlowPA.DisconnectionLineFactVoltageLimiting}'" +
+									_maximumAllowPowerFlowPA.CriteriumVoltageLimitingWithPA = $"10% U ПАР '{_maximumAllowPowerFlowPA.DisconnectionLineFactVoltageLimiting}'" +
 										$" с учетом объема УВ";
 									_maximumAllowPowerFlowPA.ControlActionAOCN = controlActionAOCN[0];
 								}
 							}
+						}
+					}
+					catch
+					{
+
 					}
 
 					
@@ -130,10 +157,10 @@ namespace OutputFileStructure
 						{
 							if (criteria[i] > 0)
 							{
-								if (_maximumAllowPowerFlowPA.LocalAutomaticValueWitoutPA == 0 ||
-									_maximumAllowPowerFlowPA.LocalAutomaticValueWitoutPA > criteria[i])
+								if (_maximumAllowPowerFlowPA.LocalAutomaticValueWithoutPA == 0 ||
+									_maximumAllowPowerFlowPA.LocalAutomaticValueWithoutPA > criteria[i])
 								{
-									_maximumAllowPowerFlowPA.LocalAutomaticValueWitoutPA = criteria[i];
+									_maximumAllowPowerFlowPA.LocalAutomaticValueWithoutPA = criteria[i];
 									_maximumAllowPowerFlowPA.CriteriumLocalAutomaticValueWithoutPA =
 										DefiningCriteria(i, emergency.CurrentLoadLinesCriterion, disturbance.Item1) + " с учетом объема УВ";
 									_maximumAllowPowerFlowPA.ControlActionsLAPNY = controlActionLAPNY;
@@ -165,10 +192,15 @@ namespace OutputFileStructure
 		}
 
 		private void MaximumAllowPowerFlowControlActionDefineWithPA(int headRow, int noRegularOscilation,
-			List<ControlAction> controlActionsInSample, List<(string, List<int>)> disturbanceWithControlAction,
-			List<ImbalanceDataSource> imbalanceDataSource, AllowPowerOverflows allowPowerOverflow, List<ImbalanceAndAutomatics> firstAlghorithmResult, ExcelWorksheet excelWorksheetPARUS)
+			List<(string, List<int>)> disturbanceWithControlAction,List<ImbalanceDataSource> imbalanceDataSource, 
+			AllowPowerOverflows allowPowerOverflow, List<ImbalanceAndAutomatics> firstAlghorithmResult, ExcelWorksheet excelWorksheetPARUS)
 		{
 			_maximumAllowPowerFlowNonBalancePA = new List<ImbalanceAndAutomatics>();
+
+			if(imbalanceDataSource.Count > 0)
+			{
+
+			}
 
 			foreach ((string, List<int>) bodyRow in disturbanceWithControlAction)
 			{
@@ -185,7 +217,7 @@ namespace OutputFileStructure
 				ImbalanceAndAutomatics imbalance = new ImbalanceAndAutomatics();
 				imbalance.ImbalanceID = bodyRow.Item1;
 				//нужна другая проверка
-				if (disturbanceWithControlAction.Count == controlActionsInSample.Count)
+				if (imbalanceFromDataSource != null)
 				{
 					var emergency = MaximumAllowPowerFlowDefinition(headRow, bodyRow, excelWorksheetPARUS);
 					List<int> criteria = new List<int> { emergency.CurrentLoadLinesValue,
@@ -220,8 +252,8 @@ namespace OutputFileStructure
 
 				foreach(ImbalanceAndAutomatics imbalanceAndAutomatics in firstAlghorithmResult)
 				{
-					imbalance.ImbalanceCoefficient = imbalanceFromDataSource.Imbalance.ImbalanceCoefficient;
-					imbalance.MaximumImbalance = imbalanceFromDataSource.Imbalance.MaximumImbalance;
+					imbalance.ImbalanceCoefficient = imbalanceFromDataSource.Imbalanceses.ImbalanceCoefficient;
+					imbalance.MaximumImbalance = imbalanceFromDataSource.Imbalanceses.MaximumImbalance;
 					imbalance.Equation = imbalance.ImbalanceValue.ToString() + "-" +
 						imbalance.ImbalanceCoefficient.ToString() + "*" + bodyRow.Item1;
 					imbalance.EquationValue = imbalance.ImbalanceValue - imbalance.ImbalanceCoefficient * imbalance.MaximumImbalance;
@@ -247,15 +279,15 @@ namespace OutputFileStructure
 			return false;
 		}
 
-		private List<ControlAction> ControlActionsForAutomatic(string LineName, List<ImbalanceDataSource> imbalanceDataSources,
+		private List<ControlActionRow> ControlActionsForAutomatic(string LineName, List<ImbalanceDataSource> imbalanceDataSources,
 			string containsText)
 		{
-			List<ControlAction> controlActionsOutput = new List<ControlAction>();
+			List<ControlActionRow> controlActionsOutput = new List<ControlActionRow>();
 			foreach(ImbalanceDataSource imbalanceDataSource in imbalanceDataSources)
 			{
 				if(IsDisturbanceConsiderAutomatics(LineName, new List<ImbalanceDataSource> {imbalanceDataSource }, containsText))
 				{
-					controlActionsOutput.Add(imbalanceDataSource.ControlAction);
+					controlActionsOutput.Add(imbalanceDataSource.ImbalanceValue);
 				}
 			}
 			return controlActionsOutput;
@@ -448,14 +480,14 @@ namespace OutputFileStructure
 
 			return valuesAfterFault;
 		}
-		private bool IsDisturbanceConsiderImbalance(string afterFault, List<ControlAction> controlActionInSample,
+		private bool IsDisturbanceConsiderImbalance(string afterFault, List<ControlActionRow> controlActionInSample,
 			List<ImbalanceDataSource> imbalanceDataSources)
 		{
 			foreach (ImbalanceDataSource imbalance in imbalanceDataSources )
 			{
 				if (imbalance.LineName == afterFault && imbalance.ImbalanceName.Contains("НБ"))
 				{
-					foreach (ControlAction controlAction in controlActionInSample)
+					foreach (ControlActionRow controlAction in controlActionInSample)
 					{
 						if (imbalance.ImbalanceName == controlAction.ParamID)
 						{
