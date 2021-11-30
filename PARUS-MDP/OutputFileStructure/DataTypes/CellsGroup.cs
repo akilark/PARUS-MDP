@@ -12,6 +12,7 @@ namespace OutputFileStructure
 		public string Direction { get; set; }
 		
 		public string SchemeName { get; set; }
+		public bool AutomaticForScheme { get; set; }
 		
 		public List<(string, int)> Factors { get; set; }
 		

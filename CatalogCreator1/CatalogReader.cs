@@ -56,7 +56,7 @@ namespace WorkWithCatalog
 			bool dataBaseConected = true;
 			if(dataBaseConected)
 			{
-				_schemesFromDataBase = pullData.Shemes;
+				_schemesFromDataBase = pullData.Schemes;
 			}
 		}
 

@@ -50,7 +50,7 @@ namespace WorkWithDataSource
 		/// <summary>
 		/// Свойство возврщающее список схем в формате (string, (string, bool)[])
 		/// </summary>
-		public List<(string, (string, bool)[])> Shemes => _schemes;
+		public List<(string, (string, bool)[])> Schemes => _schemes;
 
 		/// <summary>
 		/// Метод для заполнения списка факторов из БД

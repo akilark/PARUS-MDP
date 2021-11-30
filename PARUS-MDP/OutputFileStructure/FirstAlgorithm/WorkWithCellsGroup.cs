@@ -11,21 +11,23 @@ namespace OutputFileStructure
 		private string[] _temperature;
 		private List<CellsGroup> _pathAndDislocation;
 
-		public WorkWithCellsGroup(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample)
+		public WorkWithCellsGroup(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample, 
+			List<(string, (string, bool)[])> schemes)
 		{
 			_pathAndDislocation = new List<CellsGroup>();
-			JuxtaposePathAndCells(foldersPath, excelPackage, FactorsInSample, false);
+			JuxtaposePathAndCells(foldersPath, excelPackage, FactorsInSample, schemes, false);
 		}
-		public WorkWithCellsGroup(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample, string[] Temperature)
+		public WorkWithCellsGroup(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample, 
+			List<(string, (string, bool)[])> schemes, string[] Temperature)
 		{
 			_pathAndDislocation = new List<CellsGroup>();
 			_temperature = Temperature;
-			JuxtaposePathAndCells(foldersPath, excelPackage, FactorsInSample, true);
+			JuxtaposePathAndCells(foldersPath, excelPackage, FactorsInSample, schemes,true);
 		}
 		public List<CellsGroup> PathAndDislocation => _pathAndDislocation;
 
 		private void JuxtaposePathAndCells(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample,
-			bool temperatureDependence)
+			List<(string, (string, bool)[])> schemes, bool temperatureDependence)
 		{
 			int substractor = temperatureDependence ? 2 : 1;
 			int rowIndex;
@@ -59,6 +61,20 @@ namespace OutputFileStructure
 
 				string schemeName = FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 1, excelPackage);
 				string direction = FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 3, excelPackage);
+				for(int i = 0; i < schemes.Count; i++)
+				{
+					if(schemes[i].Item1 == direction)
+					{
+						for(int j = 0; j < schemes[i].Item2.Length; j++)
+						{
+							if(schemes[i].Item2[j].Item1 == schemeName)
+							{
+								cellsGroup.AutomaticForScheme = schemes[i].Item2[j].Item2;
+							}
+						}
+					}
+				}
+
 				cellsGroup.SchemeName = schemeName;
 				cellsGroup.Direction = direction;
 				if(temperatureDependence)

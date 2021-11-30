@@ -15,6 +15,7 @@ namespace OutputFileStructure
 		public int MaxValue { get; set; }
 
 		public float CoefficientEfficiency { get; set; }
+
 		
 	}
 }

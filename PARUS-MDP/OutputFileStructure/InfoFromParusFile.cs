@@ -11,8 +11,9 @@ namespace OutputFileStructure
 	{
 		private int _nonRegularOscilation;
 
-		public InfoFromParusFile(List<CellsGroup> cellsGroupManyTemperature, List<ControlActionRow> NBinSample,
-			List<ImbalanceDataSource> imbalanceDataSources, ref ExcelPackage excelPackageOutputFile)
+		public InfoFromParusFile(List<CellsGroup> cellsGroupManyTemperature,List<Imbalance> imbalances, 
+			List<AOPO> AOPOlist, List<AOCN> AOCNlist, List<ControlActionRow> LAPNYlist, bool disconnectingLineForEachEmergency,
+			ref ExcelPackage excelPackageOutputFile)
 		{
 			var worksheet = excelPackageOutputFile.Workbook.Worksheets[0];
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -30,10 +31,10 @@ namespace OutputFileStructure
 						{
 							flag = true;
 							WorksheetInfoWithoutPA workSheetInfoTMP = new WorksheetInfoWithoutPA(cellsGroupOneTemperature.SchemeName, NonRegularOscilation,
-							NBinSample, imbalanceDataSources, excelPackage.Workbook.Worksheets[i]);
-							WorksheetInfoWithtPA worksheetInfoWithtPA = new WorksheetInfoWithtPA(cellsGroupOneTemperature.SchemeName, NonRegularOscilation,
-								workSheetInfoTMP.AllowPowerOverflow, NBinSample, imbalanceDataSources, excelPackage.Workbook.Worksheets[i], workSheetInfoTMP.MaximumAllowPowerFlowNonBalance);
-
+							imbalances, excelPackage.Workbook.Worksheets[i], disconnectingLineForEachEmergency);
+							WorksheetInfoWithPA worksheetInfoWithPA = new WorksheetInfoWithPA(cellsGroupOneTemperature.SchemeName, cellsGroupOneTemperature.AutomaticForScheme,
+								NonRegularOscilation,workSheetInfoTMP.AllowPowerOverflow, imbalances, excelPackage.Workbook.Worksheets[i], 
+								workSheetInfoTMP.MaximumAllowPowerFlowNonBalance, AOPOlist, AOCNlist, LAPNYlist, disconnectingLineForEachEmergency);
 
 							int nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 
@@ -59,7 +60,12 @@ namespace OutputFileStructure
 							}
 
 							NeedForControl(workSheetInfoTMP, cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, ref excelPackageOutputFile);
+
+							List<float> MDPwithPAlist = ValuesWithPA(worksheetInfoWithPA, cellsGroupOneTemperature, ref excelPackageOutputFile);
+							NeedForControlWithPA(worksheetInfoWithPA, MDPwithPAlist, workSheetInfoTMP.AllowPowerOverflow,
+								cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, ref excelPackageOutputFile);
 							break;
+
 						}
 					}
 					if(flag)
@@ -73,40 +79,50 @@ namespace OutputFileStructure
 
 		public int NonRegularOscilation => _nonRegularOscilation;
 
-		private void ValuesWithPA(WorksheetInfoWithtPA worksheetInfoWithtPA, CellsGroup cellsGroupOneTemperature, ref ExcelPackage excelPackageOutputFile)
+		private List<float> ValuesWithPA(WorksheetInfoWithPA worksheetInfoWithPA, CellsGroup cellsGroupOneTemperature, ref ExcelPackage excelPackageOutputFile)
 		{
+			List<float> MDPwithPAlist = new List<float>();
 			int nextRow = FindNextRowWithoutText((cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 1), 
 				cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 			
 			string MDPwithPA;
 			string MDPwithPAcriterium;
 
-			if (worksheetInfoWithtPA.AllowPowerFlowPA.LocalAutomaticValueWithoutPA > 0)
+			if (worksheetInfoWithPA.AllowPowerFlowPA.LocalAutomaticValueWithoutPA > 0)
 			{
-				MDPwithPA = worksheetInfoWithtPA.AllowPowerFlowPA.LocalAutomaticValueWithoutPA.ToString();
-				MDPwithPAcriterium = worksheetInfoWithtPA.AllowPowerFlowPA.CriteriumLocalAutomaticValueWithoutPA;
-				if(worksheetInfoWithtPA.AllowPowerFlowPA.ControlActionsLAPNY.Count > 0)
+				float MDPtmp = worksheetInfoWithPA.AllowPowerFlowPA.LocalAutomaticValueWithoutPA;
+				MDPwithPA = worksheetInfoWithPA.AllowPowerFlowPA.LocalAutomaticValueWithoutPA.ToString();
+				MDPwithPAcriterium = worksheetInfoWithPA.AllowPowerFlowPA.CriteriumLocalAutomaticValueWithoutPA;
+				if(worksheetInfoWithPA.AllowPowerFlowPA.ControlActionsLAPNY.Count > 0)
 				{
-					foreach(ControlActionRow LAPNY in worksheetInfoWithtPA.AllowPowerFlowPA.ControlActionsLAPNY)
+					foreach(ControlActionRow LAPNY in worksheetInfoWithPA.AllowPowerFlowPA.ControlActionsLAPNY)
 					{
-						MDPwithPAcriterium = MDPwithPAcriterium + " + " + LAPNY.CoefficientEfficiency.ToString() + LAPNY.ParamID; 
+						MDPtmp += LAPNY.CoefficientEfficiency * LAPNY.MaxValue;
+						MDPwithPA = MDPwithPA + " + " + LAPNY.CoefficientEfficiency.ToString() + "*" + LAPNY.ParamID; 
 					}
 				}
 				InsertText(MDPwithPA,
 				(nextRow, cellsGroupOneTemperature.StartID.Item2 + 1), ref excelPackageOutputFile);
 				InsertText(MDPwithPAcriterium,
 					(nextRow, cellsGroupOneTemperature.StartID.Item2 + 4), ref excelPackageOutputFile);
-				
+
+				MDPwithPAlist.Add(MDPtmp);
+
 				nextRow = FindNextRowWithoutText((cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 1),
 				cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 			}
 
-			if(worksheetInfoWithtPA.AllowPowerFlowPA.EqupmentOverloadingWithoutPA > 0)
+			if(worksheetInfoWithPA.AllowPowerFlowPA.EqupmentOverloadingWithoutPA > 0)
 			{
-				MDPwithPA = worksheetInfoWithtPA.AllowPowerFlowPA.EqupmentOverloadingWithoutPA.ToString() + " + " + 
-					worksheetInfoWithtPA.AllowPowerFlowPA.ControlActionAOPO.CoefficientEfficiency.ToString() + 
-					worksheetInfoWithtPA.AllowPowerFlowPA.ControlActionAOPO.ParamID;
-				MDPwithPAcriterium = worksheetInfoWithtPA.AllowPowerFlowPA.CriteriumEqupmentOverloadingWithoutPA;
+				float MDPtmp = worksheetInfoWithPA.AllowPowerFlowPA.EqupmentOverloadingWithoutPA + 
+					worksheetInfoWithPA.AllowPowerFlowPA.ControlActionAOPO.CoefficientEfficiency * 
+					worksheetInfoWithPA.AllowPowerFlowPA.ControlActionAOPO.MaxValue;
+				MDPwithPAlist.Add(MDPtmp);
+
+				MDPwithPA = worksheetInfoWithPA.AllowPowerFlowPA.EqupmentOverloadingWithoutPA.ToString() + " + " + 
+					worksheetInfoWithPA.AllowPowerFlowPA.ControlActionAOPO.CoefficientEfficiency.ToString() + 
+					worksheetInfoWithPA.AllowPowerFlowPA.ControlActionAOPO.ParamID;
+				MDPwithPAcriterium = worksheetInfoWithPA.AllowPowerFlowPA.CriteriumEqupmentOverloadingWithoutPA;
 				InsertText(MDPwithPA,
 				(nextRow, cellsGroupOneTemperature.StartID.Item2 + 1), ref excelPackageOutputFile);
 				InsertText(MDPwithPAcriterium,
@@ -122,12 +138,16 @@ namespace OutputFileStructure
 				cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 			}
 			
-			if(worksheetInfoWithtPA.AllowPowerFlowPA.VoltageLimitingWithoutPA > 0)
+			if(worksheetInfoWithPA.AllowPowerFlowPA.VoltageLimitingWithoutPA > 0)
 			{
-				MDPwithPA = worksheetInfoWithtPA.AllowPowerFlowPA.VoltageLimitingWithoutPA.ToString() + " + " +
-					worksheetInfoWithtPA.AllowPowerFlowPA.ControlActionAOCN.CoefficientEfficiency.ToString() +
-					worksheetInfoWithtPA.AllowPowerFlowPA.ControlActionAOCN.ParamID;
-				MDPwithPAcriterium = worksheetInfoWithtPA.AllowPowerFlowPA.CriteriumVoltageLimitingWithPA;
+				float MDPtmp = worksheetInfoWithPA.AllowPowerFlowPA.VoltageLimitingWithoutPA +
+					worksheetInfoWithPA.AllowPowerFlowPA.ControlActionAOCN.CoefficientEfficiency *
+					worksheetInfoWithPA.AllowPowerFlowPA.ControlActionAOCN.MaxValue;
+				MDPwithPAlist.Add(MDPtmp);
+				MDPwithPA = worksheetInfoWithPA.AllowPowerFlowPA.VoltageLimitingWithoutPA.ToString() + " + " +
+					worksheetInfoWithPA.AllowPowerFlowPA.ControlActionAOCN.CoefficientEfficiency.ToString() +
+					worksheetInfoWithPA.AllowPowerFlowPA.ControlActionAOCN.ParamID;
+				MDPwithPAcriterium = worksheetInfoWithPA.AllowPowerFlowPA.CriteriumVoltageLimitingWithPA;
 				InsertText(MDPwithPA,
 				(nextRow, cellsGroupOneTemperature.StartID.Item2 + 1), ref excelPackageOutputFile);
 				InsertText(MDPwithPAcriterium,
@@ -143,24 +163,27 @@ namespace OutputFileStructure
 				cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 			}
 
-			if(worksheetInfoWithtPA.AllowPowerFlowPA.ValueWithPA > 0)
+			if(worksheetInfoWithPA.AllowPowerFlowPA.ValueWithPA > 0)
 			{
-				MDPwithPA = worksheetInfoWithtPA.AllowPowerFlowPA.ValueWithPA.ToString();
-				MDPwithPAcriterium = worksheetInfoWithtPA.AllowPowerFlowPA.CriteriumValueWithPA;
+				float MDPtmp = worksheetInfoWithPA.AllowPowerFlowPA.ValueWithPA;
+				MDPwithPAlist.Add(MDPtmp);
+
+				MDPwithPA = worksheetInfoWithPA.AllowPowerFlowPA.ValueWithPA.ToString();
+				MDPwithPAcriterium = worksheetInfoWithPA.AllowPowerFlowPA.CriteriumValueWithPA;
 				InsertText(MDPwithPA,
 				(nextRow, cellsGroupOneTemperature.StartID.Item2 + 1), ref excelPackageOutputFile);
 				InsertText(MDPwithPAcriterium,
 					(nextRow, cellsGroupOneTemperature.StartID.Item2 + 4), ref excelPackageOutputFile);
 			}
 
-			foreach (ImbalanceAndAutomatics imbalance in worksheetInfoWithtPA.imbalances)
+			foreach (ImbalanceAndAutomatics imbalance in worksheetInfoWithPA.imbalances)
 			{
-				//учет НБ сделать другим
 				nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
-				string equation = imbalance.Equation; // добавить КувАРПМ
 				InsertText(imbalance.Equation, (nextRow, cellsGroupOneTemperature.StartID.Item2), ref excelPackageOutputFile);
 				InsertText(imbalance.ImbalanceCriterion, (nextRow, cellsGroupOneTemperature.StartID.Item2 + 3), ref excelPackageOutputFile);
 			}
+
+			return MDPwithPAlist;
 		}
 
 		private void FindNonRegularOscilation(ExcelPackage excelPackage)
@@ -243,6 +266,43 @@ namespace OutputFileStructure
 			MergeColumn((startID.Item1, startID.Item1 + sizeCellsArea+1), startID.Item2 + 8, ref excelPackageOutputFile);
 		}
 
+		private void NeedForControlWithPA(WorksheetInfoWithPA worksheetInfoWithPA, List<float> MDPwithPAlist, AllowPowerOverflows allowPowerOverflow, (int, int) startID, int sizeCellsArea, ref ExcelPackage excelPackageOutputFile)
+		{
+			
+			if (CompareWithImbalancePA(worksheetInfoWithPA.imbalances,
+							MDPwithPAlist, allowPowerOverflow.CurrentLoadLinesValue))
+			{
+				InsertText( allowPowerOverflow.CurrentLoadLinesValue.ToString() + "*",
+					(startID.Item1 + sizeCellsArea, startID.Item2 + 1), ref excelPackageOutputFile);
+				InsertText($"ДДТН {allowPowerOverflow.CurrentLoadLinesCriterion}",
+					(startID.Item1 + sizeCellsArea, startID.Item2 + 4), ref excelPackageOutputFile);
+				InsertText($"Дополнительно осуществляется контроль токовой нагрузки '{allowPowerOverflow.CurrentLoadLinesCriterion}'",
+					(startID.Item1, startID.Item2 + 7), ref excelPackageOutputFile);
+			}
+			else if (CompareWithImbalancePA(worksheetInfoWithPA.imbalances,
+							MDPwithPAlist, allowPowerOverflow.StabilityVoltageValue))
+			{
+				InsertText(allowPowerOverflow.StabilityVoltageValue.ToString() + "*",
+					(startID.Item1 + sizeCellsArea, startID.Item2 + 1), ref excelPackageOutputFile);
+				InsertText("15% U исходная схема",
+					(startID.Item1 + sizeCellsArea, startID.Item2 + 4), ref excelPackageOutputFile);
+				InsertText($"Дополнительно осуществляется контроль напряжения на '{allowPowerOverflow.StabilityVoltageCriterion}'",
+					(startID.Item1, startID.Item2 + 7), ref excelPackageOutputFile);
+			}
+			else
+			{
+				InsertText("-",
+					(startID.Item1 + sizeCellsArea, startID.Item2 + 1), ref excelPackageOutputFile);
+				InsertText("-",
+					(startID.Item1 + sizeCellsArea, startID.Item2 + 4), ref excelPackageOutputFile);
+				InsertText("-",
+					(startID.Item1, startID.Item2 + 7), ref excelPackageOutputFile);
+			}
+			MergeColumn((startID.Item1, startID.Item1 + sizeCellsArea + 1), startID.Item2 + 7, ref excelPackageOutputFile);
+
+		}
+
+
 		private bool CompareWithImbalance(List<ImbalanceAndAutomatics> imbalances, int criterium, int maximumAllowPowerFlow, int compareValue)
 		{
 			if (compareValue == 0)
@@ -263,6 +323,29 @@ namespace OutputFileStructure
 			if(compareValue > maximumAllowPowerFlow)
 			{
 				return false;
+			}
+			return true;
+		}
+
+		private bool CompareWithImbalancePA(List<ImbalanceAndAutomatics> imbalances, List<float> MDPwithPAlist, int compareValue)
+		{
+			if (compareValue == 0)
+			{
+				return false;
+			}
+			for (int i = 0; i < imbalances.Count; i++)
+			{
+				if (compareValue > imbalances[i].EquationValue)
+				{
+					return false;
+				}
+			}
+			for(int i = 0; i< MDPwithPAlist.Count; i ++)
+			{
+				if (compareValue > MDPwithPAlist[i])
+				{
+					return false;
+				}
 			}
 			return true;
 		}
