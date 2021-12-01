@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using OfficeOpenXml;
 using WorkWithCatalog;
+using DataTypes;
 
 namespace OutputFileStructure
 {

@@ -11,6 +11,10 @@ namespace WorkWithDataSource
 	{
 		Factor,
 		Scheme,
-		Section
+		Section,
+		Imbalance,
+		ARPM,
+		AOPO,
+		AOCN
 	}
 }

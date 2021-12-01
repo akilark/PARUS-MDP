@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using OfficeOpenXml;
-using OutputFileStructure.DataTypes;
+using DataTypes;
 using WorkWithDataSource;
 
 namespace OutputFileStructure
@@ -28,15 +28,14 @@ namespace OutputFileStructure
 			}
 			SampleControlActions sampleControlActions = new SampleControlActions(excelPackage);
 
-			var imbalancesDataSource = new List<ImbalanceDataSource>();
 
 			string[] directions = new string[] { "На запад", "На восток" };
 
 			var controlActionWithNeedDirection = sampleControlActions.ControlActionsForNeedDirection(directions[0]);
 
-			var compare = new CompareControlActions(imbalancesDataSource, controlActionWithNeedDirection, new List<AOPO> { }, new List<AOCN> { }, true);
+			var compare = new CompareControlActions(pullData.Imbalances, controlActionWithNeedDirection, pullData.AOPOlist, pullData.AOCNlist, true);
 
-			InfoFromParusFile infoFromParusFile = new InfoFromParusFile(wwcg.PathAndDislocation, compare.Imbalances, compare.AOPOlist, compare.AOCNlist, compare.LAPNYlist, 
+			InfoFromParusFile infoFromParusFile = new InfoFromParusFile(cellsGroups, compare.Imbalances, compare.AOPOlist, compare.AOCNlist, compare.LAPNYlist, 
 				false, ref excelPackage2);
 
 

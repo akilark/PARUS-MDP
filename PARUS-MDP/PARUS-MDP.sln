@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkWithCatalog", "..\Catal
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExcelForParus", "..\ExcelForParus1\ExcelForParus.csproj", "{0AF074B8-461B-42ED-8A03-98A502A59F4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutputFileStructure", "OutputFileStructure\OutputFileStructure.csproj", "{D85CEDA9-ECC6-47C8-B696-A28D86C75702}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OutputFileStructure", "OutputFileStructure\OutputFileStructure.csproj", "{D85CEDA9-ECC6-47C8-B696-A28D86C75702}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTypes", "DataTypes\DataTypes.csproj", "{13F3FDE4-5FFE-4C08-AE3F-8B7A14A1768F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{D85CEDA9-ECC6-47C8-B696-A28D86C75702}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D85CEDA9-ECC6-47C8-B696-A28D86C75702}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D85CEDA9-ECC6-47C8-B696-A28D86C75702}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13F3FDE4-5FFE-4C08-AE3F-8B7A14A1768F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13F3FDE4-5FFE-4C08-AE3F-8B7A14A1768F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13F3FDE4-5FFE-4C08-AE3F-8B7A14A1768F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13F3FDE4-5FFE-4C08-AE3F-8B7A14A1768F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

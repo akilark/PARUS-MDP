@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Data.SqlClient;
+using DataTypes;
+
 
 // Добавить проверку соединения
 namespace WorkWithDataSource
@@ -16,13 +18,9 @@ namespace WorkWithDataSource
 		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
 		private List<(string, (string, bool)[])> _schemes = new List<(string, (string, bool)[])>();
 		private DataBaseAutentification _sqlConnectionString;
-
-		//TODO: удалить тестовый конструктор
-		public PullData()
-		{
-			_sectionName = " ";
-			_sqlConnectionString = new DataBaseAutentification();
-		}
+		private List<ImbalanceDataSource> _imbalancesDataSource;
+		private List<AOPO> _AOPOdataSource;
+		private List<AOCN> _AOCNdataSource;
 
 		/// <summary>
 		/// Конструктор класса с 1 параметром
@@ -32,9 +30,16 @@ namespace WorkWithDataSource
 		{
 			_sectionName = sectionName;
 			_sqlConnectionString = new DataBaseAutentification();
+			_imbalancesDataSource = new List<ImbalanceDataSource>();
+			_AOCNdataSource = new List<AOCN>();
+			_AOPOdataSource = new List<AOPO>();
 			PullSections();
 			PullFactors();
 			PullSchemes();
+			PullImbalance();
+			PullARPM();
+			PullAOPO();
+			PullAOCN();
 		}
 
 		/// <summary>
@@ -52,6 +57,9 @@ namespace WorkWithDataSource
 		/// </summary>
 		public List<(string, (string, bool)[])> Schemes => _schemes;
 
+		public List<ImbalanceDataSource> Imbalances => _imbalancesDataSource;
+		public List<AOPO> AOPOlist => _AOPOdataSource;
+		public List<AOCN> AOCNlist => _AOCNdataSource;
 		/// <summary>
 		/// Метод для заполнения списка факторов из БД
 		/// </summary>
@@ -61,6 +69,37 @@ namespace WorkWithDataSource
 				FROM [dbo].[Sections], [dbo].[Factors]
 				WHERE Sections.Section_ID = Factors.Section_ID and Sections.Section = '{_sectionName}'";
 			ConnectWithDataBase(sqlExpression, DataType.Factor);
+		}
+
+		private void PullImbalance()
+		{
+			string sqlExpression = @$"SELECT ImbalanceLine.NameLine, Imbalance.Name, Imbalance.Direction, 
+				Imbalance.MaxValue, Imbalance.Coefficient, Imbalance.Identificator 
+				FROM [dbo].[Imbalance], [dbo].[ImbalanceLine]
+				WHERE Imbalance.Imbalance_ID = ImbalanceLine.Imbalance_ID";
+			ConnectWithDataBase(sqlExpression, DataType.Imbalance);
+		}
+
+		private void PullARPM()
+		{
+			string sqlExpression = @$"SELECT  [ImbalanceLine].[NameLine],[ARPM].[Name]
+				FROM [dbo].[ARPM], [dbo].[Imbalance], [dbo].[ImbalanceLine]
+				Where Imbalance.Imbalance_ID = ARPM.Imbalance_ID and Imbalance.Imbalance_ID = ImbalanceLine.Imbalance_ID";
+			ConnectWithDataBase(sqlExpression, DataType.ARPM);
+		}
+
+		private void PullAOPO()
+		{
+			string sqlExpression = @$"SELECT [NetworkElementName] ,[NameAOPO]
+				FROM [dbo].[AOPO]";
+			ConnectWithDataBase(sqlExpression, DataType.AOPO);
+		}
+
+		private void PullAOCN()
+		{
+			string sqlExpression = @$"SELECT [ControlPointName],[NameAOCN]
+				FROM [dbo].[AOCN]";
+			ConnectWithDataBase(sqlExpression, DataType.AOCN);
 		}
 
 		/// <summary>
@@ -115,9 +154,83 @@ namespace WorkWithDataSource
 									SchemeConvertToList(reader);
 									break;
 								}
+							case DataType.Imbalance:
+								{
+									ImbalanceAllConvertToList(reader);
+									break;
+								}
+							case DataType.ARPM:
+								{
+									ARPMaddToList(reader);
+									break;
+								}
+							case DataType.AOCN:
+								{
+									AOCNConvertToList(reader);
+									break;
+								}
+							case DataType.AOPO:
+								{
+									AOPOConvertToList(reader);
+									break;
+								}
 						}
 					}
 				}
+			}
+		}
+
+		private void ImbalanceAllConvertToList(SqlDataReader reader)
+		{
+			while (reader.Read())
+			{
+				ImbalanceDataSource imbalanceDataSource = new ImbalanceDataSource();
+				imbalanceDataSource.LineName = reader.GetString(0);
+				imbalanceDataSource.ImbalanceName = reader.GetString(1);
+				imbalanceDataSource.Imbalance = new ControlActionRow();
+				imbalanceDataSource.Imbalance.Direction = reader.GetString(2);
+				imbalanceDataSource.Imbalance.MaxValue = int.Parse(reader.GetDecimal(3).ToString());
+				imbalanceDataSource.Imbalance.CoefficientEfficiency = reader.GetFloat(4);
+				imbalanceDataSource.Imbalance.ParamID = reader.GetString(5);
+				imbalanceDataSource.Imbalance.ParamSign = reader.GetString(1);
+				
+				_imbalancesDataSource.Add(imbalanceDataSource);
+			}
+		}
+
+		private void ARPMaddToList(SqlDataReader reader)
+		{
+			while (reader.Read())
+			{
+				foreach(ImbalanceDataSource imbalanceDataSource in _imbalancesDataSource)
+				{
+					if(imbalanceDataSource.LineName == reader.GetString(0))
+					{
+						imbalanceDataSource.ARPMName = reader.GetString(1);
+					}
+				}
+			}
+		}
+
+		private void AOCNConvertToList(SqlDataReader reader)
+		{
+			while (reader.Read())
+			{
+				AOCN AOCNtmp = new AOCN();
+				AOCNtmp.NodeName = reader.GetString(0);
+				AOCNtmp.AutomaticName = reader.GetString(1);
+				_AOCNdataSource.Add(AOCNtmp);
+			}
+		}
+
+		private void AOPOConvertToList(SqlDataReader reader)
+		{
+			while (reader.Read())
+			{
+				AOPO AOPOtmp = new AOPO();
+				AOPOtmp.LineName = reader.GetString(0);
+				AOPOtmp.AutomaticName = reader.GetString(1);
+				_AOPOdataSource.Add(AOPOtmp);
 			}
 		}
 

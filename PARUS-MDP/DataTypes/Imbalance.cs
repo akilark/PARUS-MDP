@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OutputFileStructure.DataTypes
+namespace DataTypes
 {
 	public class Imbalance
 	{

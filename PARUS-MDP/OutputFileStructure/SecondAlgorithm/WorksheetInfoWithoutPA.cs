@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using OfficeOpenXml;
-using OutputFileStructure.DataTypes;
+using DataTypes;
 
 namespace OutputFileStructure
 {

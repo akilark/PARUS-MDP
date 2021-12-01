@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using OutputFileStructure.DataTypes;
+using DataTypes;
 
 namespace OutputFileStructure
 {
@@ -15,6 +15,7 @@ namespace OutputFileStructure
 		public CompareControlActions(List<ImbalanceDataSource> imbalancesDataSource, List<ControlActionRow> controlActions,
 			List<AOPO> AOPOdataSource, List<AOCN> AOCNdataSource, bool workWithDataSourseInfo)
 		{
+			
 			CompareImbalances(imbalancesDataSource, controlActions, workWithDataSourseInfo);
 			CompareAOPO(AOPOdataSource, controlActions);
 			CompareAOCN(AOCNdataSource, controlActions);
