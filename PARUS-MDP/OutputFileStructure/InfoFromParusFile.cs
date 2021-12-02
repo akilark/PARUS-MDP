@@ -45,14 +45,14 @@ namespace OutputFileStructure
 							
 							InsertText(workSheetInfoTMP.MaximumAllowPowerFlow.EmergencyAllowPowerFlowValue.ToString(),
 								(cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 2), ref excelPackageOutputFile);
-							MergeColumn((cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea + 1),
-								cellsGroupOneTemperature.StartID.Item2 + 2, ref excelPackageOutputFile);
+							excelPackageOutputFile.Workbook.Worksheets[0].Cells[cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 2,
+								cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea, cellsGroupOneTemperature.StartID.Item2 + 2].Merge = true;
 							InsertText(workSheetInfoTMP.MaximumAllowPowerFlow.EmergencyAllowPowerCriterion,
 								(cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 5), ref excelPackageOutputFile);
-							MergeColumn((cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea + 1),
-								cellsGroupOneTemperature.StartID.Item2 + 5, ref excelPackageOutputFile);
-							
-							foreach(ImbalanceAndAutomatics imbalance in workSheetInfoTMP.MaximumAllowPowerFlowNonBalance)
+							excelPackageOutputFile.Workbook.Worksheets[0].Cells[cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 5,
+								cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea, cellsGroupOneTemperature.StartID.Item2 + 5].Merge = true;
+
+							foreach (ImbalanceAndAutomatics imbalance in workSheetInfoTMP.MaximumAllowPowerFlowNonBalance)
 							{
 								nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 								InsertText(imbalance.Equation, (nextRow, cellsGroupOneTemperature.StartID.Item2), ref excelPackageOutputFile);
@@ -64,8 +64,15 @@ namespace OutputFileStructure
 							List<float> MDPwithPAlist = ValuesWithPA(worksheetInfoWithPA, cellsGroupOneTemperature, ref excelPackageOutputFile);
 							NeedForControlWithPA(worksheetInfoWithPA, MDPwithPAlist, workSheetInfoTMP.AllowPowerOverflow,
 								cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, ref excelPackageOutputFile);
+							for(int j =0; j < 9; j ++)
+							{
+								excelPackageOutputFile.Workbook.Worksheets[0].Cells[cellsGroupOneTemperature.StartID.Item1, 7 + j, 
+									cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea, 7+j].
+									Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Medium);
+							}
+							
 							break;
-
+							
 						}
 					}
 					if(flag)
@@ -204,13 +211,6 @@ namespace OutputFileStructure
 			
 		}
 
-		private void MergeColumn((int, int) columnMerge, int column, ref ExcelPackage excelPackageOutputFile)
-		{
-			excelPackageOutputFile.Workbook.Worksheets[0].Cells[columnMerge.Item1, column, columnMerge.Item2 - 1, column].Merge = true;
-			excelPackageOutputFile.Workbook.Worksheets[0].Cells[columnMerge.Item1, column, columnMerge.Item2 - 1, column].
-					Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Medium);
-		}
-
 		private void NeedForControl(WorksheetInfoWithoutPA workSheetInfo, (int,int) startID, int sizeCellsArea, ref ExcelPackage excelPackageOutputFile)
 		{
 			if (CompareWithImbalance(workSheetInfo.MaximumAllowPowerFlowNonBalance,
@@ -246,9 +246,11 @@ namespace OutputFileStructure
 				InsertText("-",
 					(startID.Item1, startID.Item2 + 6), ref excelPackageOutputFile);
 			}
-			MergeColumn((startID.Item1, startID.Item1 + sizeCellsArea+1), startID.Item2 + 6, ref excelPackageOutputFile);
+					
+			excelPackageOutputFile.Workbook.Worksheets[0].Cells[startID.Item1, startID.Item2 + 6,
+				startID.Item1 + sizeCellsArea, startID.Item2 + 6].Merge = true;
 
-			if (workSheetInfo.AllowPowerOverflow.CurrentLoadLinesValue < workSheetInfo.AllowPowerOverflow.EmergencyAllowPowerOverflow)
+				if (workSheetInfo.AllowPowerOverflow.CurrentLoadLinesValue < workSheetInfo.AllowPowerOverflow.EmergencyAllowPowerOverflow)
 			{
 				InsertText($"Дополнительно осуществляется контроль токовой нагрузки '{workSheetInfo.AllowPowerOverflow.CurrentLoadLinesCriterion}'",
 					(startID.Item1, startID.Item2 + 8), ref excelPackageOutputFile);
@@ -263,7 +265,8 @@ namespace OutputFileStructure
 				InsertText("-",
 					(startID.Item1, startID.Item2 + 8), ref excelPackageOutputFile);
 			}
-			MergeColumn((startID.Item1, startID.Item1 + sizeCellsArea+1), startID.Item2 + 8, ref excelPackageOutputFile);
+			excelPackageOutputFile.Workbook.Worksheets[0].Cells[startID.Item1, startID.Item2 + 8,
+				startID.Item1 + sizeCellsArea, startID.Item2 + 8].Merge = true;
 		}
 
 		private void NeedForControlWithPA(WorksheetInfoWithPA worksheetInfoWithPA, List<float> MDPwithPAlist, AllowPowerOverflows allowPowerOverflow, (int, int) startID, int sizeCellsArea, ref ExcelPackage excelPackageOutputFile)
@@ -298,7 +301,8 @@ namespace OutputFileStructure
 				InsertText("-",
 					(startID.Item1, startID.Item2 + 7), ref excelPackageOutputFile);
 			}
-			MergeColumn((startID.Item1, startID.Item1 + sizeCellsArea + 1), startID.Item2 + 7, ref excelPackageOutputFile);
+			excelPackageOutputFile.Workbook.Worksheets[0].Cells[startID.Item1, startID.Item2 + 7,
+				startID.Item1 + sizeCellsArea, startID.Item2 + 7].Merge = true;
 
 		}
 
