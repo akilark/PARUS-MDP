@@ -1,5 +1,5 @@
 ﻿
-namespace MainForm
+namespace GUI
 {
 	partial class MainForm
 	{
@@ -43,6 +43,7 @@ namespace MainForm
 			this.FolderButton.TabIndex = 0;
 			this.FolderButton.Text = "Формирование дерева папок";
 			this.FolderButton.UseVisualStyleBackColor = true;
+			this.FolderButton.Click += new System.EventHandler(this.FolderButton_Click);
 			// 
 			// PARUSsampleButton
 			// 
@@ -53,6 +54,7 @@ namespace MainForm
 			this.PARUSsampleButton.TabIndex = 1;
 			this.PARUSsampleButton.Text = "Формирование шаблона для ПК \"ПАРУС\"";
 			this.PARUSsampleButton.UseVisualStyleBackColor = true;
+			this.PARUSsampleButton.Click += new System.EventHandler(this.PARUSsampleButton_Click);
 			// 
 			// OutputFileButton
 			// 
@@ -63,6 +65,7 @@ namespace MainForm
 			this.OutputFileButton.TabIndex = 2;
 			this.OutputFileButton.Text = "Формирование приложения №6 ПУР";
 			this.OutputFileButton.UseVisualStyleBackColor = true;
+			this.OutputFileButton.Click += new System.EventHandler(this.OutputFileButton_Click);
 			// 
 			// MainForm
 			// 

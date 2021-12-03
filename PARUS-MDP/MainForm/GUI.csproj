@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\CatalogCreator1\WorkWithCatalog.csproj" />
+    <ProjectReference Include="..\..\ExcelForParus1\ExcelForParus.csproj" />
+    <ProjectReference Include="..\..\WorkWithDataSource1\WorkWithDataSource.csproj" />
+    <ProjectReference Include="..\DataTypes\DataTypes.csproj" />
+    <ProjectReference Include="..\OutputFileStructure\OutputFileStructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

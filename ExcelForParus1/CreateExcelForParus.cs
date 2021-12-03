@@ -8,8 +8,9 @@ namespace ExcelForParus
 	/// <summary>
 	/// Класс для генерации Excel файла для ПК ПАРУС
 	/// </summary>
-	class CreateExcelForParus
+	public class CreateExcelForParus
 	{
+		private List<string> _errorList;
 		private string _path;
 		private List<(string, string, string)> _filesLinkList = new List<(string, string, string)>();
 		private string _fileSch;
@@ -22,17 +23,31 @@ namespace ExcelForParus
 		public CreateExcelForParus(string path)
 		{
 			_path = path;
+			_errorList = new List<string>();
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+			Generate();
 		}
+
+		public List<string> ErrorList => _errorList;
 
 		/// <summary>
 		/// Метод инициирующий создание excel файла для ПК ПАРУС
 		/// </summary>
-		public void Generate()
+		private void Generate()
 		{
 			FilesLinkListFill(_path);
-			_fileSch = FindFile(_path, "*.sch");
-			TransportedInfoInExcel();
+			try
+			{
+				_fileSch = FindFile(_path, "*.sch");
+			}
+			catch (ArgumentException exception)
+			{
+				_errorList.Add(exception.Message);
+			}
+			if(_errorList.Count < 1)
+			{
+				TransportedInfoInExcel();
+			}
 		}
 
 		/// <summary>
@@ -45,7 +60,31 @@ namespace ExcelForParus
 			var ArrayDirectory = Directory.GetDirectories(path);
 			if (ArrayDirectory.Length == 0)
 			{
-				_filesLinkList.Add((FindFile(path, "*.rg2"), FindFile(path, "*.ut2"), path));
+				string fileRg ="";
+				string fileUt= "";
+				try
+				{
+					fileRg = FindFile(path, "*.rg2");
+				}
+				catch (ArgumentException exception)
+				{
+					_errorList.Add(exception.Message);
+				}
+
+				try
+				{
+					fileUt = FindFile(path, "*.ut2");
+				}
+				catch (ArgumentException exception)
+				{
+					_errorList.Add(exception.Message);
+				}
+
+				if (fileRg != "" && fileUt != "")
+				{
+					_filesLinkList.Add((fileRg, fileUt, path));
+				}
+				
 			}
 			else
 			{
@@ -73,7 +112,7 @@ namespace ExcelForParus
 			}
 			else
 			{
-				throw new Exception(@$"Необходим 1 файл с расширением '{pattern}' в директории: {path}");
+				throw new ArgumentException(@$"Необходим 1 файл с расширением '{pattern}' в директории: {path}");
 			}
 		}
 

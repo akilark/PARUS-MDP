@@ -24,5 +24,15 @@ namespace GUI
 		{
 
 		}
+
+		private void OutputFileGenerate_Load(object sender, EventArgs e)
+		{
+
+		}
+
+		private void BackButton_Click(object sender, EventArgs e)
+		{
+			this.Hide();
+		}
 	}
 }

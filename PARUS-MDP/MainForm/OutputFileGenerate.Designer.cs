@@ -389,6 +389,7 @@ namespace GUI
 			this.BackButton.TabIndex = 5;
 			this.BackButton.Text = "Назад";
 			this.BackButton.UseVisualStyleBackColor = true;
+			this.BackButton.Click += new System.EventHandler(this.BackButton_Click);
 			// 
 			// EmergencyLineDisconnection
 			// 
@@ -415,6 +416,7 @@ namespace GUI
 			this.MaximizeBox = false;
 			this.Name = "OutputFileGenerate";
 			this.Text = "Формирование приложения №6 ПУР";
+			this.Load += new System.EventHandler(this.OutputFileGenerate_Load);
 			this.TemperatureAllowGroupBox.ResumeLayout(false);
 			this.TemperatureAllowGroupBox.PerformLayout();
 			this.TemperatureGroupBox.ResumeLayout(false);

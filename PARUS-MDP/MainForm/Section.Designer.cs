@@ -53,15 +53,16 @@ namespace GUI
 			this.DataSourceButton.TabIndex = 1;
 			this.DataSourceButton.UseVisualStyleBackColor = true;
 			// 
-			// CancelButton
+			// CancelingButton
 			// 
 			this.CancelingButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.CancelingButton.Location = new System.Drawing.Point(357, 200);
-			this.CancelingButton.Name = "CancelButton";
+			this.CancelingButton.Name = "CancelingButton";
 			this.CancelingButton.Size = new System.Drawing.Size(90, 25);
 			this.CancelingButton.TabIndex = 2;
 			this.CancelingButton.Text = "Назад";
 			this.CancelingButton.UseVisualStyleBackColor = true;
+			this.CancelingButton.Click += new System.EventHandler(this.CancelingButton_Click);
 			// 
 			// Section
 			// 
@@ -75,6 +76,7 @@ namespace GUI
 			this.Name = "Section";
 			this.ShowIcon = false;
 			this.Text = "Выбор сечения";
+			this.Load += new System.EventHandler(this.Section_Load);
 			this.ResumeLayout(false);
 
 		}
