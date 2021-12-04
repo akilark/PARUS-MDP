@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using OfficeOpenXml;
 using WorkWithDataSource;
+using DataTypes;
 
 namespace WorkWithCatalog
 {
@@ -15,7 +16,7 @@ namespace WorkWithCatalog
 		//TODO: Добавить проверку на наличие файла с моим расширением, если этот файл есть, то берем данные из него, если нет, пытаемся подключится к БД, если подключения нет, ошибка
 		private string _rootName;
 		private string[] _allScheme;
-		private List<(string, (string, bool)[])> _schemesFromDataBase;
+		private List<Scheme> _schemesFromDataBase;
 		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
 		private string[] _temperature = new string[0];
 
@@ -29,7 +30,7 @@ namespace WorkWithCatalog
 		/// </summary>
 		public string[] AllScheme => _allScheme;
 
-		public List<(string, (string, bool)[])> SchemeFromDataBase => _schemesFromDataBase;
+		public List<Scheme> SchemeFromDataBase => _schemesFromDataBase;
 
 		/// <summary>
 		/// Свойство хранящее список влияющих факторов без указания направления мощности

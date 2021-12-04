@@ -105,11 +105,11 @@ namespace GUI
 			this.ConnectButton.UseVisualStyleBackColor = true;
 			this.ConnectButton.Click += new System.EventHandler(this.button1_Click);
 			// 
-			// CancelButton
+			// CancelingButton
 			// 
 			this.CancelingButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.CancelingButton.Location = new System.Drawing.Point(299, 233);
-			this.CancelingButton.Name = "CancelButton";
+			this.CancelingButton.Name = "CancelingButton";
 			this.CancelingButton.Size = new System.Drawing.Size(82, 25);
 			this.CancelingButton.TabIndex = 2;
 			this.CancelingButton.Text = "Назад";
@@ -128,6 +128,7 @@ namespace GUI
 			this.Controls.Add(this.PasswordTextBox);
 			this.Controls.Add(this.LoginTextBox);
 			this.Controls.Add(this.ConnectionTextBox);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.MaximizeBox = false;
 			this.Name = "DataSource";
 			this.Text = "Подключение к базе данных";

@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using DataTypes;
 
 namespace WorkWithCatalog
 {
+	//не нужный класс
 	public class SchemeComporator
 	{
 		private bool _compareResults;
-		List<(string, (string, bool)[])> _necessarySchemes;
-		public SchemeComporator(List<(string, (string, bool)[])> necessarySchemes, List<(string, (string, bool)[])> existingSchemes)
+		List<Scheme> _necessarySchemes;
+		public SchemeComporator(List<Scheme> necessarySchemes, List<Scheme> existingSchemes)
 		{
 			_compareResults = Compare(necessarySchemes, existingSchemes);
 			if(!_compareResults)
@@ -18,32 +20,32 @@ namespace WorkWithCatalog
 			}
 			else
 			{
-				_necessarySchemes = new List<(string, (string, bool)[])>();
+				_necessarySchemes = new List<Scheme>();
 			}
 
 		}
 
-		private bool Compare(List<(string, (string, bool)[])> necessarySchemes, List<(string, (string, bool)[])> existingSchemes)
+		private bool Compare(List<Scheme> necessarySchemes, List<Scheme> existingSchemes)
 		{
 			bool Disturbanceflag = true;
 			bool SchemeFlag;
-			foreach ((string, (string, bool)[]) necessaryScheme in necessarySchemes)
+			foreach (Scheme necessaryScheme in necessarySchemes)
 			{
 				SchemeFlag = false;
-				foreach ((string, (string, bool)[]) existingScheme in existingSchemes)
+				foreach (Scheme existingScheme in existingSchemes)
 				{
-					if (necessaryScheme.Item1.Trim().ToLower() == existingScheme.Item1.Trim().ToLower())
+					if (necessaryScheme.SchemeName.Trim().ToLower() == existingScheme.SchemeName.Trim().ToLower())
 					{
 						SchemeFlag = true;
-						if (necessaryScheme.Item2.Length != existingScheme.Item2.Length)
+						if (necessaryScheme.Disturbance.Count != existingScheme.Disturbance.Count)
 						{
 							return false;
 						}
 						else
 						{
-							for (int i = 0; i < necessaryScheme.Item2.Length; i++)
+							for (int i = 0; i < necessaryScheme.Disturbance.Count; i++)
 							{
-								if (necessaryScheme.Item2[i].Item1.Trim().ToLower() != existingScheme.Item2[i].Item1.Trim().ToLower())
+								if (necessaryScheme.Disturbance[i].Item1.Trim().ToLower() != existingScheme.Disturbance[i].Item1.Trim().ToLower())
 								{
 									return false;
 								}
@@ -61,6 +63,6 @@ namespace WorkWithCatalog
 
 		public bool CompareResults => _compareResults;
 
-		public List<(string, (string, bool)[])> SchemesForXML => _necessarySchemes;
+		public List<Scheme> SchemesForXML => _necessarySchemes;
 	}
 }

@@ -12,8 +12,8 @@ namespace DataTypes
 		public string Direction { get; set; }
 		
 		public string SchemeName { get; set; }
-		public bool AutomaticForScheme { get; set; }
-		
+		public List<(string, bool)> Disturbance { get; set; }
+
 		public List<(string, int)> Factors { get; set; }
 		
 		public int SizeCellsArea { get; set; }

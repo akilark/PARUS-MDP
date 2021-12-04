@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using DataTypes;
 
 namespace WorkWithCatalog
 {
@@ -12,7 +13,7 @@ namespace WorkWithCatalog
 		private string _path;
 		private string _rootName;
 		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
-		private List<(string, (string, bool)[])> _schemes = new List<(string, (string, bool)[])>();
+		private List<Scheme> _schemes = new List<Scheme>();
 
 		/// <summary>
 		/// Коструктор класса с 4 параметрами
@@ -21,7 +22,7 @@ namespace WorkWithCatalog
 		/// <param name="rootName"></param>
 		/// <param name="Factors">Лист факторов со структурой (направление, (фактор, значение фактора[])[])</param>
 		/// <param name="Shemes">Лист схем со структурой (ремонтная схема, (возмущение, наличие противоаварийной автоматики)[])</param>
-		public CatalogCreator(string path, string rootName, List<(string, (string, string[])[])> Factors, List<(string, (string, bool)[])> Shemes)
+		public CatalogCreator(string path, string rootName, List<(string, (string, string[])[])> Factors, List<Scheme> Shemes)
 		{
 			_path = path;
 			_rootName = rootName;
@@ -64,7 +65,7 @@ namespace WorkWithCatalog
 			var allScheme = new string[schemeArraySize];
 			for (int schemeIndex = 0; schemeIndex < schemeArraySize; schemeIndex++)
 			{
-				allScheme[schemeIndex] = _schemes[schemeIndex].Item1;
+				allScheme[schemeIndex] = _schemes[schemeIndex].SchemeName;
 			}
 			return allScheme;
 		}

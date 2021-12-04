@@ -33,7 +33,6 @@ namespace GUI
 		{
 			this.Hide();
 			_section.ShowDialog();
-			this.Show();
 		}
 
 		private void OutputFileButton_Click(object sender, EventArgs e)

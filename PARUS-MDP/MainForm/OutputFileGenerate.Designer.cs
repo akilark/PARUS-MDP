@@ -413,6 +413,7 @@ namespace GUI
 			this.Controls.Add(this.ExploreButton);
 			this.Controls.Add(this.PathLabel);
 			this.Controls.Add(this.PathTextBox);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.MaximizeBox = false;
 			this.Name = "OutputFileGenerate";
 			this.Text = "Формирование приложения №6 ПУР";

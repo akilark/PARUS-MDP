@@ -13,13 +13,13 @@ namespace OutputFileStructure
 		private List<CellsGroup> _pathAndDislocation;
 
 		public WorkWithCellsGroup(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample, 
-			List<(string, (string, bool)[])> schemes)
+			List<Scheme> schemes)
 		{
 			_pathAndDislocation = new List<CellsGroup>();
 			JuxtaposePathAndCells(foldersPath, excelPackage, FactorsInSample, schemes, false);
 		}
 		public WorkWithCellsGroup(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample, 
-			List<(string, (string, bool)[])> schemes, string[] Temperature)
+			List<Scheme> schemes, string[] Temperature)
 		{
 			_pathAndDislocation = new List<CellsGroup>();
 			_temperature = Temperature;
@@ -28,7 +28,7 @@ namespace OutputFileStructure
 		public List<CellsGroup> PathAndDislocation => _pathAndDislocation;
 
 		private void JuxtaposePathAndCells(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample,
-			List<(string, (string, bool)[])> schemes, bool temperatureDependence)
+			List<Scheme> schemes, bool temperatureDependence)
 		{
 			int substractor = temperatureDependence ? 2 : 1;
 			int rowIndex;
@@ -64,15 +64,10 @@ namespace OutputFileStructure
 				string direction = FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 3, excelPackage);
 				for(int i = 0; i < schemes.Count; i++)
 				{
-					if(schemes[i].Item1 == direction)
+					if(schemes[i].SchemeName == schemeName)
 					{
-						for(int j = 0; j < schemes[i].Item2.Length; j++)
-						{
-							if(schemes[i].Item2[j].Item1 == schemeName)
-							{
-								cellsGroup.AutomaticForScheme = schemes[i].Item2[j].Item2;
-							}
-						}
+						cellsGroup.Disturbance = schemes[i].Disturbance;
+
 					}
 				}
 

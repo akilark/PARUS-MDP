@@ -5,6 +5,7 @@ using WorkWithCatalog;
 using System.IO;
 using System.Reflection;
 using OfficeOpenXml;
+using DataTypes;
 
 
 
@@ -103,7 +104,7 @@ namespace OutputFileStructure
 		{
 			List<(string, (int, int))> factorsInSample = FactorsInSample();
 			int amountControlActions = _sampleControlActions.AmountControlActions(factors.Item1);
-			List<(string, (string, bool)[])> schemeWithDisturbance = _catalogReader.SchemeFromDataBase;
+			List<Scheme> schemeWithDisturbance = _catalogReader.SchemeFromDataBase;
 
 			foreach (string scheme in _catalogReader.AllScheme)
 			{
@@ -143,13 +144,13 @@ namespace OutputFileStructure
 			return rowNumberForScheme;
 		}
 
-		private int CountDisturbances(string namescheme, List<(string, (string, bool)[])> schemesWithDisturbance)
+		private int CountDisturbances(string namescheme, List<Scheme> schemesWithDisturbance)
 		{
-			foreach((string,(string,bool)[]) schemeWithDisturbance in schemesWithDisturbance)
+			foreach(Scheme schemeWithDisturbance in schemesWithDisturbance)
 			{
-				if (namescheme.Trim().ToLower() == schemeWithDisturbance.Item1.Trim().ToLower())
+				if (namescheme.Trim().ToLower() == schemeWithDisturbance.SchemeName.Trim().ToLower())
 				{
-					return schemeWithDisturbance.Item2.Length;
+					return schemeWithDisturbance.Disturbance.Count;
 				}
 			}
 			return 0;

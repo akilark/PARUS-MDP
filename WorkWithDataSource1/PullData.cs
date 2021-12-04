@@ -16,11 +16,17 @@ namespace WorkWithDataSource
 		private string _sectionName;
 		private List<string> _sections = new List<string>();
 		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
-		private List<(string, (string, bool)[])> _schemes = new List<(string, (string, bool)[])>();
+		private List<Scheme> _schemes = new List<Scheme>();
 		private DataBaseAutentification _sqlConnectionString;
 		private List<ImbalanceDataSource> _imbalancesDataSource;
 		private List<AOPO> _AOPOdataSource;
 		private List<AOCN> _AOCNdataSource;
+
+		public PullData()
+		{
+			_sqlConnectionString = new DataBaseAutentification();
+			PullSections();
+		}
 
 		/// <summary>
 		/// Конструктор класса с 1 параметром
@@ -55,7 +61,7 @@ namespace WorkWithDataSource
 		/// <summary>
 		/// Свойство возврщающее список схем в формате (string, (string, bool)[])
 		/// </summary>
-		public List<(string, (string, bool)[])> Schemes => _schemes;
+		public List<Scheme> Schemes => _schemes;
 
 		public List<ImbalanceDataSource> Imbalances => _imbalancesDataSource;
 		public List<AOPO> AOPOlist => _AOPOdataSource;
@@ -305,7 +311,7 @@ namespace WorkWithDataSource
 		/// способ чтения потока строк в БД</param>
 		private void SchemeConvertToList(SqlDataReader reader)
 		{
-			(string, bool)[] disturbance = new (string, bool)[0];
+			List<(string, bool)> disturbance = new List<(string, bool)>();
 			bool firstSchemeFlag = true;
 			string compareScheme = "";
 			while (reader.Read())
@@ -314,21 +320,26 @@ namespace WorkWithDataSource
 				{
 					if (!firstSchemeFlag)
 					{
-						_schemes.Add((compareScheme, (disturbance)));
-						disturbance = new (string, bool)[0];
+						Scheme schemeTmp = new Scheme();
+						schemeTmp.SchemeName = compareScheme;
+						schemeTmp.Disturbance = disturbance;
+						_schemes.Add(schemeTmp);
+						disturbance = new List<(string, bool)>();
 					}
 					compareScheme = reader.GetString(0);
 				}
 
 				if (reader.GetString(0) == compareScheme)
 				{
-					Array.Resize(ref disturbance, disturbance.Length + 1);
-					disturbance[disturbance.Length - 1] = (reader.GetString(1), reader.GetBoolean(2));
+					disturbance.Add((reader.GetString(1), reader.GetBoolean(2)));
 				}
 
 				firstSchemeFlag = false;
 			}
-			_schemes.Add((compareScheme, (disturbance)));
+			Scheme scheme = new Scheme();
+			scheme.SchemeName = compareScheme;
+			scheme.Disturbance = disturbance;
+			_schemes.Add(scheme);
 		}
 	}
 }

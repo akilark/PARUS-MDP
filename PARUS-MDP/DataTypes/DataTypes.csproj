@@ -49,6 +49,7 @@
     <Compile Include="AOPO.cs" />
     <Compile Include="CellsGroup.cs" />
     <Compile Include="ControlActionRow.cs" />
+    <Compile Include="Factor.cs" />
     <Compile Include="Imbalance.cs" />
     <Compile Include="ImbalanceAndAutomatics.cs" />
     <Compile Include="ImbalanceDataSource.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="MaximumAllowPowerFlowPA.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scheme.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

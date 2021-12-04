@@ -37,34 +37,44 @@ namespace GUI
 			// 
 			// SectionComboBox
 			// 
+			this.SectionComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.SectionComboBox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.SectionComboBox.FormattingEnabled = true;
 			this.SectionComboBox.Location = new System.Drawing.Point(12, 12);
 			this.SectionComboBox.Name = "SectionComboBox";
-			this.SectionComboBox.Size = new System.Drawing.Size(242, 25);
+			this.SectionComboBox.Size = new System.Drawing.Size(337, 25);
 			this.SectionComboBox.TabIndex = 0;
 			// 
 			// FactorComboBox
 			// 
+			this.FactorComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.FactorComboBox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.FactorComboBox.FormattingEnabled = true;
 			this.FactorComboBox.Location = new System.Drawing.Point(12, 60);
 			this.FactorComboBox.Name = "FactorComboBox";
-			this.FactorComboBox.Size = new System.Drawing.Size(242, 25);
+			this.FactorComboBox.Size = new System.Drawing.Size(337, 25);
 			this.FactorComboBox.TabIndex = 1;
 			// 
 			// FactorValueTextBox
 			// 
+			this.FactorValueTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.FactorValueTextBox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.FactorValueTextBox.Location = new System.Drawing.Point(12, 108);
 			this.FactorValueTextBox.Name = "FactorValueTextBox";
-			this.FactorValueTextBox.Size = new System.Drawing.Size(139, 25);
+			this.FactorValueTextBox.Size = new System.Drawing.Size(218, 25);
 			this.FactorValueTextBox.TabIndex = 2;
 			// 
 			// AddingButton
 			// 
+			this.AddingButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.AddingButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.AddingButton.Location = new System.Drawing.Point(172, 108);
+			this.AddingButton.Location = new System.Drawing.Point(267, 107);
 			this.AddingButton.Name = "AddingButton";
 			this.AddingButton.Size = new System.Drawing.Size(82, 25);
 			this.AddingButton.TabIndex = 3;
@@ -75,7 +85,7 @@ namespace GUI
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(267, 147);
+			this.ClientSize = new System.Drawing.Size(361, 144);
 			this.Controls.Add(this.AddingButton);
 			this.Controls.Add(this.FactorValueTextBox);
 			this.Controls.Add(this.FactorComboBox);

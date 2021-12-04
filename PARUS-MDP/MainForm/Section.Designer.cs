@@ -31,7 +31,7 @@ namespace GUI
 		{
 			this.SectionComboBox = new System.Windows.Forms.ComboBox();
 			this.DataSourceButton = new System.Windows.Forms.Button();
-			this.CancelingButton = new System.Windows.Forms.Button();
+			this.AcceptingButton = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// SectionComboBox
@@ -42,6 +42,7 @@ namespace GUI
 			this.SectionComboBox.Name = "SectionComboBox";
 			this.SectionComboBox.Size = new System.Drawing.Size(316, 25);
 			this.SectionComboBox.TabIndex = 0;
+			this.SectionComboBox.SelectedIndexChanged += new System.EventHandler(this.SectionComboBox_SelectedIndexChanged);
 			// 
 			// DataSourceButton
 			// 
@@ -52,30 +53,34 @@ namespace GUI
 			this.DataSourceButton.Size = new System.Drawing.Size(32, 32);
 			this.DataSourceButton.TabIndex = 1;
 			this.DataSourceButton.UseVisualStyleBackColor = true;
+			this.DataSourceButton.Click += new System.EventHandler(this.DataSourceButton_Click);
 			// 
-			// CancelingButton
+			// AcceptingButton
 			// 
-			this.CancelingButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.CancelingButton.Location = new System.Drawing.Point(357, 200);
-			this.CancelingButton.Name = "CancelingButton";
-			this.CancelingButton.Size = new System.Drawing.Size(90, 25);
-			this.CancelingButton.TabIndex = 2;
-			this.CancelingButton.Text = "Назад";
-			this.CancelingButton.UseVisualStyleBackColor = true;
-			this.CancelingButton.Click += new System.EventHandler(this.CancelingButton_Click);
+			this.AcceptingButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.AcceptingButton.Location = new System.Drawing.Point(356, 200);
+			this.AcceptingButton.Name = "AcceptingButton";
+			this.AcceptingButton.Size = new System.Drawing.Size(90, 25);
+			this.AcceptingButton.TabIndex = 3;
+			this.AcceptingButton.Text = "Принять";
+			this.AcceptingButton.UseVisualStyleBackColor = true;
+			this.AcceptingButton.Click += new System.EventHandler(this.AcceptingButton_Click);
 			// 
 			// Section
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(459, 237);
-			this.Controls.Add(this.CancelingButton);
+			this.Controls.Add(this.AcceptingButton);
 			this.Controls.Add(this.DataSourceButton);
 			this.Controls.Add(this.SectionComboBox);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.MaximizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(475, 276);
 			this.Name = "Section";
 			this.ShowIcon = false;
 			this.Text = "Выбор сечения";
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Section_FormClosed);
 			this.Load += new System.EventHandler(this.Section_Load);
 			this.ResumeLayout(false);
 
@@ -85,6 +90,6 @@ namespace GUI
 
 		private System.Windows.Forms.ComboBox SectionComboBox;
 		private System.Windows.Forms.Button DataSourceButton;
-		private System.Windows.Forms.Button CancelingButton;
+		private System.Windows.Forms.Button AcceptingButton;
 	}
 }

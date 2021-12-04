@@ -32,9 +32,9 @@ namespace OutputFileStructure
 							flag = true;
 							WorksheetInfoWithoutPA workSheetInfoTMP = new WorksheetInfoWithoutPA(cellsGroupOneTemperature.SchemeName, NonRegularOscilation,
 							imbalances, excelPackage.Workbook.Worksheets[i], disconnectingLineForEachEmergency);
-							WorksheetInfoWithPA worksheetInfoWithPA = new WorksheetInfoWithPA(cellsGroupOneTemperature.SchemeName, cellsGroupOneTemperature.AutomaticForScheme,
+							WorksheetInfoWithPA worksheetInfoWithPA = new WorksheetInfoWithPA(cellsGroupOneTemperature.SchemeName,
 								NonRegularOscilation,workSheetInfoTMP.AllowPowerOverflow, imbalances, excelPackage.Workbook.Worksheets[i], 
-								workSheetInfoTMP.MaximumAllowPowerFlowNonBalance, AOPOlist, AOCNlist, LAPNYlist, disconnectingLineForEachEmergency);
+								workSheetInfoTMP.MaximumAllowPowerFlowNonBalance, AOPOlist, AOCNlist, LAPNYlist, cellsGroupOneTemperature.Disturbance);
 
 							int nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 

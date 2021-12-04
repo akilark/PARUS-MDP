@@ -83,6 +83,7 @@ namespace GUI
 			this.Controls.Add(this.ErrorListBox);
 			this.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.MaximizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(601, 407);
 			this.Name = "ErrorWindow";
 			this.Text = "Список ошибок";
 			this.Load += new System.EventHandler(this.ErrorWindow_Load);
