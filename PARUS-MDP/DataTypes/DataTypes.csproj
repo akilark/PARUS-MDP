@@ -49,7 +49,7 @@
     <Compile Include="AOPO.cs" />
     <Compile Include="CellsGroup.cs" />
     <Compile Include="ControlActionRow.cs" />
-    <Compile Include="Factor.cs" />
+    <Compile Include="FactorsWithDirection.cs" />
     <Compile Include="Imbalance.cs" />
     <Compile Include="ImbalanceAndAutomatics.cs" />
     <Compile Include="ImbalanceDataSource.cs" />

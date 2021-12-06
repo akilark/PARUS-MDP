@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using DataTypes;
 using WorkWithDataSource;
+using WorkWithCatalog;
 
 
 namespace GUI
@@ -59,15 +60,30 @@ namespace GUI
 
 					if (dialogResultFactor == DialogResult.OK)
 					{
-						schemeForm.Close();
-						factorForm.Close();
-						this.Close();
+						FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+						if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+						{
+							CatalogCreator catalogCreator = 
+								new CatalogCreator(folderBrowserDialog.SelectedPath,_section, factorForm.Factors, schemeForm.Schemes);
+							catalogCreator.Create();
+							this.Close();
+						}
 						break;
 					}
 					if (dialogResultFactor == DialogResult.Cancel)
 					{
 						dialogresultScheme = schemeForm.ShowForm();
 					}
+					if(dialogResultFactor == DialogResult.Abort)
+					{
+						this.Close();
+						break;
+					}
+				}
+				if(dialogresultScheme == DialogResult.Abort)
+				{
+					this.Close();
+					break;
 				}
 			}
 		}

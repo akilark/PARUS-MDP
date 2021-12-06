@@ -11,23 +11,23 @@ namespace WorkWithCatalog
 	public class CatalogCreator
 	{
 		private string _path;
-		private string _rootName;
-		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
+		private List<FactorsWithDirection> _factors = new List<FactorsWithDirection>();
 		private List<Scheme> _schemes = new List<Scheme>();
+		private string _sectionName;
 
 		/// <summary>
-		/// Коструктор класса с 4 параметрами
+		/// Коструктор класса с 3 параметрами
 		/// </summary>
 		/// <param name="path"></param>
 		/// <param name="rootName"></param>
 		/// <param name="Factors">Лист факторов со структурой (направление, (фактор, значение фактора[])[])</param>
 		/// <param name="Shemes">Лист схем со структурой (ремонтная схема, (возмущение, наличие противоаварийной автоматики)[])</param>
-		public CatalogCreator(string path, string rootName, List<(string, (string, string[])[])> Factors, List<Scheme> Shemes)
+		public CatalogCreator(string path, string sectionName ,List<FactorsWithDirection> Factors, List<Scheme> Shemes)
 		{
 			_path = path;
-			_rootName = rootName;
 			_factors = Factors;
 			_schemes = Shemes;
+			_sectionName = sectionName;
 		}
 
 
@@ -36,9 +36,8 @@ namespace WorkWithCatalog
 		/// </summary>
 		public void Create()
 		{
-			var pathRoot = Path.Combine(_path, _rootName);
-			Directory.CreateDirectory(pathRoot);
-			CreateReversable(pathRoot);
+			Directory.CreateDirectory(_path + @$"\{_sectionName}");
+			CreateReversable(_path + @$"\{_sectionName}");
 		}
 
 		/// <summary>
@@ -47,9 +46,9 @@ namespace WorkWithCatalog
 		/// <param name="pathRoot">путь к корневой папке</param>
 		private void CreateReversable(string pathRoot)
 		{
-			foreach ((string, (string, string[])[]) direct in _factors)
+			for (int i = 0; i <  _factors.Count; i++)
 			{
-				var pathReversable = Path.Combine(pathRoot, direct.Item1);
+				var pathReversable = Path.Combine(pathRoot, _factors[i].Direction);
 				Directory.CreateDirectory(pathReversable);
 				CreateScheme(pathReversable);
 			}
@@ -96,25 +95,15 @@ namespace WorkWithCatalog
 		/// производится определение</param>
 		private void DirectionFactors(string pathScheme)
 		{
-			if (pathScheme.Contains(_factors[0].Item1))
+			if (pathScheme.Contains(_factors[0].Direction))
 			{
-				List<(string, string[])> factorList = new List<(string, string[])>();
-				foreach ((string, string[]) factor in _factors[0].Item2)
-				{
-					factorList.Add(factor);
-				}
-				CreateFactorsCatalog(pathScheme, factorList);
+				CreateFactorsCatalog(pathScheme, _factors[0].FactorNameAndValues);
 			}
 			if (_factors.Count == 2)
 			{
-				if (pathScheme.Contains(_factors[1].Item1))
+				if (pathScheme.Contains(_factors[1].Direction))
 				{
-					List<(string, string[])> factorList = new List<(string, string[])>();
-					foreach ((string, string[]) factor in _factors[1].Item2)
-					{
-						factorList.Add(factor);
-					}
-					CreateFactorsCatalog(pathScheme, factorList);
+					CreateFactorsCatalog(pathScheme, _factors[1].FactorNameAndValues);
 				}
 			}
 

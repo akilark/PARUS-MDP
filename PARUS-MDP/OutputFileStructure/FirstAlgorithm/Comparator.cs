@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DataTypes;
 
 namespace OutputFileStructure
 {
@@ -31,14 +32,14 @@ namespace OutputFileStructure
 			}
 		}
 
-		public static List<(string, string[])> CompareFactors((string, (string, string[])[]) factorsFromFolder,
+		public static List<(string, string[])> CompareFactors(FactorsWithDirection factorsFromFolder,
 			List<(string, (int, int))> factorsFromSample, bool temperatureDependence, string[] temperature)
 		{
 			List<(string, string[])> factorList = new List<(string, string[])>();
 			for (int i = 0; i < factorsFromSample.Count; i++)
 			{
 				bool addFlag = false;
-				foreach ((string, string[]) factorFolder in factorsFromFolder.Item2)
+				foreach ((string, string[]) factorFolder in factorsFromFolder.FactorNameAndValues)
 				{
 					if (factorsFromSample[i].Item1.ToLower().Trim() == factorFolder.Item1.ToLower().Trim())
 					{

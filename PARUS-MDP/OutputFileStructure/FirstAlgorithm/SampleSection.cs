@@ -86,7 +86,7 @@ namespace OutputFileStructure
 			
 			for (int i = 0; i < _catalogReader.Factors.Count; i++)
 			{			
-				_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForDirection, columnNumberForDirection].Value = _catalogReader.Factors[i].Item1;
+				_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForDirection, columnNumberForDirection].Value = _catalogReader.Factors[i].Direction;
 				rowNumberForDirection = FillScheme(columnNumberForDirection + 1, rowNumberForDirection, _catalogReader.Factors[i]);
 			}
 			
@@ -100,10 +100,10 @@ namespace OutputFileStructure
 		}
 
 
-		private int FillScheme(int columnNumberForScheme, int rowNumberForScheme, (string,(string,string[])[]) factors)
+		private int FillScheme(int columnNumberForScheme, int rowNumberForScheme, FactorsWithDirection factors)
 		{
 			List<(string, (int, int))> factorsInSample = FactorsInSample();
-			int amountControlActions = _sampleControlActions.AmountControlActions(factors.Item1);
+			int amountControlActions = _sampleControlActions.AmountControlActions(factors.Direction);
 			List<Scheme> schemeWithDisturbance = _catalogReader.SchemeFromDataBase;
 
 			foreach (string scheme in _catalogReader.AllScheme)

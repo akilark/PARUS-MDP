@@ -17,7 +17,7 @@ namespace WorkWithCatalog
 		private string _rootName;
 		private string[] _allScheme;
 		private List<Scheme> _schemesFromDataBase;
-		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
+		private List<FactorsWithDirection> _factors = new List<FactorsWithDirection>();
 		private string[] _temperature = new string[0];
 
 		/// <summary>
@@ -35,7 +35,7 @@ namespace WorkWithCatalog
 		/// <summary>
 		/// Свойство хранящее список влияющих факторов без указания направления мощности
 		/// </summary>
-		public List<(string, (string, string[])[])> Factors => _factors;
+		public List<FactorsWithDirection> Factors => _factors;
 
 		/// <summary>
 		/// Свойство хранящее сведения о температурах
@@ -81,7 +81,11 @@ namespace WorkWithCatalog
 
 			for (int i = 0; i < directorysArray.Length; i++)
 			{
-				_factors.Add((FolderName(directorysArray[i]), FindFactorsOneDirection(FindSchemeName(directorysArray[i]))));
+				FactorsWithDirection factorsWithDirection = new FactorsWithDirection();
+				factorsWithDirection.Direction = FolderName(directorysArray[i]);
+				factorsWithDirection.FactorNameAndValues = FindFactorsOneDirection(FindSchemeName(directorysArray[i]));
+
+				_factors.Add(factorsWithDirection);
 			}
 		}
 
@@ -106,13 +110,13 @@ namespace WorkWithCatalog
 		/// </summary>
 		/// <param name="schemePath">путь к папке для определенного сочетания факторов</param>
 		/// <returns> Список факторов</returns>
-		private (string, string[])[] FindFactorsOneDirection(string schemePath)
+		private List<(string, string[])> FindFactorsOneDirection(string schemePath)
 		{
 			var directoriesArray = Directory.GetDirectories(schemePath);
 			if (directoriesArray.Length != 0)
 			{
 				FindTemperature(directoriesArray[0]);
-				var factorsTmp = new (string, string[])[0];
+				var factorsTmp = new List<(string, string[])>();
 				for (int i = 0; i < directoriesArray.Length; i++)
 				{
 					directoriesArray[i] = FolderName(directoriesArray[i]);
@@ -149,8 +153,7 @@ namespace WorkWithCatalog
 							factorValue[factorValue.Length - 1] = factorValueTmp;
 						}
 					}
-					Array.Resize(ref factorsTmp, factorsTmp.Length + 1);
-					factorsTmp[factorsTmp.Length - 1] = (factorName, factorValue);
+					factorsTmp.Add((factorName, factorValue));
 				}
 				return factorsTmp;
 			}

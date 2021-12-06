@@ -29,7 +29,7 @@ namespace GUI
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.SectionOrSchemeTreeView = new System.Windows.Forms.TreeView();
+			this.FactorOrSchemeTreeView = new System.Windows.Forms.TreeView();
 			this.SectionLabel = new System.Windows.Forms.Label();
 			this.SectionNameLabel = new System.Windows.Forms.Label();
 			this.GroupBox = new System.Windows.Forms.GroupBox();
@@ -44,16 +44,17 @@ namespace GUI
 			this.GroupBox.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// SectionOrSchemeTreeView
+			// FactorOrSchemeTreeView
 			// 
-			this.SectionOrSchemeTreeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.FactorOrSchemeTreeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.SectionOrSchemeTreeView.Location = new System.Drawing.Point(12, 37);
-			this.SectionOrSchemeTreeView.Name = "SectionOrSchemeTreeView";
-			this.SectionOrSchemeTreeView.Size = new System.Drawing.Size(322, 376);
-			this.SectionOrSchemeTreeView.TabIndex = 0;
-			this.SectionOrSchemeTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
+			this.FactorOrSchemeTreeView.Location = new System.Drawing.Point(12, 37);
+			this.FactorOrSchemeTreeView.Name = "FactorOrSchemeTreeView";
+			this.FactorOrSchemeTreeView.Size = new System.Drawing.Size(322, 376);
+			this.FactorOrSchemeTreeView.TabIndex = 0;
+			this.FactorOrSchemeTreeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.FactorOrSchemeTreeView_AfterCheck);
+			this.FactorOrSchemeTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
 			// 
 			// SectionLabel
 			// 
@@ -188,11 +189,13 @@ namespace GUI
 			this.Controls.Add(this.GroupBox);
 			this.Controls.Add(this.SectionNameLabel);
 			this.Controls.Add(this.SectionLabel);
-			this.Controls.Add(this.SectionOrSchemeTreeView);
+			this.Controls.Add(this.FactorOrSchemeTreeView);
 			this.MaximizeBox = false;
 			this.MinimumSize = new System.Drawing.Size(570, 464);
 			this.Name = "FactorsOrSchemesForm";
 			this.Text = "Редактирование данных";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FactorsOrSchemesForm_FormClosing);
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FactorsOrSchemesForm_FormClosed);
 			this.Load += new System.EventHandler(this.FactorsOrSchemesForm_Load);
 			this.GroupBox.ResumeLayout(false);
 			this.GroupBox.PerformLayout();
@@ -203,7 +206,7 @@ namespace GUI
 
 		#endregion
 
-		private System.Windows.Forms.TreeView SectionOrSchemeTreeView;
+		private System.Windows.Forms.TreeView FactorOrSchemeTreeView;
 		private System.Windows.Forms.Label SectionLabel;
 		private System.Windows.Forms.Label SectionNameLabel;
 		private System.Windows.Forms.GroupBox GroupBox;

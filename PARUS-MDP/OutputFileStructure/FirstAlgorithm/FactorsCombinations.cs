@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using DataTypes;
 
 namespace OutputFileStructure
 {
@@ -10,13 +10,13 @@ namespace OutputFileStructure
 		private string[,] _factorsMixed;
 		private string[] _temperature;
 		
-		public FactorsCombinations((string, (string, string[])[]) factorsFromFolder, 
+		public FactorsCombinations(FactorsWithDirection factorsFromFolder, 
 			List<(string, (int, int))> factorsFromSample, int temperatureMerge)
 		{
 			_factorsMixed = GenerateFactorMatrix(Comparator.CompareFactors(factorsFromFolder, factorsFromSample, false ,new string[0]), temperatureMerge);
 		}
 
-		public FactorsCombinations((string, (string, string[])[]) factorsFromFolder, 
+		public FactorsCombinations(FactorsWithDirection factorsFromFolder, 
 			List<(string, (int, int))> factorsFromSample, string[] temperature, int temperatureMerge)
 		{
 			_temperature = temperature;

@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace DataTypes
 {
-	public class Factor
+	public class FactorsWithDirection
 	{
-		public string FactorName { get; set; }
-
-		public string[] FactorValues { get; set; }
+		public List<(string, string[])> FactorNameAndValues { get; set; }
 
 		public string Direction { get; set; }
 	}

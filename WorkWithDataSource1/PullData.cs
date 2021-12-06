@@ -15,7 +15,7 @@ namespace WorkWithDataSource
 	{
 		private string _sectionName;
 		private List<string> _sections = new List<string>();
-		private List<(string, (string, string[])[])> _factors = new List<(string, (string, string[])[])>();
+		private List<FactorsWithDirection> _factors = new List<FactorsWithDirection>();
 		private List<Scheme> _schemes = new List<Scheme>();
 		private DataBaseAutentification _sqlConnectionString;
 		private List<ImbalanceDataSource> _imbalancesDataSource;
@@ -56,7 +56,7 @@ namespace WorkWithDataSource
 		/// <summary>
 		/// Свойство возвращающее список факторов в формате (string, (string, string[])[])
 		/// </summary>
-		public List<(string, (string, string[])[])> Factors => _factors;
+		public List<FactorsWithDirection> Factors => _factors;
 
 		/// <summary>
 		/// Свойство возврщающее список схем в формате (string, (string, bool)[])
@@ -262,7 +262,7 @@ namespace WorkWithDataSource
 		{
 			string[] factorValues = new string[0];
 
-			(string, string[])[] factors = new (string, string[])[0];
+			List<(string, string[])> factors = new List<(string, string[])>();
 			bool firstFactorFlag = true;
 			bool firstDirectionFlag = true;
 			string compareDirection = "";
@@ -273,8 +273,7 @@ namespace WorkWithDataSource
 				{
 					if (!firstFactorFlag)
 					{
-						Array.Resize(ref factors, factors.Length + 1);
-						factors[factors.Length - 1] = (compareFactor, factorValues);
+						factors.Add((compareFactor, factorValues));
 						factorValues = new string[0];
 					}
 					compareFactor = reader.GetString(1);
@@ -284,8 +283,11 @@ namespace WorkWithDataSource
 				{
 					if (!firstDirectionFlag)
 					{
-						_factors.Add((compareDirection, factors));
-						factors = new (string, string[])[0];
+						FactorsWithDirection factorsWithDirection = new FactorsWithDirection();
+						factorsWithDirection.FactorNameAndValues = factors;
+						factorsWithDirection.Direction = compareDirection;
+						_factors.Add(factorsWithDirection);
+						factors = new List<(string, string[])>();
 					}
 					compareDirection = reader.GetString(0);
 				}
@@ -299,9 +301,11 @@ namespace WorkWithDataSource
 				firstFactorFlag = false;
 				firstDirectionFlag = false;
 			}
-			Array.Resize(ref factors, factors.Length + 1);
-			factors[factors.Length - 1] = (compareFactor, factorValues);
-			_factors.Add((compareDirection, factors));
+			factors.Add((compareFactor, factorValues));
+			FactorsWithDirection factorsWithDirectionTmp = new FactorsWithDirection();
+			factorsWithDirectionTmp.FactorNameAndValues = factors;
+			factorsWithDirectionTmp.Direction = compareDirection;
+			_factors.Add(factorsWithDirectionTmp);
 		}
 
 		/// <summary>

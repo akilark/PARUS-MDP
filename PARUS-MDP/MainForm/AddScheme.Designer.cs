@@ -36,6 +36,9 @@ namespace GUI
 			this.PAradioButtonNo = new System.Windows.Forms.RadioButton();
 			this.PAradioButtonYes = new System.Windows.Forms.RadioButton();
 			this.AddingButton = new System.Windows.Forms.Button();
+			this.SchemeLabel = new System.Windows.Forms.Label();
+			this.DisturbanceLabel = new System.Windows.Forms.Label();
+			this.ErrorLabel = new System.Windows.Forms.Label();
 			this.PAgroupBox.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -46,10 +49,12 @@ namespace GUI
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.SchemeComboBox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.SchemeComboBox.FormattingEnabled = true;
-			this.SchemeComboBox.Location = new System.Drawing.Point(12, 12);
+			this.SchemeComboBox.Location = new System.Drawing.Point(12, 47);
 			this.SchemeComboBox.Name = "SchemeComboBox";
 			this.SchemeComboBox.Size = new System.Drawing.Size(299, 25);
 			this.SchemeComboBox.TabIndex = 0;
+			this.SchemeComboBox.SelectedIndexChanged += new System.EventHandler(this.SchemeComboBox_SelectedIndexChanged);
+			this.SchemeComboBox.TextChanged += new System.EventHandler(this.SchemeComboBox_TextChanged);
 			// 
 			// DisturbanceComboBox
 			// 
@@ -58,17 +63,18 @@ namespace GUI
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.DisturbanceComboBox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.DisturbanceComboBox.FormattingEnabled = true;
-			this.DisturbanceComboBox.Location = new System.Drawing.Point(12, 62);
+			this.DisturbanceComboBox.Location = new System.Drawing.Point(12, 117);
 			this.DisturbanceComboBox.Name = "DisturbanceComboBox";
 			this.DisturbanceComboBox.Size = new System.Drawing.Size(299, 25);
 			this.DisturbanceComboBox.TabIndex = 1;
 			// 
 			// PAgroupBox
 			// 
+			this.PAgroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.PAgroupBox.Controls.Add(this.PAlabel);
 			this.PAgroupBox.Controls.Add(this.PAradioButtonNo);
 			this.PAgroupBox.Controls.Add(this.PAradioButtonYes);
-			this.PAgroupBox.Location = new System.Drawing.Point(12, 92);
+			this.PAgroupBox.Location = new System.Drawing.Point(12, 160);
 			this.PAgroupBox.Name = "PAgroupBox";
 			this.PAgroupBox.Size = new System.Drawing.Size(88, 66);
 			this.PAgroupBox.TabIndex = 2;
@@ -112,29 +118,67 @@ namespace GUI
 			// 
 			this.AddingButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.AddingButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.AddingButton.Location = new System.Drawing.Point(225, 133);
+			this.AddingButton.Location = new System.Drawing.Point(225, 201);
 			this.AddingButton.Name = "AddingButton";
 			this.AddingButton.Size = new System.Drawing.Size(86, 25);
 			this.AddingButton.TabIndex = 3;
 			this.AddingButton.Text = "Добавить";
 			this.AddingButton.UseVisualStyleBackColor = true;
+			this.AddingButton.Click += new System.EventHandler(this.AddingButton_Click);
+			// 
+			// SchemeLabel
+			// 
+			this.SchemeLabel.AutoSize = true;
+			this.SchemeLabel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.SchemeLabel.Location = new System.Drawing.Point(12, 26);
+			this.SchemeLabel.Name = "SchemeLabel";
+			this.SchemeLabel.Size = new System.Drawing.Size(195, 19);
+			this.SchemeLabel.TabIndex = 4;
+			this.SchemeLabel.Text = "Введите или выберите схему:";
+			// 
+			// DisturbanceLabel
+			// 
+			this.DisturbanceLabel.AutoSize = true;
+			this.DisturbanceLabel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.DisturbanceLabel.Location = new System.Drawing.Point(12, 95);
+			this.DisturbanceLabel.Name = "DisturbanceLabel";
+			this.DisturbanceLabel.Size = new System.Drawing.Size(239, 19);
+			this.DisturbanceLabel.TabIndex = 4;
+			this.DisturbanceLabel.Text = "Введите или выберите возмущение:";
+			// 
+			// ErrorLabel
+			// 
+			this.ErrorLabel.AutoSize = true;
+			this.ErrorLabel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.ErrorLabel.ForeColor = System.Drawing.Color.Red;
+			this.ErrorLabel.Location = new System.Drawing.Point(76, 145);
+			this.ErrorLabel.Name = "ErrorLabel";
+			this.ErrorLabel.Size = new System.Drawing.Size(235, 19);
+			this.ErrorLabel.TabIndex = 5;
+			this.ErrorLabel.Text = "Необходимо заполнить все данные";
+			this.ErrorLabel.Visible = false;
 			// 
 			// AddScheme
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(323, 170);
+			this.ClientSize = new System.Drawing.Size(323, 238);
+			this.Controls.Add(this.ErrorLabel);
+			this.Controls.Add(this.DisturbanceLabel);
+			this.Controls.Add(this.SchemeLabel);
 			this.Controls.Add(this.AddingButton);
 			this.Controls.Add(this.PAgroupBox);
 			this.Controls.Add(this.DisturbanceComboBox);
 			this.Controls.Add(this.SchemeComboBox);
 			this.MaximizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(339, 209);
+			this.MinimumSize = new System.Drawing.Size(339, 277);
 			this.Name = "AddScheme";
 			this.Text = "Добавить схему";
+			this.Load += new System.EventHandler(this.AddScheme_Load);
 			this.PAgroupBox.ResumeLayout(false);
 			this.PAgroupBox.PerformLayout();
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
@@ -147,5 +191,8 @@ namespace GUI
 		private System.Windows.Forms.RadioButton PAradioButtonNo;
 		private System.Windows.Forms.RadioButton PAradioButtonYes;
 		private System.Windows.Forms.Button AddingButton;
+		private System.Windows.Forms.Label SchemeLabel;
+		private System.Windows.Forms.Label DisturbanceLabel;
+		private System.Windows.Forms.Label ErrorLabel;
 	}
 }

@@ -12,7 +12,7 @@ namespace WorkWithCatalog
 	{
 		static void Main(string[] args)
 		{
-			
+			/*
 			CatalogReader CR = new CatalogReader(@"C:\test\Тест_1");
 			FolderForCellsGroup FFCG = new FolderForCellsGroup(@"C:\test\Тест_1", CR.Factors[0].Item1, CR.AllScheme[0]);
 			string[] xlsxFiles;
@@ -29,13 +29,13 @@ namespace WorkWithCatalog
 				}
 			}
 			
-			//PullData pull = new PullData("Тест_2");
-			//CatalogCreator catalog = new CatalogCreator(@"C:\test", "Тест_2", pull.Factors, pull.Schemes);
-			//catalog.Create();
+			PullData pull = new PullData("Тест_2");
+			CatalogCreator catalog = new CatalogCreator(@"C:\test\Тест_2", pull.Factors, pull.Schemes);
+			catalog.Create();
 
 			//var CatalogRead = new CatalogReader(@"C:\test\Камала- Красноярская");
-
-
+			
+			*/
 		}
 	}
 }
