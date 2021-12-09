@@ -19,5 +19,10 @@ namespace GUI
 		{
 
 		}
+
+		private void DataSource_Load(object sender, EventArgs e)
+		{
+
+		}
 	}
 }

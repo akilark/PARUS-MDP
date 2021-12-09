@@ -32,6 +32,7 @@ namespace GUI
 			this.SectionComboBox = new System.Windows.Forms.ComboBox();
 			this.DataSourceButton = new System.Windows.Forms.Button();
 			this.AcceptingButton = new System.Windows.Forms.Button();
+			this.label1 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// SectionComboBox
@@ -66,11 +67,22 @@ namespace GUI
 			this.AcceptingButton.UseVisualStyleBackColor = true;
 			this.AcceptingButton.Click += new System.EventHandler(this.AcceptingButton_Click);
 			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.label1.Location = new System.Drawing.Point(12, 13);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(272, 19);
+			this.label1.TabIndex = 4;
+			this.label1.Text = "Введите или выберите название сечения:";
+			// 
 			// Section
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(459, 237);
+			this.Controls.Add(this.label1);
 			this.Controls.Add(this.AcceptingButton);
 			this.Controls.Add(this.DataSourceButton);
 			this.Controls.Add(this.SectionComboBox);
@@ -83,6 +95,7 @@ namespace GUI
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Section_FormClosed);
 			this.Load += new System.EventHandler(this.Section_Load);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
@@ -91,5 +104,6 @@ namespace GUI
 		private System.Windows.Forms.ComboBox SectionComboBox;
 		private System.Windows.Forms.Button DataSourceButton;
 		private System.Windows.Forms.Button AcceptingButton;
+		private System.Windows.Forms.Label label1;
 	}
 }

@@ -27,7 +27,7 @@ namespace GUI
 			SchemeComboBox.DataSource = _schemeName;
 		}
 
-		public Scheme schemeAdd => _scheme;
+		public Scheme SchemeAdd => _scheme;
 		private void AddScheme_Load(object sender, EventArgs e)
 		{
 			

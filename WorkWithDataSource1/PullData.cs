@@ -69,8 +69,9 @@ namespace WorkWithDataSource
 		/// <summary>
 		/// Метод для заполнения списка факторов из БД
 		/// </summary>
-		private void PullFactors()
+		public void PullFactors()
 		{
+			_factors = new List<FactorsWithDirection>();
 			string sqlExpression = @$"SELECT  Factors.Direction, Factors.Factor, Factors.FactorValue
 				FROM [dbo].[Sections], [dbo].[Factors]
 				WHERE Sections.Section_ID = Factors.Section_ID and Sections.Section = '{_sectionName}'";
@@ -120,8 +121,9 @@ namespace WorkWithDataSource
 		/// <summary>
 		/// Метод для заполнения списка схем из БД
 		/// </summary>
-		private void PullSchemes()
+		public void PullSchemes()
 		{
+			_schemes = new List<Scheme>();
 			string sqlExpression = @$"SELECT Schemes.Scheme, Schemes.Disturbance, Schemes.Automation
 				FROM [dbo].[Schemes],[dbo].[Sections]
 				WHERE Sections.Section_ID = Schemes.Section_ID and Sections.Section = '{_sectionName}'";

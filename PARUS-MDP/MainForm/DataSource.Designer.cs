@@ -132,6 +132,7 @@ namespace GUI
 			this.MaximizeBox = false;
 			this.Name = "DataSource";
 			this.Text = "Подключение к базе данных";
+			this.Load += new System.EventHandler(this.DataSource_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
