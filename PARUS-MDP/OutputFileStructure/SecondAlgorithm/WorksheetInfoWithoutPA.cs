@@ -168,7 +168,7 @@ namespace OutputFileStructure
 		{
 			for (int i = 0; i < imbalance.Count; i++)
 			{
-				if (disturbance == imbalance[i].LineName)
+				if (Comparator.CompareString(disturbance, imbalance[i].LineName))
 				{
 					return imbalance[i].ImbalanceValue;
 				}
@@ -464,7 +464,7 @@ namespace OutputFileStructure
 
 			foreach(Imbalance imbalance in imbalances)
 			{
-				if(imbalance.LineName == afterFault)
+				if (Comparator.CompareString(imbalance.LineName, afterFault))
 				{
 					return true;
 				}

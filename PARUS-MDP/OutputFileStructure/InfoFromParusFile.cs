@@ -11,80 +11,77 @@ namespace OutputFileStructure
 	{
 		private int _nonRegularOscilation;
 
-		public InfoFromParusFile(List<CellsGroup> cellsGroupManyTemperature,List<Imbalance> imbalances, 
+		public InfoFromParusFile(CellsGroup cellsGroupOneTemperature, List<Imbalance> imbalances, 
 			List<AOPO> AOPOlist, List<AOCN> AOCNlist, List<ControlActionRow> LAPNYlist, bool disconnectingLineForEachEmergency,
 			ref ExcelPackage excelPackageOutputFile)
 		{
-			var worksheet = excelPackageOutputFile.Workbook.Worksheets[0];
+			MainMethod(cellsGroupOneTemperature, imbalances, AOPOlist, AOCNlist, LAPNYlist, disconnectingLineForEachEmergency, ref excelPackageOutputFile);	
+		}
+
+		public int NonRegularOscilation => _nonRegularOscilation;
+
+		private void MainMethod(CellsGroup cellsGroupOneTemperature, List<Imbalance> imbalances,
+			List<AOPO> AOPOlist, List<AOCN> AOCNlist, List<ControlActionRow> LAPNYlist, bool disconnectingLineForEachEmergency,
+			ref ExcelPackage excelPackageOutputFile)
+		{
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-			foreach(CellsGroup cellsGroupOneTemperature in cellsGroupManyTemperature)
+			foreach (string path in cellsGroupOneTemperature.Folders)
 			{
-				foreach (string path in cellsGroupOneTemperature.Folders)
+				FileInfo fileInfo = new FileInfo(path);
+				var excelPackage = new ExcelPackage(fileInfo);
+				FindNonRegularOscilation(excelPackage);
+				for (int i = 0; i < excelPackage.Workbook.Worksheets.Count; i++)
 				{
-					bool flag = false;
-					FileInfo fileInfo = new FileInfo(path);
-					var excelPackage = new ExcelPackage(fileInfo);
-					FindNonRegularOscilation(excelPackage);
-					for (int i = 0; i < excelPackage.Workbook.Worksheets.Count; i++)
+					if (excelPackage.Workbook.Worksheets[i].Name == $"T= {cellsGroupOneTemperature.Temperature}")
 					{
-						if(excelPackage.Workbook.Worksheets[i].Name == $"T= {cellsGroupOneTemperature.Temperature}")
+						WorksheetInfoWithoutPA workSheetInfoTMP = new WorksheetInfoWithoutPA(cellsGroupOneTemperature.SchemeName, NonRegularOscilation,
+						imbalances, excelPackage.Workbook.Worksheets[i], disconnectingLineForEachEmergency);
+						WorksheetInfoWithPA worksheetInfoWithPA = new WorksheetInfoWithPA(cellsGroupOneTemperature.SchemeName,
+							NonRegularOscilation, workSheetInfoTMP.AllowPowerOverflow, imbalances, excelPackage.Workbook.Worksheets[i],
+							workSheetInfoTMP.MaximumAllowPowerFlowNonBalance, AOPOlist, AOCNlist, LAPNYlist, cellsGroupOneTemperature.Disturbance);
+
+						int nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
+
+						InsertText(workSheetInfoTMP.MaximumAllowPowerFlow.MaximumAllowPowerFlowValue.ToString(),
+							(nextRow, cellsGroupOneTemperature.StartID.Item2), ref excelPackageOutputFile);
+						InsertText(workSheetInfoTMP.MaximumAllowPowerFlow.MaximumAllowPowerCriterion,
+							(nextRow, cellsGroupOneTemperature.StartID.Item2 + 3), ref excelPackageOutputFile);
+
+						InsertText(workSheetInfoTMP.MaximumAllowPowerFlow.EmergencyAllowPowerFlowValue.ToString(),
+							(cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 2), ref excelPackageOutputFile);
+						excelPackageOutputFile.Workbook.Worksheets[0].Cells[cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 2,
+							cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea, cellsGroupOneTemperature.StartID.Item2 + 2].Merge = true;
+						InsertText(workSheetInfoTMP.MaximumAllowPowerFlow.EmergencyAllowPowerCriterion,
+							(cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 5), ref excelPackageOutputFile);
+						excelPackageOutputFile.Workbook.Worksheets[0].Cells[cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 5,
+							cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea, cellsGroupOneTemperature.StartID.Item2 + 5].Merge = true;
+
+						foreach (ImbalanceAndAutomatics imbalance in workSheetInfoTMP.MaximumAllowPowerFlowNonBalance)
 						{
-							flag = true;
-							WorksheetInfoWithoutPA workSheetInfoTMP = new WorksheetInfoWithoutPA(cellsGroupOneTemperature.SchemeName, NonRegularOscilation,
-							imbalances, excelPackage.Workbook.Worksheets[i], disconnectingLineForEachEmergency);
-							WorksheetInfoWithPA worksheetInfoWithPA = new WorksheetInfoWithPA(cellsGroupOneTemperature.SchemeName,
-								NonRegularOscilation,workSheetInfoTMP.AllowPowerOverflow, imbalances, excelPackage.Workbook.Worksheets[i], 
-								workSheetInfoTMP.MaximumAllowPowerFlowNonBalance, AOPOlist, AOCNlist, LAPNYlist, cellsGroupOneTemperature.Disturbance);
-
-							int nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
-
-							InsertText(workSheetInfoTMP.MaximumAllowPowerFlow.MaximumAllowPowerFlowValue.ToString(),
-								(nextRow, cellsGroupOneTemperature.StartID.Item2), ref excelPackageOutputFile);
-							InsertText(workSheetInfoTMP.MaximumAllowPowerFlow.MaximumAllowPowerCriterion,
-								(nextRow, cellsGroupOneTemperature.StartID.Item2 + 3), ref excelPackageOutputFile);
-							
-							InsertText(workSheetInfoTMP.MaximumAllowPowerFlow.EmergencyAllowPowerFlowValue.ToString(),
-								(cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 2), ref excelPackageOutputFile);
-							excelPackageOutputFile.Workbook.Worksheets[0].Cells[cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 2,
-								cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea, cellsGroupOneTemperature.StartID.Item2 + 2].Merge = true;
-							InsertText(workSheetInfoTMP.MaximumAllowPowerFlow.EmergencyAllowPowerCriterion,
-								(cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 5), ref excelPackageOutputFile);
-							excelPackageOutputFile.Workbook.Worksheets[0].Cells[cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 5,
-								cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea, cellsGroupOneTemperature.StartID.Item2 + 5].Merge = true;
-
-							foreach (ImbalanceAndAutomatics imbalance in workSheetInfoTMP.MaximumAllowPowerFlowNonBalance)
-							{
-								nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
-								InsertText(imbalance.Equation, (nextRow, cellsGroupOneTemperature.StartID.Item2), ref excelPackageOutputFile);
-								InsertText(imbalance.ImbalanceCriterion, (nextRow, cellsGroupOneTemperature.StartID.Item2 + 3), ref excelPackageOutputFile);
-							}
-
-							NeedForControl(workSheetInfoTMP, cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, ref excelPackageOutputFile);
-
-							List<float> MDPwithPAlist = ValuesWithPA(worksheetInfoWithPA, cellsGroupOneTemperature, ref excelPackageOutputFile);
-							NeedForControlWithPA(worksheetInfoWithPA, MDPwithPAlist, workSheetInfoTMP.AllowPowerOverflow,
-								cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, ref excelPackageOutputFile);
-							for(int j =0; j < 9; j ++)
-							{
-								excelPackageOutputFile.Workbook.Worksheets[0].Cells[cellsGroupOneTemperature.StartID.Item1, 7 + j, 
-									cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea, 7+j].
-									Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Medium);
-							}
-							
-							break;
-							
+							nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
+							InsertText(imbalance.Equation, (nextRow, cellsGroupOneTemperature.StartID.Item2), ref excelPackageOutputFile);
+							InsertText(imbalance.ImbalanceCriterion, (nextRow, cellsGroupOneTemperature.StartID.Item2 + 3), ref excelPackageOutputFile);
 						}
-					}
-					if(flag)
-					{
-						break ;
+
+						NeedForControl(workSheetInfoTMP, cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, ref excelPackageOutputFile);
+
+						List<float> MDPwithPAlist = ValuesWithPA(worksheetInfoWithPA, cellsGroupOneTemperature, ref excelPackageOutputFile);
+						NeedForControlWithPA(worksheetInfoWithPA, MDPwithPAlist, workSheetInfoTMP.AllowPowerOverflow,
+							cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, ref excelPackageOutputFile);
+						for (int j = 0; j < 9; j++)
+						{
+							excelPackageOutputFile.Workbook.Worksheets[0].Cells[cellsGroupOneTemperature.StartID.Item1, 7 + j,
+								cellsGroupOneTemperature.StartID.Item1 + cellsGroupOneTemperature.SizeCellsArea, 7 + j].
+								Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Medium);
+						}
+
+						break;
+
 					}
 				}
 			}
 			
 		}
-
-		public int NonRegularOscilation => _nonRegularOscilation;
 
 		private List<float> ValuesWithPA(WorksheetInfoWithPA worksheetInfoWithPA, CellsGroup cellsGroupOneTemperature, ref ExcelPackage excelPackageOutputFile)
 		{

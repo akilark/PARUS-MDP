@@ -91,7 +91,8 @@ namespace OutputFileStructure
 			int outputValue = 0;
 			foreach(ControlActionRow row in ControlActionRows)
 			{
-				if(direction.Trim().ToLower() == row.Direction.Trim().ToLower())
+
+				if(Comparator.CompareString(direction, row.Direction))
 				{
 					outputValue += 1;
 				}
@@ -103,7 +104,7 @@ namespace OutputFileStructure
 			var outputValue = new List<ControlActionRow>();
 			foreach (ControlActionRow row in ControlActionRows)
 			{
-				if (direction.Trim().ToLower() == row.Direction.Trim().ToLower())
+				if (Comparator.CompareString(direction, row.Direction))
 				{
 					outputValue.Add(row);
 				}

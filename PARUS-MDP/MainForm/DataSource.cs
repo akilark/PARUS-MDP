@@ -24,5 +24,10 @@ namespace GUI
 		{
 
 		}
+
+		private void CancelingButton_Click(object sender, EventArgs e)
+		{
+			this.Hide();
+		}
 	}
 }

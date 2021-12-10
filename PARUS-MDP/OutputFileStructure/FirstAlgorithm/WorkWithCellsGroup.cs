@@ -34,24 +34,30 @@ namespace OutputFileStructure
 			int rowIndex;
 			int nextRowIndex = FindNextRowForFactors(FactorsInSample[FactorsInSample.Count - substractor].Item2.Item1,
 				FactorsInSample[FactorsInSample.Count - substractor].Item2.Item2,excelPackage);
+			bool flagFirst = true;
 			while (true)
 			{
 				CellsGroup cellsGroup = new CellsGroup();
 				rowIndex = nextRowIndex;
 				
-				nextRowIndex = FindNextRowForFactors(rowIndex,
-					FactorsInSample[FactorsInSample.Count - substractor].Item2.Item2, excelPackage);
-				
-				if(nextRowIndex == rowIndex)
+				if(!flagFirst)
 				{
-					break;
+					nextRowIndex = FindNextRowForFactors(nextRowIndex,
+						FactorsInSample[FactorsInSample.Count - substractor].Item2.Item2, excelPackage);
+					if (nextRowIndex == rowIndex)
+					{
+						break;
+					}
 				}
+				flagFirst = false;
+				
+				
 				cellsGroup.Factors = new List<(string, int)>();
 				List<string> factors = new List<string>();
 				for (int i = 0; i < FactorsInSample.Count - substractor + 1; i++)
 				{
 					string factorValue =
-						excelPackage.Workbook.Worksheets[0].Cells[rowIndex, FactorsInSample[i].Item2.Item2].Value.ToString();
+						excelPackage.Workbook.Worksheets[0].Cells[nextRowIndex, FactorsInSample[i].Item2.Item2].Value.ToString();
 					if (factorValue != "-")
 					{
 						factors.Add("[" + factorValue + "]" + FactorsInSample[i].Item1);
@@ -60,8 +66,8 @@ namespace OutputFileStructure
 				}
 				Permutation(factors.ToArray(), 0, ref factors);
 
-				string schemeName = FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 1, excelPackage);
-				string direction = FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 3, excelPackage);
+				string schemeName = FindPreviousText(nextRowIndex, FactorsInSample[0].Item2.Item2 - 1, excelPackage);
+				string direction = FindPreviousText(nextRowIndex, FactorsInSample[0].Item2.Item2 - 3, excelPackage);
 				for(int i = 0; i < schemes.Count; i++)
 				{
 					if(schemes[i].SchemeName == schemeName)
@@ -75,21 +81,20 @@ namespace OutputFileStructure
 				cellsGroup.Direction = direction;
 				if(temperatureDependence)
 				{
-					cellsGroup.Temperature = int.Parse(FindPreviousText(rowIndex, FactorsInSample[FactorsInSample.Count - 1].Item2.Item2, excelPackage));
+					cellsGroup.Temperature = int.Parse(FindPreviousText(nextRowIndex, FactorsInSample[FactorsInSample.Count - 1].Item2.Item2, excelPackage));
 				}
 				//TODO добавть Try catch.
 				string[] xlsxFilesFolder = FindFolderForCellsGroup(foldersPath, direction,
-					FindPreviousText(rowIndex, FactorsInSample[0].Item2.Item2 - 2, excelPackage) + "_" + schemeName,
-					factors);
+					FindPreviousText(nextRowIndex, FactorsInSample[0].Item2.Item2 - 2, excelPackage) + "_" + schemeName, factors);
 				cellsGroup.Folders = xlsxFilesFolder;
-				cellsGroup.StartID = (rowIndex, FactorsInSample[FactorsInSample.Count - 1].Item2.Item2 + 1);
+				cellsGroup.StartID = (nextRowIndex, FactorsInSample[FactorsInSample.Count - 1].Item2.Item2 + 1);
 				
 				int size = FindNextRowForFactors(nextRowIndex,
 					FactorsInSample[FactorsInSample.Count - substractor].Item2.Item2, excelPackage) - nextRowIndex -1;
-				if(size == 0)
+				if(size == -1)
 				{
-					cellsGroup.SizeCellsArea = FindNextRowForFactors(rowIndex,
-					FactorsInSample[FactorsInSample.Count - substractor].Item2.Item2, excelPackage) - rowIndex - 1;
+					cellsGroup.SizeCellsArea = FindNextRowForFactors(nextRowIndex,
+						FactorsInSample[FactorsInSample.Count - substractor].Item2.Item2, excelPackage) - rowIndex - 1;
 				}
 				else
 				{

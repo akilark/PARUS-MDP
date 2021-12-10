@@ -35,11 +35,9 @@ namespace GUI
 			this.TemperatureAllowGroupBox = new System.Windows.Forms.GroupBox();
 			this.TemperatureCheckBox = new System.Windows.Forms.CheckBox();
 			this.TemperatureGroupBox = new System.Windows.Forms.GroupBox();
-			this.checkBox_40 = new System.Windows.Forms.CheckBox();
+			this.checkBox45 = new System.Windows.Forms.CheckBox();
 			this.checkBox40 = new System.Windows.Forms.CheckBox();
-			this.checkBox_35 = new System.Windows.Forms.CheckBox();
 			this.checkBox35 = new System.Windows.Forms.CheckBox();
-			this.checkBox_30 = new System.Windows.Forms.CheckBox();
 			this.checkBox30 = new System.Windows.Forms.CheckBox();
 			this.checkBox_25 = new System.Windows.Forms.CheckBox();
 			this.checkBox_20 = new System.Windows.Forms.CheckBox();
@@ -52,13 +50,17 @@ namespace GUI
 			this.AwayButton = new System.Windows.Forms.Button();
 			this.checkBox_10 = new System.Windows.Forms.CheckBox();
 			this.SelectButton = new System.Windows.Forms.Button();
-			this.checkBox11 = new System.Windows.Forms.CheckBox();
+			this.checkBox0 = new System.Windows.Forms.CheckBox();
 			this.checkBox_5 = new System.Windows.Forms.CheckBox();
 			this.checkBox10 = new System.Windows.Forms.CheckBox();
 			this.checkBox5 = new System.Windows.Forms.CheckBox();
 			this.FormButton = new System.Windows.Forms.Button();
 			this.BackButton = new System.Windows.Forms.Button();
 			this.EmergencyLineDisconnection = new System.Windows.Forms.CheckBox();
+			this.SamplePathLabel = new System.Windows.Forms.Label();
+			this.SamplePathtextBox = new System.Windows.Forms.TextBox();
+			this.SamplePathButton = new System.Windows.Forms.Button();
+			this.progressBar = new System.Windows.Forms.ProgressBar();
 			this.TemperatureAllowGroupBox.SuspendLayout();
 			this.TemperatureGroupBox.SuspendLayout();
 			this.SuspendLayout();
@@ -81,7 +83,6 @@ namespace GUI
 			this.PathLabel.TabIndex = 1;
 			this.PathLabel.Text = "Путь к каталогу";
 			this.PathLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			this.PathLabel.Click += new System.EventHandler(this.PathLabel_Click);
 			// 
 			// ExploreButton
 			// 
@@ -92,14 +93,15 @@ namespace GUI
 			this.ExploreButton.TabIndex = 2;
 			this.ExploreButton.Text = "Обзор";
 			this.ExploreButton.UseVisualStyleBackColor = true;
+			this.ExploreButton.Click += new System.EventHandler(this.ExploreButton_Click);
 			// 
 			// TemperatureAllowGroupBox
 			// 
 			this.TemperatureAllowGroupBox.Controls.Add(this.TemperatureCheckBox);
 			this.TemperatureAllowGroupBox.Controls.Add(this.TemperatureGroupBox);
-			this.TemperatureAllowGroupBox.Location = new System.Drawing.Point(7, 59);
+			this.TemperatureAllowGroupBox.Location = new System.Drawing.Point(10, 131);
 			this.TemperatureAllowGroupBox.Name = "TemperatureAllowGroupBox";
-			this.TemperatureAllowGroupBox.Size = new System.Drawing.Size(581, 175);
+			this.TemperatureAllowGroupBox.Size = new System.Drawing.Size(581, 180);
 			this.TemperatureAllowGroupBox.TabIndex = 3;
 			this.TemperatureAllowGroupBox.TabStop = false;
 			// 
@@ -113,14 +115,13 @@ namespace GUI
 			this.TemperatureCheckBox.TabIndex = 1;
 			this.TemperatureCheckBox.Text = "Учитывать температуру";
 			this.TemperatureCheckBox.UseVisualStyleBackColor = true;
+			this.TemperatureCheckBox.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// TemperatureGroupBox
 			// 
-			this.TemperatureGroupBox.Controls.Add(this.checkBox_40);
+			this.TemperatureGroupBox.Controls.Add(this.checkBox45);
 			this.TemperatureGroupBox.Controls.Add(this.checkBox40);
-			this.TemperatureGroupBox.Controls.Add(this.checkBox_35);
 			this.TemperatureGroupBox.Controls.Add(this.checkBox35);
-			this.TemperatureGroupBox.Controls.Add(this.checkBox_30);
 			this.TemperatureGroupBox.Controls.Add(this.checkBox30);
 			this.TemperatureGroupBox.Controls.Add(this.checkBox_25);
 			this.TemperatureGroupBox.Controls.Add(this.checkBox_20);
@@ -133,76 +134,55 @@ namespace GUI
 			this.TemperatureGroupBox.Controls.Add(this.AwayButton);
 			this.TemperatureGroupBox.Controls.Add(this.checkBox_10);
 			this.TemperatureGroupBox.Controls.Add(this.SelectButton);
-			this.TemperatureGroupBox.Controls.Add(this.checkBox11);
+			this.TemperatureGroupBox.Controls.Add(this.checkBox0);
 			this.TemperatureGroupBox.Controls.Add(this.checkBox_5);
 			this.TemperatureGroupBox.Controls.Add(this.checkBox10);
 			this.TemperatureGroupBox.Controls.Add(this.checkBox5);
+			this.TemperatureGroupBox.Enabled = false;
 			this.TemperatureGroupBox.Location = new System.Drawing.Point(6, 51);
 			this.TemperatureGroupBox.Name = "TemperatureGroupBox";
 			this.TemperatureGroupBox.Size = new System.Drawing.Size(567, 123);
 			this.TemperatureGroupBox.TabIndex = 0;
 			this.TemperatureGroupBox.TabStop = false;
 			// 
-			// checkBox_40
+			// checkBox45
 			// 
-			this.checkBox_40.AutoSize = true;
-			this.checkBox_40.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox_40.Location = new System.Drawing.Point(505, 51);
-			this.checkBox_40.Name = "checkBox_40";
-			this.checkBox_40.Size = new System.Drawing.Size(50, 23);
-			this.checkBox_40.TabIndex = 11;
-			this.checkBox_40.Text = "-40";
-			this.checkBox_40.UseVisualStyleBackColor = true;
+			this.checkBox45.AutoSize = true;
+			this.checkBox45.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.checkBox45.Location = new System.Drawing.Point(508, 22);
+			this.checkBox45.Name = "checkBox45";
+			this.checkBox45.Size = new System.Drawing.Size(54, 23);
+			this.checkBox45.TabIndex = 11;
+			this.checkBox45.Text = "+45";
+			this.checkBox45.UseVisualStyleBackColor = true;
 			// 
 			// checkBox40
 			// 
 			this.checkBox40.AutoSize = true;
 			this.checkBox40.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox40.Location = new System.Drawing.Point(505, 22);
+			this.checkBox40.Location = new System.Drawing.Point(448, 22);
 			this.checkBox40.Name = "checkBox40";
 			this.checkBox40.Size = new System.Drawing.Size(54, 23);
 			this.checkBox40.TabIndex = 11;
 			this.checkBox40.Text = "+40";
 			this.checkBox40.UseVisualStyleBackColor = true;
 			// 
-			// checkBox_35
-			// 
-			this.checkBox_35.AutoSize = true;
-			this.checkBox_35.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox_35.Location = new System.Drawing.Point(441, 51);
-			this.checkBox_35.Name = "checkBox_35";
-			this.checkBox_35.Size = new System.Drawing.Size(50, 23);
-			this.checkBox_35.TabIndex = 10;
-			this.checkBox_35.Text = "-35";
-			this.checkBox_35.UseVisualStyleBackColor = true;
-			// 
 			// checkBox35
 			// 
 			this.checkBox35.AutoSize = true;
 			this.checkBox35.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox35.Location = new System.Drawing.Point(441, 22);
+			this.checkBox35.Location = new System.Drawing.Point(384, 22);
 			this.checkBox35.Name = "checkBox35";
 			this.checkBox35.Size = new System.Drawing.Size(54, 23);
 			this.checkBox35.TabIndex = 10;
 			this.checkBox35.Text = "+35";
 			this.checkBox35.UseVisualStyleBackColor = true;
 			// 
-			// checkBox_30
-			// 
-			this.checkBox_30.AutoSize = true;
-			this.checkBox_30.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox_30.Location = new System.Drawing.Point(377, 51);
-			this.checkBox_30.Name = "checkBox_30";
-			this.checkBox_30.Size = new System.Drawing.Size(50, 23);
-			this.checkBox_30.TabIndex = 9;
-			this.checkBox_30.Text = "-30";
-			this.checkBox_30.UseVisualStyleBackColor = true;
-			// 
 			// checkBox30
 			// 
 			this.checkBox30.AutoSize = true;
 			this.checkBox30.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox30.Location = new System.Drawing.Point(377, 22);
+			this.checkBox30.Location = new System.Drawing.Point(320, 22);
 			this.checkBox30.Name = "checkBox30";
 			this.checkBox30.Size = new System.Drawing.Size(54, 23);
 			this.checkBox30.TabIndex = 9;
@@ -213,7 +193,7 @@ namespace GUI
 			// 
 			this.checkBox_25.AutoSize = true;
 			this.checkBox_25.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox_25.Location = new System.Drawing.Point(313, 51);
+			this.checkBox_25.Location = new System.Drawing.Point(508, 51);
 			this.checkBox_25.Name = "checkBox_25";
 			this.checkBox_25.Size = new System.Drawing.Size(50, 23);
 			this.checkBox_25.TabIndex = 8;
@@ -224,7 +204,7 @@ namespace GUI
 			// 
 			this.checkBox_20.AutoSize = true;
 			this.checkBox_20.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox_20.Location = new System.Drawing.Point(249, 51);
+			this.checkBox_20.Location = new System.Drawing.Point(448, 51);
 			this.checkBox_20.Name = "checkBox_20";
 			this.checkBox_20.Size = new System.Drawing.Size(50, 23);
 			this.checkBox_20.TabIndex = 7;
@@ -235,7 +215,7 @@ namespace GUI
 			// 
 			this.checkBox25.AutoSize = true;
 			this.checkBox25.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox25.Location = new System.Drawing.Point(313, 22);
+			this.checkBox25.Location = new System.Drawing.Point(256, 22);
 			this.checkBox25.Name = "checkBox25";
 			this.checkBox25.Size = new System.Drawing.Size(54, 23);
 			this.checkBox25.TabIndex = 8;
@@ -246,7 +226,7 @@ namespace GUI
 			// 
 			this.checkBox_15.AutoSize = true;
 			this.checkBox_15.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox_15.Location = new System.Drawing.Point(185, 51);
+			this.checkBox_15.Location = new System.Drawing.Point(384, 51);
 			this.checkBox_15.Name = "checkBox_15";
 			this.checkBox_15.Size = new System.Drawing.Size(50, 23);
 			this.checkBox_15.TabIndex = 6;
@@ -257,7 +237,7 @@ namespace GUI
 			// 
 			this.checkBox20.AutoSize = true;
 			this.checkBox20.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox20.Location = new System.Drawing.Point(249, 22);
+			this.checkBox20.Location = new System.Drawing.Point(192, 22);
 			this.checkBox20.Name = "checkBox20";
 			this.checkBox20.Size = new System.Drawing.Size(54, 23);
 			this.checkBox20.TabIndex = 7;
@@ -268,7 +248,7 @@ namespace GUI
 			// 
 			this.checkBox15.AutoSize = true;
 			this.checkBox15.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox15.Location = new System.Drawing.Point(185, 22);
+			this.checkBox15.Location = new System.Drawing.Point(128, 22);
 			this.checkBox15.Name = "checkBox15";
 			this.checkBox15.Size = new System.Drawing.Size(54, 23);
 			this.checkBox15.TabIndex = 6;
@@ -284,6 +264,7 @@ namespace GUI
 			this.SummerButton.TabIndex = 5;
 			this.SummerButton.Text = "Лето";
 			this.SummerButton.UseVisualStyleBackColor = true;
+			this.SummerButton.Click += new System.EventHandler(this.SummerButton_Click);
 			// 
 			// WinterButton
 			// 
@@ -294,6 +275,7 @@ namespace GUI
 			this.WinterButton.TabIndex = 4;
 			this.WinterButton.Text = "Зима";
 			this.WinterButton.UseVisualStyleBackColor = true;
+			this.WinterButton.Click += new System.EventHandler(this.WinterButton_Click);
 			// 
 			// AwayButton
 			// 
@@ -304,12 +286,13 @@ namespace GUI
 			this.AwayButton.TabIndex = 3;
 			this.AwayButton.Text = "Убрать отметки";
 			this.AwayButton.UseVisualStyleBackColor = true;
+			this.AwayButton.Click += new System.EventHandler(this.AwayButton_Click);
 			// 
 			// checkBox_10
 			// 
 			this.checkBox_10.AutoSize = true;
 			this.checkBox_10.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox_10.Location = new System.Drawing.Point(121, 51);
+			this.checkBox_10.Location = new System.Drawing.Point(320, 51);
 			this.checkBox_10.Name = "checkBox_10";
 			this.checkBox_10.Size = new System.Drawing.Size(50, 23);
 			this.checkBox_10.TabIndex = 1;
@@ -325,23 +308,24 @@ namespace GUI
 			this.SelectButton.TabIndex = 2;
 			this.SelectButton.Text = "Отметить всё";
 			this.SelectButton.UseVisualStyleBackColor = true;
+			this.SelectButton.Click += new System.EventHandler(this.SelectButton_Click);
 			// 
-			// checkBox11
+			// checkBox0
 			// 
-			this.checkBox11.AutoSize = true;
-			this.checkBox11.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox11.Location = new System.Drawing.Point(9, 51);
-			this.checkBox11.Name = "checkBox11";
-			this.checkBox11.Size = new System.Drawing.Size(36, 23);
-			this.checkBox11.TabIndex = 0;
-			this.checkBox11.Text = "0";
-			this.checkBox11.UseVisualStyleBackColor = true;
+			this.checkBox0.AutoSize = true;
+			this.checkBox0.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.checkBox0.Location = new System.Drawing.Point(192, 51);
+			this.checkBox0.Name = "checkBox0";
+			this.checkBox0.Size = new System.Drawing.Size(36, 23);
+			this.checkBox0.TabIndex = 0;
+			this.checkBox0.Text = "0";
+			this.checkBox0.UseVisualStyleBackColor = true;
 			// 
 			// checkBox_5
 			// 
 			this.checkBox_5.AutoSize = true;
 			this.checkBox_5.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox_5.Location = new System.Drawing.Point(65, 51);
+			this.checkBox_5.Location = new System.Drawing.Point(256, 51);
 			this.checkBox_5.Name = "checkBox_5";
 			this.checkBox_5.Size = new System.Drawing.Size(42, 23);
 			this.checkBox_5.TabIndex = 0;
@@ -352,7 +336,7 @@ namespace GUI
 			// 
 			this.checkBox10.AutoSize = true;
 			this.checkBox10.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox10.Location = new System.Drawing.Point(121, 22);
+			this.checkBox10.Location = new System.Drawing.Point(64, 51);
 			this.checkBox10.Name = "checkBox10";
 			this.checkBox10.Size = new System.Drawing.Size(54, 23);
 			this.checkBox10.TabIndex = 1;
@@ -363,7 +347,7 @@ namespace GUI
 			// 
 			this.checkBox5.AutoSize = true;
 			this.checkBox5.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.checkBox5.Location = new System.Drawing.Point(65, 22);
+			this.checkBox5.Location = new System.Drawing.Point(128, 51);
 			this.checkBox5.Name = "checkBox5";
 			this.checkBox5.Size = new System.Drawing.Size(46, 23);
 			this.checkBox5.TabIndex = 0;
@@ -373,17 +357,18 @@ namespace GUI
 			// FormButton
 			// 
 			this.FormButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.FormButton.Location = new System.Drawing.Point(370, 268);
+			this.FormButton.Location = new System.Drawing.Point(373, 364);
 			this.FormButton.Name = "FormButton";
 			this.FormButton.Size = new System.Drawing.Size(121, 25);
 			this.FormButton.TabIndex = 4;
 			this.FormButton.Text = "Сформировать";
 			this.FormButton.UseVisualStyleBackColor = true;
+			this.FormButton.Click += new System.EventHandler(this.FormButton_Click);
 			// 
 			// BackButton
 			// 
 			this.BackButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.BackButton.Location = new System.Drawing.Point(497, 268);
+			this.BackButton.Location = new System.Drawing.Point(500, 364);
 			this.BackButton.Name = "BackButton";
 			this.BackButton.Size = new System.Drawing.Size(75, 25);
 			this.BackButton.TabIndex = 5;
@@ -394,18 +379,61 @@ namespace GUI
 			// EmergencyLineDisconnection
 			// 
 			this.EmergencyLineDisconnection.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.EmergencyLineDisconnection.Location = new System.Drawing.Point(22, 235);
+			this.EmergencyLineDisconnection.Location = new System.Drawing.Point(25, 331);
 			this.EmergencyLineDisconnection.Name = "EmergencyLineDisconnection";
 			this.EmergencyLineDisconnection.Size = new System.Drawing.Size(262, 69);
 			this.EmergencyLineDisconnection.TabIndex = 6;
 			this.EmergencyLineDisconnection.Text = "Учет каждого аварийного небаланса выполнялся отключением соответствующей ветви";
 			this.EmergencyLineDisconnection.UseVisualStyleBackColor = true;
+			this.EmergencyLineDisconnection.CheckedChanged += new System.EventHandler(this.EmergencyLineDisconnection_CheckedChanged);
+			// 
+			// SamplePathLabel
+			// 
+			this.SamplePathLabel.AutoSize = true;
+			this.SamplePathLabel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.SamplePathLabel.Location = new System.Drawing.Point(10, 86);
+			this.SamplePathLabel.Name = "SamplePathLabel";
+			this.SamplePathLabel.Size = new System.Drawing.Size(60, 19);
+			this.SamplePathLabel.TabIndex = 7;
+			this.SamplePathLabel.Text = "Шаблон";
+			// 
+			// SamplePathtextBox
+			// 
+			this.SamplePathtextBox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.SamplePathtextBox.Location = new System.Drawing.Point(98, 83);
+			this.SamplePathtextBox.Name = "SamplePathtextBox";
+			this.SamplePathtextBox.Size = new System.Drawing.Size(382, 25);
+			this.SamplePathtextBox.TabIndex = 8;
+			// 
+			// SamplePathButton
+			// 
+			this.SamplePathButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.SamplePathButton.Location = new System.Drawing.Point(499, 83);
+			this.SamplePathButton.Name = "SamplePathButton";
+			this.SamplePathButton.Size = new System.Drawing.Size(75, 25);
+			this.SamplePathButton.TabIndex = 9;
+			this.SamplePathButton.Text = "Обзор";
+			this.SamplePathButton.UseVisualStyleBackColor = true;
+			this.SamplePathButton.Click += new System.EventHandler(this.SamplePathButton_Click);
+			// 
+			// progressBar
+			// 
+			this.progressBar.ForeColor = System.Drawing.Color.ForestGreen;
+			this.progressBar.Location = new System.Drawing.Point(373, 335);
+			this.progressBar.Name = "progressBar";
+			this.progressBar.Size = new System.Drawing.Size(121, 23);
+			this.progressBar.TabIndex = 2;
+			this.progressBar.Visible = false;
 			// 
 			// OutputFileGenerate
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(600, 305);
+			this.ClientSize = new System.Drawing.Size(600, 401);
+			this.Controls.Add(this.progressBar);
+			this.Controls.Add(this.SamplePathButton);
+			this.Controls.Add(this.SamplePathtextBox);
+			this.Controls.Add(this.SamplePathLabel);
 			this.Controls.Add(this.EmergencyLineDisconnection);
 			this.Controls.Add(this.BackButton);
 			this.Controls.Add(this.FormButton);
@@ -417,6 +445,7 @@ namespace GUI
 			this.MaximizeBox = false;
 			this.Name = "OutputFileGenerate";
 			this.Text = "Формирование приложения №6 ПУР";
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OutputFileGenerate_FormClosed);
 			this.Load += new System.EventHandler(this.OutputFileGenerate_Load);
 			this.TemperatureAllowGroupBox.ResumeLayout(false);
 			this.TemperatureAllowGroupBox.PerformLayout();
@@ -435,11 +464,8 @@ namespace GUI
 		private System.Windows.Forms.GroupBox TemperatureAllowGroupBox;
 		private System.Windows.Forms.CheckBox TemperatureCheckBox;
 		private System.Windows.Forms.GroupBox TemperatureGroupBox;
-		private System.Windows.Forms.CheckBox checkBox_40;
 		private System.Windows.Forms.CheckBox checkBox40;
-		private System.Windows.Forms.CheckBox checkBox_35;
 		private System.Windows.Forms.CheckBox checkBox35;
-		private System.Windows.Forms.CheckBox checkBox_30;
 		private System.Windows.Forms.CheckBox checkBox30;
 		private System.Windows.Forms.CheckBox checkBox_25;
 		private System.Windows.Forms.CheckBox checkBox_20;
@@ -452,12 +478,17 @@ namespace GUI
 		private System.Windows.Forms.Button AwayButton;
 		private System.Windows.Forms.CheckBox checkBox_10;
 		private System.Windows.Forms.Button SelectButton;
-		private System.Windows.Forms.CheckBox checkBox11;
+		private System.Windows.Forms.CheckBox checkBox0;
 		private System.Windows.Forms.CheckBox checkBox_5;
 		private System.Windows.Forms.CheckBox checkBox10;
 		private System.Windows.Forms.CheckBox checkBox5;
 		private System.Windows.Forms.Button FormButton;
 		private System.Windows.Forms.Button BackButton;
 		private System.Windows.Forms.CheckBox EmergencyLineDisconnection;
+		private System.Windows.Forms.CheckBox checkBox45;
+		private System.Windows.Forms.Label SamplePathLabel;
+		private System.Windows.Forms.TextBox SamplePathtextBox;
+		private System.Windows.Forms.Button SamplePathButton;
+		private System.Windows.Forms.ProgressBar progressBar;
 	}
 }

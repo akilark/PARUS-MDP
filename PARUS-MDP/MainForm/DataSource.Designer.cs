@@ -114,6 +114,7 @@ namespace GUI
 			this.CancelingButton.TabIndex = 2;
 			this.CancelingButton.Text = "Назад";
 			this.CancelingButton.UseVisualStyleBackColor = true;
+			this.CancelingButton.Click += new System.EventHandler(this.CancelingButton_Click);
 			// 
 			// DataSource
 			// 

@@ -64,5 +64,29 @@ namespace OutputFileStructure
 			}
 			return factorList;
 		}
+
+		public static bool CompareString(string stringOne, string stringTwo)
+		{
+			
+			if(PrepareStringToCompare(stringOne) == PrepareStringToCompare(stringTwo))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		private static string PrepareStringToCompare(string stringInput)
+		{
+			string[] arrayInput = stringInput.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+			string stringOutput = "";
+			foreach(string stringTmp in arrayInput)
+			{
+				stringOutput += stringTmp.ToLower();
+			}
+			return stringOutput;
+		}
 	}
 }

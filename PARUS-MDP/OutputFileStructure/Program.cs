@@ -12,7 +12,7 @@ namespace OutputFileStructure
 	{
 		static void Main(string[] args)
 		{
-			
+			/*
 			SampleSection sampleSection = new SampleSection(@"C:\test\Тест_1", @"C:\test\Тест_1\Шаблон для теста2.xlsx", new string[] {"35", "30", "25", "20", "15" });
 			FileInfo fileInfo = new FileInfo(@"C:\test\Тест_1\Шаблон для теста2.xlsx");
 			var excelPackage = new ExcelPackage(fileInfo);
@@ -41,7 +41,7 @@ namespace OutputFileStructure
 
 			FileInfo file = new FileInfo(@$"C:\test\Тест_1\Сформированная структура2.xlsx");
 			excelPackage2.SaveAs(file);
-			
+			*/
 		}
 	}
 }

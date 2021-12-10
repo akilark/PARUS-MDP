@@ -40,7 +40,6 @@ namespace OutputFileStructure
 			_catalogReader = new CatalogReader(path);
 			_startRow = FindStartRow();
 			FillDirection();
-			SaveSampleWithStructure(path, _excelPackage);
 		}
 
 		private void DownloadSample(string samplePath)
@@ -227,10 +226,10 @@ namespace OutputFileStructure
 
 		
 
-		private void SaveSampleWithStructure(string path, ExcelPackage excelPackage)
+		public void SaveSampleWithStructure(string path)
 		{
-			FileInfo file = new FileInfo(path + @$"\Сформированная структура.xlsx");
-			excelPackage.SaveAs(file);
+			FileInfo file = new FileInfo(path);
+			_excelPackage.SaveAs(file);
 
 		}
 	}
