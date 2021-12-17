@@ -444,6 +444,7 @@ namespace GUI
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.MaximizeBox = false;
 			this.Name = "OutputFileGenerate";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Формирование приложения №6 ПУР";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OutputFileGenerate_FormClosed);
 			this.Load += new System.EventHandler(this.OutputFileGenerate_Load);

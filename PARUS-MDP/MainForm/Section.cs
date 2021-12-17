@@ -14,7 +14,6 @@ namespace GUI
 {
 	public partial class Section : Form
 	{
-		private string _section;
 		public Section()
 		{
 			InitializeComponent();
@@ -34,16 +33,11 @@ namespace GUI
 			dataSource.Show();
 		}
 
-		private void SectionComboBox_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			_section = SectionComboBox.SelectedItem.ToString();
-		}
-
 		private void AcceptingButton_Click(object sender, EventArgs e)
 		{
-			PullData pullData = new PullData(_section);
-			FactorsOrSchemesForm schemeForm = new FactorsOrSchemesForm(_section, EnumForGUI.Scheme, pullData);
-			FactorsOrSchemesForm factorForm = new FactorsOrSchemesForm(_section, EnumForGUI.Factor, pullData);
+			PullData pullData = new PullData(SectionComboBox.Text);
+			FactorsOrSchemesForm schemeForm = new FactorsOrSchemesForm(SectionComboBox.Text, EnumForGUI.Scheme, pullData);
+			FactorsOrSchemesForm factorForm = new FactorsOrSchemesForm(SectionComboBox.Text, EnumForGUI.Factor, pullData);
 			bool flag = true;
 			this.Hide();
 			var dialogresultScheme = schemeForm.ShowForm();

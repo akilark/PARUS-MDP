@@ -425,38 +425,61 @@ namespace GUI
 		private void TreeViewSchemeFill()
 		{
 			_pullData.PullSchemes();
-			for(int i = 0; i < _pullData.Schemes.Count; i ++)
+			bool flag = true;
+			if(_pullData.Schemes.Count == 1)
 			{
-				FactorOrSchemeTreeView.Nodes.Add(_pullData.Schemes[i].SchemeName);
-				
-				
-				for (int j = 0; j < _pullData.Schemes[i].Disturbance.Count; j ++)
+				if(_pullData.Schemes[0].SchemeName == "")
 				{
-					FactorOrSchemeTreeView.Nodes[i].Nodes.Add(_pullData.Schemes[i].Disturbance[j].Item1);
-					FactorOrSchemeTreeView.Nodes[i].Nodes[j].Checked = _pullData.Schemes[i].Disturbance[j].Item2;
+					flag = false;
 				}
 			}
-			FactorOrSchemeTreeView.ExpandAll();
+			if(flag)
+			{
+				for (int i = 0; i < _pullData.Schemes.Count; i++)
+				{
+					FactorOrSchemeTreeView.Nodes.Add(_pullData.Schemes[i].SchemeName);
+
+
+					for (int j = 0; j < _pullData.Schemes[i].Disturbance.Count; j++)
+					{
+						FactorOrSchemeTreeView.Nodes[i].Nodes.Add(_pullData.Schemes[i].Disturbance[j].Item1);
+						FactorOrSchemeTreeView.Nodes[i].Nodes[j].Checked = _pullData.Schemes[i].Disturbance[j].Item2;
+					}
+				}
+				FactorOrSchemeTreeView.ExpandAll();
+			}
 		}
 
 		private void TreeViewFactorsFill()
 		{
 			_pullData.PullFactors();
-			for (int i = 0; i < _pullData.Factors.Count; i++)
+			bool flag = true;
+			if (_pullData.Factors.Count == 1)
 			{
-				FactorOrSchemeTreeView.Nodes.Add(_pullData.Factors[i].Direction);
-
-
-				for (int j = 0; j < _pullData.Factors[i].FactorNameAndValues.Count; j++)
+				if (_pullData.Factors[0].Direction == "")
 				{
-					FactorOrSchemeTreeView.Nodes[i].Nodes.Add(_pullData.Factors[i].FactorNameAndValues[j].Item1);
-					for(int z = 0; z < _pullData.Factors[i].FactorNameAndValues[j].Item2.Length; z++)
-					{
-						FactorOrSchemeTreeView.Nodes[i].Nodes[j].Nodes.Add(_pullData.Factors[i].FactorNameAndValues[j].Item2[z]);
-					}
+					flag = false;
 				}
 			}
-			FactorOrSchemeTreeView.ExpandAll();
+			if (flag)
+			{
+				for (int i = 0; i < _pullData.Factors.Count; i++)
+				{
+					FactorOrSchemeTreeView.Nodes.Add(_pullData.Factors[i].Direction);
+
+
+					for (int j = 0; j < _pullData.Factors[i].FactorNameAndValues.Count; j++)
+					{
+						FactorOrSchemeTreeView.Nodes[i].Nodes.Add(_pullData.Factors[i].FactorNameAndValues[j].Item1);
+						for (int z = 0; z < _pullData.Factors[i].FactorNameAndValues[j].Item2.Length; z++)
+						{
+							FactorOrSchemeTreeView.Nodes[i].Nodes[j].Nodes.Add(_pullData.Factors[i].FactorNameAndValues[j].Item2[z]);
+						}
+					}
+				}
+				FactorOrSchemeTreeView.ExpandAll();
+			}
+				
 		}
 
 

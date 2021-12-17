@@ -43,7 +43,6 @@ namespace GUI
 			this.SectionComboBox.Name = "SectionComboBox";
 			this.SectionComboBox.Size = new System.Drawing.Size(316, 25);
 			this.SectionComboBox.TabIndex = 0;
-			this.SectionComboBox.SelectedIndexChanged += new System.EventHandler(this.SectionComboBox_SelectedIndexChanged);
 			// 
 			// DataSourceButton
 			// 
@@ -91,6 +90,7 @@ namespace GUI
 			this.MinimumSize = new System.Drawing.Size(475, 276);
 			this.Name = "Section";
 			this.ShowIcon = false;
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Выбор сечения";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Section_FormClosed);
 			this.Load += new System.EventHandler(this.Section_Load);

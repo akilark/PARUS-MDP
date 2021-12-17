@@ -146,6 +146,7 @@ namespace GUI
 			this.MaximizeBox = false;
 			this.MinimumSize = new System.Drawing.Size(439, 211);
 			this.Name = "AddFactor";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Добавить фактор";
 			this.Load += new System.EventHandler(this.AddFactor_Load);
 			this.ResumeLayout(false);

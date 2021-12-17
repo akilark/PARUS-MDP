@@ -193,6 +193,7 @@ namespace GUI
 			this.MaximizeBox = false;
 			this.MinimumSize = new System.Drawing.Size(570, 464);
 			this.Name = "FactorsOrSchemesForm";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Редактирование данных";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FactorsOrSchemesForm_FormClosing);
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FactorsOrSchemesForm_FormClosed);

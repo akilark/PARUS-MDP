@@ -132,6 +132,7 @@ namespace GUI
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.MaximizeBox = false;
 			this.Name = "DataSource";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Подключение к базе данных";
 			this.Load += new System.EventHandler(this.DataSource_Load);
 			this.ResumeLayout(false);

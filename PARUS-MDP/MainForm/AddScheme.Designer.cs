@@ -173,6 +173,7 @@ namespace GUI
 			this.MaximizeBox = false;
 			this.MinimumSize = new System.Drawing.Size(339, 277);
 			this.Name = "AddScheme";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Добавить схему";
 			this.Load += new System.EventHandler(this.AddScheme_Load);
 			this.PAgroupBox.ResumeLayout(false);

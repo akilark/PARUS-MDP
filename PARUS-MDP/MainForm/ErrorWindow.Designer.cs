@@ -85,6 +85,7 @@ namespace GUI
 			this.MaximizeBox = false;
 			this.MinimumSize = new System.Drawing.Size(601, 407);
 			this.Name = "ErrorWindow";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Список ошибок";
 			this.Load += new System.EventHandler(this.ErrorWindow_Load);
 			this.ResumeLayout(false);
