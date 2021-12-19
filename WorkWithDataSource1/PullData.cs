@@ -5,7 +5,6 @@ using System.Data.SqlClient;
 using DataTypes;
 
 
-// Добавить проверку соединения
 namespace WorkWithDataSource
 {
 	/// <summary>
@@ -21,11 +20,20 @@ namespace WorkWithDataSource
 		private List<ImbalanceDataSource> _imbalancesDataSource;
 		private List<AOPO> _AOPOdataSource;
 		private List<AOCN> _AOCNdataSource;
+		private bool _connectedFlag;
 
 		public PullData()
 		{
+			_connectedFlag = true;
 			_sqlConnectionString = new DataBaseAutentification();
-			PullSections();
+			try
+			{
+				PullSections();
+			}
+			catch
+			{
+				_connectedFlag = false;
+			}
 		}
 
 		/// <summary>
@@ -34,18 +42,27 @@ namespace WorkWithDataSource
 		/// <param name="sectionName">название сечения</param>
 		public PullData(string sectionName)
 		{
+			_connectedFlag = true;
 			_sectionName = sectionName;
 			_sqlConnectionString = new DataBaseAutentification();
 			_imbalancesDataSource = new List<ImbalanceDataSource>();
 			_AOCNdataSource = new List<AOCN>();
 			_AOPOdataSource = new List<AOPO>();
-			PullSections();
-			PullFactors();
-			PullSchemes();
-			PullImbalance();
-			PullARPM();
-			PullAOPO();
-			PullAOCN();
+			try
+			{
+				PullSections();
+				PullFactors();
+				PullSchemes();
+				PullImbalance();
+				PullARPM();
+				PullAOPO();
+				PullAOCN();
+			}
+			catch
+			{
+				_connectedFlag = false;
+			}
+
 		}
 
 		/// <summary>
@@ -58,6 +75,8 @@ namespace WorkWithDataSource
 		/// </summary>
 		public List<FactorsWithDirection> Factors => _factors;
 
+		public bool IsConnected => _connectedFlag;
+
 		/// <summary>
 		/// Свойство возврщающее список схем в формате (string, (string, bool)[])
 		/// </summary>
@@ -66,6 +85,7 @@ namespace WorkWithDataSource
 		public List<ImbalanceDataSource> Imbalances => _imbalancesDataSource;
 		public List<AOPO> AOPOlist => _AOPOdataSource;
 		public List<AOCN> AOCNlist => _AOCNdataSource;
+
 		/// <summary>
 		/// Метод для заполнения списка факторов из БД
 		/// </summary>

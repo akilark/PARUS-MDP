@@ -8,18 +8,32 @@ using System.Windows.Forms;
 using DataTypes;
 using WorkWithDataSource;
 using WorkWithCatalog;
+using OutputFileStructure;
 
 
 namespace GUI
 {
 	public partial class Section : Form
 	{
+		private List<string> _sections;
+		private bool _dataSourceConnected;
+		private PullData _nullPullData;
 		public Section()
 		{
 			InitializeComponent();
 			PullData pullData = new PullData();
-			var sections = pullData.Sections;
-			SectionComboBox.DataSource = sections;
+			_dataSourceConnected = pullData.IsConnected;
+			if (_dataSourceConnected)
+			{
+				_sections = pullData.Sections;
+			}
+			else
+			{
+				dataSourceLabel.Visible = true;
+				_nullPullData = pullData;
+				_sections = new List<string>();
+			}
+			SectionComboBox.DataSource = _sections;
 		}
 
 		private void Section_Load(object sender, EventArgs e)
@@ -35,7 +49,29 @@ namespace GUI
 
 		private void AcceptingButton_Click(object sender, EventArgs e)
 		{
-			PullData pullData = new PullData(SectionComboBox.Text);
+			PullData pullData;
+			if(_dataSourceConnected)
+			{
+				pullData = new PullData(SectionComboBox.Text);
+				bool uniqueFlag = true;
+				for(int i = 0; i < pullData.Sections.Count; i ++)
+				{
+					if(Comparator.CompareString(SectionComboBox.Text, pullData.Sections[i]))
+					{
+						uniqueFlag = false;
+					}
+				}
+				if (uniqueFlag)
+				{
+					_sections.Add(SectionComboBox.Text);
+				}
+			}
+			else
+			{
+				pullData = _nullPullData;
+				_sections.Add(SectionComboBox.Text);
+			}
+			
 			FactorsOrSchemesForm schemeForm = new FactorsOrSchemesForm(SectionComboBox.Text, EnumForGUI.Scheme, pullData);
 			FactorsOrSchemesForm factorForm = new FactorsOrSchemesForm(SectionComboBox.Text, EnumForGUI.Factor, pullData);
 			bool flag = true;
@@ -58,8 +94,18 @@ namespace GUI
 						if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
 						{
 							CatalogCreator catalogCreator = 
-								new CatalogCreator(folderBrowserDialog.SelectedPath,_section, factorForm.Factors, schemeForm.Schemes);
+								new CatalogCreator(folderBrowserDialog.SelectedPath, SectionComboBox.Text, factorForm.Factors, schemeForm.Schemes);
 							catalogCreator.Create();
+
+							SectionFromDataSource sectionFromDataSource = new SectionFromDataSource();
+							sectionFromDataSource.SectionName = SectionComboBox.Text;
+							sectionFromDataSource.Schemes = schemeForm.Schemes;
+							sectionFromDataSource.Factors = factorForm.Factors;
+							sectionFromDataSource.Imbalances = pullData.Imbalances;
+							sectionFromDataSource.AOPOlist = pullData.AOPOlist;
+							sectionFromDataSource.AOCNlist = pullData.AOCNlist;
+							SectionInfoToXml pullDataToXml = new SectionInfoToXml(folderBrowserDialog.SelectedPath + @$"\{SectionComboBox.Text}", sectionFromDataSource);
+							
 							this.Close();
 						}
 						break;

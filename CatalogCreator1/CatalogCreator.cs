@@ -36,7 +36,9 @@ namespace WorkWithCatalog
 		/// </summary>
 		public void Create()
 		{
-			Directory.CreateDirectory(_path + @$"\{_sectionName}");
+			DirectoryInfo dir = new DirectoryInfo(_path + @$"\{_sectionName}");
+			dir.Create();
+			dir.Attributes = FileAttributes.Normal;
 			CreateReversable(_path + @$"\{_sectionName}");
 		}
 
@@ -49,7 +51,10 @@ namespace WorkWithCatalog
 			for (int i = 0; i <  _factors.Count; i++)
 			{
 				var pathReversable = Path.Combine(pathRoot, _factors[i].Direction);
-				Directory.CreateDirectory(pathReversable);
+				DirectoryInfo dir = new DirectoryInfo(pathReversable);
+				dir.Create();
+				dir.Attributes = FileAttributes.Normal;
+				
 				CreateScheme(pathReversable);
 			}
 		}
@@ -81,7 +86,10 @@ namespace WorkWithCatalog
 			foreach (string scheme in allScheme)
 			{
 				string pathScheme = Path.Combine(pathReversable, "№" + serialNumber + "_" + scheme);
-				Directory.CreateDirectory(pathScheme);
+				DirectoryInfo dir = new DirectoryInfo(pathScheme);
+				dir.Create();
+				dir.Attributes = FileAttributes.Normal;
+				
 				serialNumber++;
 
 				DirectionFactors(pathScheme);
@@ -156,7 +164,10 @@ namespace WorkWithCatalog
 			foreach (string stringMiexedFactors in GenerateMixedFactors(factors))
 			{
 				var pathFactor = Path.Combine(pathDirection, stringMiexedFactors);
-				Directory.CreateDirectory(pathFactor);
+				DirectoryInfo dir = new DirectoryInfo(pathFactor);
+				dir.Create();
+				dir.Attributes = FileAttributes.Normal;
+				
 			}
 		}
 
@@ -257,7 +268,10 @@ namespace WorkWithCatalog
 			{
 				var pathFactor = Path.Combine(pathDirection,
 					"[" + factorValue + "]" + factors[0].Item1);
-				Directory.CreateDirectory(pathFactor);
+				DirectoryInfo dir = new DirectoryInfo(pathFactor);
+				dir.Create();
+				dir.Attributes = FileAttributes.Normal;
+				
 			}
 		}
 	}

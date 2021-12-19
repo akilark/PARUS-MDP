@@ -30,7 +30,16 @@ namespace GUI
 		{
 			InitializeComponent();
 			_section = section;
-			_pullData = pullData;
+			if(pullData.IsConnected)
+			{
+				_pullData = pullData;
+			}
+			else
+			{
+				SaveButton.Enabled = false;
+				DownloadButton.Enabled = false;
+			}
+			
 			_deletedScheme = new List<Scheme>();
 			_editedScheme = new List<Scheme>();
 			_factors = new List<FactorsWithDirection>();
@@ -43,17 +52,33 @@ namespace GUI
 				case EnumForGUI.Scheme:
 					{
 						_checkFlag = false;
-						_schemes = pullData.Schemes;
-						FactorOrSchemeTreeView.CheckBoxes = true;
-						TreeViewSchemeFill();
-						_checkFlag = true;
+						if (pullData.IsConnected)
+						{ 
+							_schemes = pullData.Schemes;
+							FactorOrSchemeTreeView.CheckBoxes = true;
+							TreeViewSchemeFill();
+							_checkFlag = true;
+						}
+						else
+						{
+							FactorOrSchemeTreeView.CheckBoxes = true;
+							_schemes = new List<Scheme>();
+						}
 						break;
 					}
 				case EnumForGUI.Factor:
 					{
 						FactorOrSchemeTreeView.CheckBoxes = false;
-						_factors = pullData.Factors;
-						TreeViewFactorsFill();
+						if (pullData.IsConnected)
+						{
+							_factors = pullData.Factors;
+							TreeViewFactorsFill();
+						}
+						else
+						{
+							_factors = new List<FactorsWithDirection>();
+						}
+
 						break;
 					}
 			}

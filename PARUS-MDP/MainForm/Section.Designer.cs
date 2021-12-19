@@ -33,6 +33,7 @@ namespace GUI
 			this.DataSourceButton = new System.Windows.Forms.Button();
 			this.AcceptingButton = new System.Windows.Forms.Button();
 			this.label1 = new System.Windows.Forms.Label();
+			this.dataSourceLabel = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// SectionComboBox
@@ -76,11 +77,24 @@ namespace GUI
 			this.label1.TabIndex = 4;
 			this.label1.Text = "Введите или выберите название сечения:";
 			// 
+			// dataSourceLabel
+			// 
+			this.dataSourceLabel.AutoSize = true;
+			this.dataSourceLabel.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.dataSourceLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.dataSourceLabel.Location = new System.Drawing.Point(144, 72);
+			this.dataSourceLabel.Name = "dataSourceLabel";
+			this.dataSourceLabel.Size = new System.Drawing.Size(184, 13);
+			this.dataSourceLabel.TabIndex = 5;
+			this.dataSourceLabel.Text = "Связь с базой данных отсутствует";
+			this.dataSourceLabel.Visible = false;
+			// 
 			// Section
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(459, 237);
+			this.Controls.Add(this.dataSourceLabel);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.AcceptingButton);
 			this.Controls.Add(this.DataSourceButton);
@@ -105,5 +119,6 @@ namespace GUI
 		private System.Windows.Forms.Button DataSourceButton;
 		private System.Windows.Forms.Button AcceptingButton;
 		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label dataSourceLabel;
 	}
 }

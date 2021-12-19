@@ -53,6 +53,7 @@
     <Compile Include="Imbalance.cs" />
     <Compile Include="ImbalanceAndAutomatics.cs" />
     <Compile Include="ImbalanceDataSource.cs" />
+    <Compile Include="SectionFromDataSource.cs" />
     <Compile Include="MaximumAllowPowerFlow.cs" />
     <Compile Include="MaximumAllowPowerFlowPA.cs" />
     <Compile Include="Program.cs" />

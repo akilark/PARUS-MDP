@@ -41,6 +41,7 @@ namespace GUI
 			// 
 			// DirectionComboBox
 			// 
+			this.DirectionComboBox.AccessibleRole = System.Windows.Forms.AccessibleRole.DropList;
 			this.DirectionComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -132,6 +133,7 @@ namespace GUI
 			// 
 			// AddFactor
 			// 
+			this.AccessibleRole = System.Windows.Forms.AccessibleRole.DropList;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(423, 205);
