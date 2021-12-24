@@ -142,7 +142,7 @@ namespace OutputFileStructure
 				{
 					imbalance.EquationValue = compare.Item2;
 					imbalance.Equation = imbalance.ImbalanceValue.ToString() + "-" + 
-						controlAction.CoefficientEfficiency.ToString() + "*" + bodyRow.Item1;
+						controlAction.CoefficientEfficiency.ToString() + "*" + controlAction.ParamID;
 					
 					_maximumAllowPowerFlowNonBalance.Add(imbalance);
 				}

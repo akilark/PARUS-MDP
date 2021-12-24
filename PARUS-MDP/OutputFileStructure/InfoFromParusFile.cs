@@ -40,6 +40,15 @@ namespace OutputFileStructure
 							NonRegularOscilation, workSheetInfoTMP.AllowPowerOverflow, imbalances, excelPackage.Workbook.Worksheets[i],
 							workSheetInfoTMP.MaximumAllowPowerFlowNonBalance, AOPOlist, AOCNlist, LAPNYlist, cellsGroupOneTemperature.Disturbance);
 
+						InsertText("МИН",
+							(cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2), ref excelPackageOutputFile);
+						InsertText("МИН",
+							(cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 1), ref excelPackageOutputFile);
+						InsertText("МИН",
+							(cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 3), ref excelPackageOutputFile);
+						InsertText("МИН",
+							(cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 4), ref excelPackageOutputFile);
+
 						int nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 
 						InsertText(workSheetInfoTMP.MaximumAllowPowerFlow.MaximumAllowPowerFlowValue.ToString(),
@@ -138,6 +147,8 @@ namespace OutputFileStructure
 			{
 				InsertText("-",
 				(nextRow, cellsGroupOneTemperature.StartID.Item2 + 1), ref excelPackageOutputFile);
+				InsertText("-",
+				(nextRow, cellsGroupOneTemperature.StartID.Item2 + 4), ref excelPackageOutputFile);
 				nextRow = FindNextRowWithoutText((cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 1),
 				cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 			}
@@ -163,6 +174,8 @@ namespace OutputFileStructure
 			{
 				InsertText("-",
 				(nextRow, cellsGroupOneTemperature.StartID.Item2 + 1), ref excelPackageOutputFile);
+				InsertText("-",
+				(nextRow, cellsGroupOneTemperature.StartID.Item2 + 4), ref excelPackageOutputFile);
 				nextRow = FindNextRowWithoutText((cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 1),
 				cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
 			}
@@ -182,9 +195,10 @@ namespace OutputFileStructure
 
 			foreach (ImbalanceAndAutomatics imbalance in worksheetInfoWithPA.imbalances)
 			{
-				nextRow = FindNextRowWithoutText(cellsGroupOneTemperature.StartID, cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
-				InsertText(imbalance.Equation, (nextRow, cellsGroupOneTemperature.StartID.Item2), ref excelPackageOutputFile);
-				InsertText(imbalance.ImbalanceCriterion, (nextRow, cellsGroupOneTemperature.StartID.Item2 + 3), ref excelPackageOutputFile);
+				nextRow = FindNextRowWithoutText((cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 1),
+				cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
+				InsertText(imbalance.Equation, (nextRow, cellsGroupOneTemperature.StartID.Item2 + 1), ref excelPackageOutputFile);
+				InsertText(imbalance.ImbalanceCriterion, (nextRow, cellsGroupOneTemperature.StartID.Item2 + 4), ref excelPackageOutputFile);
 			}
 
 			return MDPwithPAlist;
@@ -205,7 +219,6 @@ namespace OutputFileStructure
 			excelPackageOutputFile.Workbook.Worksheets[0].Cells[rowAndColumn.Item1, rowAndColumn.Item2].Value = value;
 			excelPackageOutputFile.Workbook.Worksheets[0].Cells[rowAndColumn.Item1, rowAndColumn.Item2].Style.Font.Name = "Times New Roman";
 			excelPackageOutputFile.Workbook.Worksheets[0].Cells[rowAndColumn.Item1, rowAndColumn.Item2].Style.Font.Size = 8;
-			
 		}
 
 		private void NeedForControl(WorksheetInfoWithoutPA workSheetInfo, (int,int) startID, int sizeCellsArea, ref ExcelPackage excelPackageOutputFile)
@@ -353,7 +366,7 @@ namespace OutputFileStructure
 
 		private int FindNextRowWithoutText((int, int) StartID, int SizeCellsArea, ExcelPackage excelPackageOutputFile)
 		{
-			for(int i = 0; i < SizeCellsArea; i ++ )
+			for(int i = 0; i <= SizeCellsArea; i ++ )
 			{
 				if(excelPackageOutputFile.Workbook.Worksheets[0].Cells[StartID.Item1 + i, StartID.Item2].Value == null)
 				{

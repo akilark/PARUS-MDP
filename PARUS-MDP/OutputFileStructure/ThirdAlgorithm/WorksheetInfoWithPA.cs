@@ -50,8 +50,6 @@ namespace OutputFileStructure
 				List<(string, List<int>)> disturbancesWithControlAction = new List<(string, List<int>)>();
 				for (int i = 0; i < bodyRowsAfterFault.Count; i++)
 				{
-					//TODO: После переноса imbalanceDataSource на imbalance 
-					//Аналогично WithoutPA
 					if (IsDisturbanceConsiderImbalance(bodyRowsAfterFault[i].Item1, imbalances))
 					{
 						disturbancesWithControlAction.Add(bodyRowsAfterFault[i]);
@@ -68,8 +66,6 @@ namespace OutputFileStructure
 			}
 		}
 
-		//TODO: После переноса imbalanceDataSource на imbalance 
-		//Нужно будет передавать дополнительно AOPO и АОСН
 		private void MaximumAllowPowerFlowDefineWithPA(int headRow, List<(string, List<int>)> disturbances, 
 			AllowPowerOverflows allowPowerOverflow,	List<AOPO> AOPOlist, List<AOCN> AOCNlist, List<ControlActionRow> LAPNYlist, ExcelWorksheet excelWorksheetPARUS, List<(string, bool)> disturbanecDataSource)
 		{
@@ -181,7 +177,8 @@ namespace OutputFileStructure
 
 					foreach ((string, bool) disturbanceDS in disturbanecDataSource)
 					{
-						if (disturbance.Item1 == disturbanceDS.Item1)
+						//сделать disturbanceDS contanse(disturbance)
+						if (disturbanceDS.Item1.ToLower().Contains(disturbance.Item1.ToLower()))
 						{
 							disconnectingLineForEachEmergency = disturbanceDS.Item2;
 							break;
@@ -242,18 +239,24 @@ namespace OutputFileStructure
 				Imbalance imbalanceTmp = new Imbalance();
 				foreach(Imbalance imbalance in imbalances)
 				{
-					if (imbalance.LineName == bodyRow.Item1)
+					if (Comparator.CompareString(imbalance.LineName, bodyRow.Item1))
 					{
 						imbalanceTmp = imbalance;
 						break;
 					}
 				}
+				if(imbalanceTmp.ImbalanceValue == null)
+				{
+					continue;
+				}
+
 
 				bool disconnectingLineForEachEmergency = false;
 
 				foreach ((string, bool) disturbance in disturbances)
 				{
-					if(bodyRow.Item1 == disturbance.Item1)
+					
+					if(Comparator.ContainsString(disturbance.Item1, bodyRow.Item1))
 					{
 						disconnectingLineForEachEmergency = disturbance.Item2;
 						break;
@@ -321,7 +324,7 @@ namespace OutputFileStructure
 						imbalanceOutput.ImbalanceCoefficient = imbalanceTmp.ImbalanceValue.CoefficientEfficiency;
 						imbalanceOutput.MaximumImbalance = imbalanceTmp.ImbalanceValue.MaxValue;
 						imbalanceOutput.Equation = imbalanceOutput.ImbalanceValue.ToString() + " - " +
-							imbalanceOutput.ImbalanceCoefficient.ToString() + "*" + bodyRow.Item1;
+							imbalanceOutput.ImbalanceCoefficient.ToString() + "*" + imbalanceAndAutomatics.ImbalanceID;
 						imbalanceOutput.EquationValue = imbalanceOutput.ImbalanceValue - imbalanceOutput.ImbalanceCoefficient * imbalanceOutput.MaximumImbalance;
 						if (imbalanceTmp.ARPM != null)
 						{
@@ -526,7 +529,7 @@ namespace OutputFileStructure
 			if (imbalances == null) return false;
 			foreach (Imbalance imbalance in imbalances)
 			{
-				if (imbalance.LineName == afterFault)
+				if (Comparator.CompareString(imbalance.LineName, afterFault))
 				{
 					return true;
 				}

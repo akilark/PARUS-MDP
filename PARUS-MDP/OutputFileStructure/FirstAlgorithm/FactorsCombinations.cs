@@ -8,7 +8,6 @@ namespace OutputFileStructure
 	public class FactorsCombinations
 	{
 		private string[,] _factorsMixed;
-		private string[] _temperature;
 		
 		public FactorsCombinations(FactorsWithDirection factorsFromFolder, 
 			List<(string, (int, int))> factorsFromSample, int temperatureMerge)
@@ -19,7 +18,6 @@ namespace OutputFileStructure
 		public FactorsCombinations(FactorsWithDirection factorsFromFolder, 
 			List<(string, (int, int))> factorsFromSample, string[] temperature, int temperatureMerge)
 		{
-			_temperature = temperature;
 			_factorsMixed = GenerateFactorMatrix(Comparator.CompareFactors(factorsFromFolder, factorsFromSample, true, temperature), temperatureMerge);
 		}
 

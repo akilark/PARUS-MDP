@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using OfficeOpenXml;
 using DataTypes;
-using WorkWithDataSource;
 using OutputFileStructure;
+using WorkWithCatalog;
 
 namespace GUI
 {
@@ -95,17 +91,18 @@ namespace GUI
 				var excelSample = new ExcelPackage(sampleFile);
 				FileInfo outputFile = new FileInfo(filePath);
 				var excelOutputFile = new ExcelPackage(outputFile);
-				PullData pullData = new PullData("Тест_2");
+				SectionInfoToXml sectionInfoToXml = new SectionInfoToXml(PathTextBox.Text + @"\configurationFile.kek");
+				SectionFromDataSource sectionFromDataSource = sectionInfoToXml.ReadFileInfo();
 				WorkWithCellsGroup workWithCellsGroup;
 				if (TemperatureCheckBox.Checked)
 				{
 					workWithCellsGroup = new WorkWithCellsGroup(PathTextBox.Text, excelOutputFile, sampleSection.FactorsInSample(),
-					pullData.Schemes, temperature);
+					sectionFromDataSource.Schemes, temperature);
 				}
 				else
 				{
 					workWithCellsGroup = new WorkWithCellsGroup(PathTextBox.Text, excelOutputFile, sampleSection.FactorsInSample(),
-					pullData.Schemes);
+					sectionFromDataSource.Schemes);
 				}
 
 				
@@ -113,14 +110,17 @@ namespace GUI
 
 				var controlActionWithNeedDirection = sampleControlActions.ControlActionRows;
 
-				var compare = new CompareControlActions(pullData.Imbalances, controlActionWithNeedDirection, pullData.AOPOlist, pullData.AOCNlist, true);
+				var compare = new CompareControlActions(sectionFromDataSource.Imbalances, controlActionWithNeedDirection, sectionFromDataSource.AOPOlist, sectionFromDataSource.AOCNlist, true);
 
 				progressBar.Visible = true;
 				progressBar.Maximum = workWithCellsGroup.PathAndDislocation.Count;
 				foreach (CellsGroup cellsGroupOneTemperature in workWithCellsGroup.PathAndDislocation)
 				{
-					InfoFromParusFile infoFromParusFile = new InfoFromParusFile(cellsGroupOneTemperature, compare.Imbalances, compare.AOPOlist, compare.AOCNlist, compare.LAPNYlist,
-					false, ref excelOutputFile);
+					InfoFromParusFile infoFromParusFile = new InfoFromParusFile(cellsGroupOneTemperature,
+						ImbalancesWithRightDirection(compare.Imbalances, cellsGroupOneTemperature.Direction),
+						AOPOwithRightDirection(compare.AOPOlist,cellsGroupOneTemperature.Direction),
+						AOCNwithRightDirection(compare.AOCNlist,cellsGroupOneTemperature.Direction), 
+						compare.LAPNYlist, false, ref excelOutputFile);
 					progressBar.Value += 1;
 				}
 				
@@ -128,6 +128,59 @@ namespace GUI
 				excelOutputFile.SaveAs(file);
 			}
 			MessageBox.Show("Файл сформирован");
+		}
+
+		private List<Imbalance> ImbalancesWithRightDirection(List<Imbalance> imbalances, string direction)
+		{
+			var outputList = new List<Imbalance>();
+			foreach(Imbalance imbalance in imbalances)
+			{
+				if(imbalance.ImbalanceValue == null)
+				{
+					continue;
+				}
+				if(imbalance.ImbalanceValue.Direction.ToLower() == direction.ToLower())
+				{
+					outputList.Add(imbalance);
+				}
+			}
+
+
+			return outputList;
+		}
+
+		private List<AOPO> AOPOwithRightDirection(List<AOPO> aopoList, string direction)
+		{
+			var outputList = new List<AOPO>();
+			foreach(AOPO aopo in aopoList)
+			{
+				if(aopo.Automatic == null)
+				{
+					continue;
+				}
+				if(aopo.Automatic.Direction.ToLower() == direction.ToLower())
+				{
+					outputList.Add(aopo);
+				}
+			}
+			return outputList;
+		}
+
+		private List<AOCN> AOCNwithRightDirection(List<AOCN> aocnList, string direction)
+		{
+			var outputList = new List<AOCN>();
+			foreach(AOCN aocn in aocnList)
+			{
+				if(aocn.Automatic == null)
+				{
+					continue;
+				}
+				if(aocn.Automatic.Direction.ToLower() == direction.ToLower())
+				{
+					outputList.Add(aocn);
+				}
+			}
+			return outputList;
 		}
 
 		private string[] TemperatureArrayCreate()

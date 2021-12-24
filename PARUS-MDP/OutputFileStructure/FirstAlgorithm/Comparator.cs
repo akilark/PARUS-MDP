@@ -78,6 +78,18 @@ namespace OutputFileStructure
 			}
 		}
 
+		public static bool ContainsString(string stringOne, string stringTwo)
+		{
+			if(PrepareStringToCompare(stringOne).Contains(PrepareStringToCompare(stringTwo)))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
 		private static string PrepareStringToCompare(string stringInput)
 		{
 			string[] arrayInput = stringInput.Split(" ", StringSplitOptions.RemoveEmptyEntries);

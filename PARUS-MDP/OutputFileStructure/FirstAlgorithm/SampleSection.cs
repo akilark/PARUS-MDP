@@ -101,9 +101,29 @@ namespace OutputFileStructure
 
 		private int FillScheme(int columnNumberForScheme, int rowNumberForScheme, FactorsWithDirection factors)
 		{
-			List<(string, (int, int))> factorsInSample = FactorsInSample();
-			int amountControlActions = _sampleControlActions.AmountControlActions(factors.Direction);
-			List<Scheme> schemeWithDisturbance = _catalogReader.SchemeFromDataBase;
+			var factorsInSample = FactorsInSample();
+			var controlActions = _sampleControlActions.ControlActionsForNeedDirection(factors.Direction);
+			int amountNB = 0;
+			int amountAOCN = 0;
+			int amountAOPO = 0;
+			foreach(ControlActionRow controlActionRow in controlActions)
+			{
+				if (controlActionRow.ParamSign.ToLower().Contains("нб"))
+				{
+					amountNB += 1;
+					continue;
+				}
+				if (controlActionRow.ParamSign.ToLower().Contains("аосн"))
+				{
+					amountAOCN += 1;
+					continue;
+				}
+				if (controlActionRow.ParamSign.ToLower().Contains("аопо"))
+				{
+					amountAOPO += 1;
+					continue;
+				}
+			}
 
 			foreach (string scheme in _catalogReader.AllScheme)
 			{
@@ -112,7 +132,7 @@ namespace OutputFileStructure
 				_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForScheme, columnNumberForScheme].Value = numberScheme;
 				_excelPackage.Workbook.Worksheets[0].Cells[rowNumberForScheme, columnNumberForScheme + 1].Value = nameScheme;
 				int rowNumberForFactor = rowNumberForScheme;
-				int temperatureMerge = CountTemperatureMerge(CountDisturbances(nameScheme, schemeWithDisturbance), amountControlActions);
+				int temperatureMerge = CountTemperatureMerge(amountNB,amountAOCN, amountAOPO);
 				
 				FactorsCombinations factorsCombinations;
 				if (_temperatureDependence)
@@ -143,28 +163,16 @@ namespace OutputFileStructure
 			return rowNumberForScheme;
 		}
 
-		private int CountDisturbances(string namescheme, List<Scheme> schemesWithDisturbance)
-		{
-			foreach(Scheme schemeWithDisturbance in schemesWithDisturbance)
-			{
-				if (namescheme.Trim().ToLower() == schemeWithDisturbance.SchemeName.Trim().ToLower())
-				{
-					return schemeWithDisturbance.Disturbance.Count;
-				}
-			}
-			return 0;
-		}
-
-		private int CountTemperatureMerge(int amountDisturbance, int amountControlActions)
+		private int CountTemperatureMerge(int amountNB, int amountAOCN, int amountAOPO)
 		{
 			int outputNumber;
-			if(amountControlActions>0)
+			if(amountAOCN>0 || amountAOPO > 0)
 			{
-				outputNumber = amountDisturbance + 2 * amountControlActions + 4;
+				outputNumber = amountNB + amountAOCN + amountAOPO + 5;
 			}
 			else
 			{
-				outputNumber = amountDisturbance + 3;
+				outputNumber = amountNB + 5;
 			}
 			return outputNumber;
 		}
