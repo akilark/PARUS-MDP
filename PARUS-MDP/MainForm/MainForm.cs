@@ -39,7 +39,6 @@ namespace GUI
 		{
 			this.Hide();
 			_outputFileGenerate.ShowDialog();
-			this.Show();
 		}
 
 		private void PARUSsampleButton_Click(object sender, EventArgs e)

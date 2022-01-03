@@ -55,7 +55,6 @@ namespace GUI
 			this.checkBox10 = new System.Windows.Forms.CheckBox();
 			this.checkBox5 = new System.Windows.Forms.CheckBox();
 			this.FormButton = new System.Windows.Forms.Button();
-			this.BackButton = new System.Windows.Forms.Button();
 			this.EmergencyLineDisconnection = new System.Windows.Forms.CheckBox();
 			this.SamplePathLabel = new System.Windows.Forms.Label();
 			this.SamplePathtextBox = new System.Windows.Forms.TextBox();
@@ -155,6 +154,7 @@ namespace GUI
 			this.checkBox45.TabIndex = 11;
 			this.checkBox45.Text = "+45";
 			this.checkBox45.UseVisualStyleBackColor = true;
+			this.checkBox45.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox40
 			// 
@@ -166,6 +166,7 @@ namespace GUI
 			this.checkBox40.TabIndex = 11;
 			this.checkBox40.Text = "+40";
 			this.checkBox40.UseVisualStyleBackColor = true;
+			this.checkBox40.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox35
 			// 
@@ -177,6 +178,7 @@ namespace GUI
 			this.checkBox35.TabIndex = 10;
 			this.checkBox35.Text = "+35";
 			this.checkBox35.UseVisualStyleBackColor = true;
+			this.checkBox35.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox30
 			// 
@@ -188,6 +190,7 @@ namespace GUI
 			this.checkBox30.TabIndex = 9;
 			this.checkBox30.Text = "+30";
 			this.checkBox30.UseVisualStyleBackColor = true;
+			this.checkBox30.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox_25
 			// 
@@ -199,6 +202,7 @@ namespace GUI
 			this.checkBox_25.TabIndex = 8;
 			this.checkBox_25.Text = "-25";
 			this.checkBox_25.UseVisualStyleBackColor = true;
+			this.checkBox_25.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox_20
 			// 
@@ -210,6 +214,7 @@ namespace GUI
 			this.checkBox_20.TabIndex = 7;
 			this.checkBox_20.Text = "-20";
 			this.checkBox_20.UseVisualStyleBackColor = true;
+			this.checkBox_20.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox25
 			// 
@@ -221,6 +226,7 @@ namespace GUI
 			this.checkBox25.TabIndex = 8;
 			this.checkBox25.Text = "+25";
 			this.checkBox25.UseVisualStyleBackColor = true;
+			this.checkBox25.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox_15
 			// 
@@ -232,6 +238,7 @@ namespace GUI
 			this.checkBox_15.TabIndex = 6;
 			this.checkBox_15.Text = "-15";
 			this.checkBox_15.UseVisualStyleBackColor = true;
+			this.checkBox_15.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox20
 			// 
@@ -243,6 +250,7 @@ namespace GUI
 			this.checkBox20.TabIndex = 7;
 			this.checkBox20.Text = "+20";
 			this.checkBox20.UseVisualStyleBackColor = true;
+			this.checkBox20.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox15
 			// 
@@ -254,6 +262,7 @@ namespace GUI
 			this.checkBox15.TabIndex = 6;
 			this.checkBox15.Text = "+15";
 			this.checkBox15.UseVisualStyleBackColor = true;
+			this.checkBox15.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// SummerButton
 			// 
@@ -298,6 +307,7 @@ namespace GUI
 			this.checkBox_10.TabIndex = 1;
 			this.checkBox_10.Text = "-10";
 			this.checkBox_10.UseVisualStyleBackColor = true;
+			this.checkBox_10.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// SelectButton
 			// 
@@ -320,6 +330,7 @@ namespace GUI
 			this.checkBox0.TabIndex = 0;
 			this.checkBox0.Text = "0";
 			this.checkBox0.UseVisualStyleBackColor = true;
+			this.checkBox0.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox_5
 			// 
@@ -331,6 +342,7 @@ namespace GUI
 			this.checkBox_5.TabIndex = 0;
 			this.checkBox_5.Text = "-5";
 			this.checkBox_5.UseVisualStyleBackColor = true;
+			this.checkBox_5.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox10
 			// 
@@ -342,6 +354,7 @@ namespace GUI
 			this.checkBox10.TabIndex = 1;
 			this.checkBox10.Text = "+10";
 			this.checkBox10.UseVisualStyleBackColor = true;
+			this.checkBox10.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// checkBox5
 			// 
@@ -353,11 +366,13 @@ namespace GUI
 			this.checkBox5.TabIndex = 0;
 			this.checkBox5.Text = "+5";
 			this.checkBox5.UseVisualStyleBackColor = true;
+			this.checkBox5.CheckedChanged += new System.EventHandler(this.TemperatureCheckBox_CheckedChanged);
 			// 
 			// FormButton
 			// 
+			this.FormButton.Enabled = false;
 			this.FormButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.FormButton.Location = new System.Drawing.Point(373, 364);
+			this.FormButton.Location = new System.Drawing.Point(462, 364);
 			this.FormButton.Name = "FormButton";
 			this.FormButton.Size = new System.Drawing.Size(121, 25);
 			this.FormButton.TabIndex = 4;
@@ -365,25 +380,16 @@ namespace GUI
 			this.FormButton.UseVisualStyleBackColor = true;
 			this.FormButton.Click += new System.EventHandler(this.FormButton_Click);
 			// 
-			// BackButton
-			// 
-			this.BackButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.BackButton.Location = new System.Drawing.Point(500, 364);
-			this.BackButton.Name = "BackButton";
-			this.BackButton.Size = new System.Drawing.Size(75, 25);
-			this.BackButton.TabIndex = 5;
-			this.BackButton.Text = "Назад";
-			this.BackButton.UseVisualStyleBackColor = true;
-			this.BackButton.Click += new System.EventHandler(this.BackButton_Click);
-			// 
 			// EmergencyLineDisconnection
 			// 
+			this.EmergencyLineDisconnection.Checked = true;
+			this.EmergencyLineDisconnection.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.EmergencyLineDisconnection.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.EmergencyLineDisconnection.Location = new System.Drawing.Point(25, 331);
+			this.EmergencyLineDisconnection.Location = new System.Drawing.Point(10, 365);
 			this.EmergencyLineDisconnection.Name = "EmergencyLineDisconnection";
-			this.EmergencyLineDisconnection.Size = new System.Drawing.Size(262, 69);
+			this.EmergencyLineDisconnection.Size = new System.Drawing.Size(310, 24);
 			this.EmergencyLineDisconnection.TabIndex = 6;
-			this.EmergencyLineDisconnection.Text = "Учет каждого аварийного небаланса выполнялся отключением соответствующей ветви";
+			this.EmergencyLineDisconnection.Text = "Каждый небаланс учитывать как АДП- НК";
 			this.EmergencyLineDisconnection.UseVisualStyleBackColor = true;
 			this.EmergencyLineDisconnection.CheckedChanged += new System.EventHandler(this.EmergencyLineDisconnection_CheckedChanged);
 			// 
@@ -404,6 +410,7 @@ namespace GUI
 			this.SamplePathtextBox.Name = "SamplePathtextBox";
 			this.SamplePathtextBox.Size = new System.Drawing.Size(382, 25);
 			this.SamplePathtextBox.TabIndex = 8;
+			this.SamplePathtextBox.TextChanged += new System.EventHandler(this.PathTextBox_TextChanged);
 			// 
 			// SamplePathButton
 			// 
@@ -419,7 +426,7 @@ namespace GUI
 			// progressBar
 			// 
 			this.progressBar.ForeColor = System.Drawing.Color.ForestGreen;
-			this.progressBar.Location = new System.Drawing.Point(373, 335);
+			this.progressBar.Location = new System.Drawing.Point(462, 335);
 			this.progressBar.Name = "progressBar";
 			this.progressBar.Size = new System.Drawing.Size(121, 23);
 			this.progressBar.TabIndex = 2;
@@ -435,7 +442,6 @@ namespace GUI
 			this.Controls.Add(this.SamplePathtextBox);
 			this.Controls.Add(this.SamplePathLabel);
 			this.Controls.Add(this.EmergencyLineDisconnection);
-			this.Controls.Add(this.BackButton);
 			this.Controls.Add(this.FormButton);
 			this.Controls.Add(this.TemperatureAllowGroupBox);
 			this.Controls.Add(this.ExploreButton);
@@ -484,7 +490,6 @@ namespace GUI
 		private System.Windows.Forms.CheckBox checkBox10;
 		private System.Windows.Forms.CheckBox checkBox5;
 		private System.Windows.Forms.Button FormButton;
-		private System.Windows.Forms.Button BackButton;
 		private System.Windows.Forms.CheckBox EmergencyLineDisconnection;
 		private System.Windows.Forms.CheckBox checkBox45;
 		private System.Windows.Forms.Label SamplePathLabel;

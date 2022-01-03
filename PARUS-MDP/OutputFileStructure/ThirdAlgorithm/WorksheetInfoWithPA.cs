@@ -13,7 +13,7 @@ namespace OutputFileStructure
 
 		public WorksheetInfoWithPA(string repairScheme,int noRegularOscilation, AllowPowerOverflows allowPowerOverflow, 
 			List<Imbalance> imbalances, ExcelWorksheet excelWorksheetPARUS, List<ImbalanceAndAutomatics> firstAlghorithmResult, List<AOPO> AOPOlist,
-			List<AOCN> AOCNlist, List<ControlActionRow> LAPNYlist,List<(string, bool)> disturbancesDataSource)
+			List<AOCN> AOCNlist, List<ControlActionRow> LAPNYlist,List<(string, bool)> disturbancesDataSource, bool disconnectingLineForEachEmergency)
 		{
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			_maximumAllowPowerFlowPA = new AllowPowerFlowPA();
@@ -32,7 +32,7 @@ namespace OutputFileStructure
 			}
 
 			MainMethod(startRow, imbalances, noRegularOscilation, allowPowerOverflow, excelWorksheetPARUS,
-				firstAlghorithmResult, AOPOlist,AOCNlist, LAPNYlist, disturbancesDataSource);
+				firstAlghorithmResult, AOPOlist,AOCNlist, LAPNYlist, disturbancesDataSource, disconnectingLineForEachEmergency);
 		}
 
 		public AllowPowerFlowPA AllowPowerFlowPA => _maximumAllowPowerFlowPA;
@@ -40,7 +40,7 @@ namespace OutputFileStructure
 
 		private void MainMethod(int startRow, List<Imbalance> imbalances, int noRegularOscilation, 
 			AllowPowerOverflows allowPowerOverflow, ExcelWorksheet excelWorksheetPARUS, List<ImbalanceAndAutomatics> firstAlghorithmResult,
-			List<AOPO> AOPOlist, List<AOCN> AOCNlist, List<ControlActionRow> LAPNYlist, List<(string, bool)> disturbanecDataSource)
+			List<AOPO> AOPOlist, List<AOCN> AOCNlist, List<ControlActionRow> LAPNYlist, List<(string, bool)> disturbanceDataSource, bool disconnectingLineForEachEmergency)
 		{
 			int headRow = startRow + 3;
 			if (excelWorksheetPARUS.Cells[headRow, 1].Value != null)
@@ -59,9 +59,9 @@ namespace OutputFileStructure
 						disturbances.Add(bodyRowsAfterFault[i]);
 					}
 				}
-				MaximumAllowPowerFlowDefineWithPA(headRow, disturbances, allowPowerOverflow, AOPOlist, AOCNlist, LAPNYlist,excelWorksheetPARUS, disturbanecDataSource);
+				MaximumAllowPowerFlowDefineWithPA(headRow, disturbances, allowPowerOverflow, AOPOlist, AOCNlist, LAPNYlist,excelWorksheetPARUS, disturbanceDataSource);
 				MaximumAllowPowerFlowControlActionDefineWithPA(headRow,noRegularOscilation, disturbancesWithControlAction, 
-					imbalances,	allowPowerOverflow, firstAlghorithmResult, excelWorksheetPARUS, disturbanecDataSource);
+					imbalances,	allowPowerOverflow, firstAlghorithmResult, excelWorksheetPARUS, disturbanceDataSource, disconnectingLineForEachEmergency);
 
 			}
 		}
@@ -230,7 +230,7 @@ namespace OutputFileStructure
 
 		private void MaximumAllowPowerFlowControlActionDefineWithPA(int headRow, int noRegularOscilation,
 			List<(string, List<int>)> disturbanceWithControlAction, List<Imbalance> imbalances,	AllowPowerOverflows allowPowerOverflow, 
-			List<ImbalanceAndAutomatics> firstAlghorithmResult, ExcelWorksheet excelWorksheetPARUS, List<(string, bool)> disturbances)
+			List<ImbalanceAndAutomatics> firstAlghorithmResult, ExcelWorksheet excelWorksheetPARUS, List<(string, bool)> disturbances, bool disconnectingLineForEachEmergency)
 		{
 			_maximumAllowPowerFlowNonBalancePA = new List<ImbalanceAndAutomatics>();
 
@@ -249,22 +249,9 @@ namespace OutputFileStructure
 				{
 					continue;
 				}
-
-
-				bool disconnectingLineForEachEmergency = false;
-
-				foreach ((string, bool) disturbance in disturbances)
-				{
-					
-					if(Comparator.ContainsString(disturbance.Item1, bodyRow.Item1))
-					{
-						disconnectingLineForEachEmergency = disturbance.Item2;
-						break;
-					}
-				}
-
+				var controlAction = FindRightControlAction(imbalances, bodyRow.Item1);
 				ImbalanceAndAutomatics imbalanceOutput = new ImbalanceAndAutomatics();
-				imbalanceOutput.ImbalanceID = bodyRow.Item1;
+				imbalanceOutput.ImbalanceID = controlAction.ParamID;
 				if (disconnectingLineForEachEmergency)
 				{
 					var emergency = MaximumAllowPowerFlowDefinition(headRow, bodyRow, excelWorksheetPARUS);
@@ -329,12 +316,24 @@ namespace OutputFileStructure
 						if (imbalanceTmp.ARPM != null)
 						{
 							imbalanceOutput.Equation = imbalanceOutput.Equation +  " + " + 
-								imbalanceTmp.ARPM.CoefficientEfficiency.ToString() + "*" + imbalanceTmp.ARPM.ParamSign;
+								imbalanceTmp.ARPM.CoefficientEfficiency.ToString() + "*" + imbalanceTmp.ARPM.ParamID;
 						}
 						_maximumAllowPowerFlowNonBalancePA.Add(imbalanceOutput);
 					}
 				}
 			}
+		}
+
+		private ControlActionRow FindRightControlAction(List<Imbalance> imbalance, string disturbance)
+		{
+			for (int i = 0; i < imbalance.Count; i++)
+			{
+				if (Comparator.CompareString(disturbance, imbalance[i].LineName))
+				{
+					return imbalance[i].ImbalanceValue;
+				}
+			}
+			throw new Exception($"УВ {disturbance} нет в файле шаблона ");
 		}
 
 		private string FindCellValue(int headRow, int bodyRow, string columnName, ExcelWorksheet excelWorksheetPARUS)

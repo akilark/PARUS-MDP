@@ -20,7 +20,14 @@ namespace GUI
 
 		private void PathTextBox_TextChanged(object sender, EventArgs e)
 		{
-
+			if(PathTextBox.Text.Length != 0 && SamplePathtextBox.Text.Length != 0)
+			{
+				FormButton.Enabled = true;
+			}
+			else
+			{
+				FormButton.Enabled = false;
+			}
 		}
 
 		private void OutputFileGenerate_Load(object sender, EventArgs e)
@@ -45,10 +52,6 @@ namespace GUI
 			_summerCheckBox.Add(checkBox45);
 		}
 
-		private void BackButton_Click(object sender, EventArgs e)
-		{
-			this.Hide();
-		}
 
 		private void ExploreButton_Click(object sender, EventArgs e)
 		{
@@ -61,73 +64,73 @@ namespace GUI
 
 		private void FormButton_Click(object sender, EventArgs e)
 		{
-			if (SamplePathtextBox.Text != "" && PathTextBox.Text != "")
+			var temperature = TemperatureArrayCreate();
+			SampleSection sampleSection;
+			if (TemperatureCheckBox.Checked)
 			{
-				var temperature = TemperatureArrayCreate();
-				SampleSection sampleSection;
-				if (TemperatureCheckBox.Checked)
-				{
-					sampleSection = new SampleSection(PathTextBox.Text, SamplePathtextBox.Text, temperature);
-				}
-				else
-				{
-					sampleSection = new SampleSection(PathTextBox.Text, SamplePathtextBox.Text);
-				}
-				string filePath = PathTextBox.Text + @"\Сформированная структура.xlsx";
-				var openFileDialog = new SaveFileDialog
-				{
-					Filter = "txt files (*.xlsx)|*.xlsx",
-					InitialDirectory = PathTextBox.Text,
-					RestoreDirectory = true,
-				};
-				if (openFileDialog.ShowDialog() == DialogResult.OK)
-				{
-					filePath = openFileDialog.FileName;
-				}
-				sampleSection.SaveSampleWithStructure(filePath);
-
-				
-				FileInfo sampleFile = new FileInfo(SamplePathtextBox.Text);
-				var excelSample = new ExcelPackage(sampleFile);
-				FileInfo outputFile = new FileInfo(filePath);
-				var excelOutputFile = new ExcelPackage(outputFile);
-				SectionInfoToXml sectionInfoToXml = new SectionInfoToXml(PathTextBox.Text + @"\configurationFile.kek");
-				SectionFromDataSource sectionFromDataSource = sectionInfoToXml.ReadFileInfo();
-				WorkWithCellsGroup workWithCellsGroup;
-				if (TemperatureCheckBox.Checked)
-				{
-					workWithCellsGroup = new WorkWithCellsGroup(PathTextBox.Text, excelOutputFile, sampleSection.FactorsInSample(),
-					sectionFromDataSource.Schemes, temperature);
-				}
-				else
-				{
-					workWithCellsGroup = new WorkWithCellsGroup(PathTextBox.Text, excelOutputFile, sampleSection.FactorsInSample(),
-					sectionFromDataSource.Schemes);
-				}
-
-				
-				SampleControlActions sampleControlActions = new SampleControlActions(excelSample);
-
-				var controlActionWithNeedDirection = sampleControlActions.ControlActionRows;
-
-				var compare = new CompareControlActions(sectionFromDataSource.Imbalances, controlActionWithNeedDirection, sectionFromDataSource.AOPOlist, sectionFromDataSource.AOCNlist, true);
-
-				progressBar.Visible = true;
-				progressBar.Maximum = workWithCellsGroup.PathAndDislocation.Count;
-				foreach (CellsGroup cellsGroupOneTemperature in workWithCellsGroup.PathAndDislocation)
-				{
-					InfoFromParusFile infoFromParusFile = new InfoFromParusFile(cellsGroupOneTemperature,
-						ImbalancesWithRightDirection(compare.Imbalances, cellsGroupOneTemperature.Direction),
-						AOPOwithRightDirection(compare.AOPOlist,cellsGroupOneTemperature.Direction),
-						AOCNwithRightDirection(compare.AOCNlist,cellsGroupOneTemperature.Direction), 
-						compare.LAPNYlist, false, ref excelOutputFile);
-					progressBar.Value += 1;
-				}
-				
-				FileInfo file = new FileInfo(filePath);
-				excelOutputFile.SaveAs(file);
+				sampleSection = new SampleSection(PathTextBox.Text, SamplePathtextBox.Text, temperature);
 			}
-			MessageBox.Show("Файл сформирован");
+			else
+			{
+				sampleSection = new SampleSection(PathTextBox.Text, SamplePathtextBox.Text);
+			}
+			string filePath = PathTextBox.Text + @"\Сформированная структура.xlsx";
+			var openFileDialog = new SaveFileDialog
+			{
+				Filter = "txt files (*.xlsx)|*.xlsx",
+				InitialDirectory = PathTextBox.Text,
+				RestoreDirectory = true,
+			};
+			if (openFileDialog.ShowDialog() == DialogResult.OK)
+			{
+				filePath = openFileDialog.FileName;
+			}
+			sampleSection.SaveSampleWithStructure(filePath);
+
+			
+			FileInfo sampleFile = new FileInfo(SamplePathtextBox.Text);
+			var excelSample = new ExcelPackage(sampleFile);
+			FileInfo outputFile = new FileInfo(filePath);
+			var excelOutputFile = new ExcelPackage(outputFile);
+			SectionInfoToXml sectionInfoToXml = new SectionInfoToXml(PathTextBox.Text + @"\configurationFile.kek");
+			SectionFromDataSource sectionFromDataSource = sectionInfoToXml.ReadFileInfo();
+			WorkWithCellsGroup workWithCellsGroup;
+			if (TemperatureCheckBox.Checked)
+			{
+				workWithCellsGroup = new WorkWithCellsGroup(PathTextBox.Text, excelOutputFile, sampleSection.FactorsInSample(),
+				sectionFromDataSource.Schemes, temperature);
+			}
+			else
+			{
+				workWithCellsGroup = new WorkWithCellsGroup(PathTextBox.Text, excelOutputFile, sampleSection.FactorsInSample(),
+				sectionFromDataSource.Schemes);
+			}
+
+			
+			SampleControlActions sampleControlActions = new SampleControlActions(excelSample);
+
+			var controlActionWithNeedDirection = sampleControlActions.ControlActionRows;
+
+			var compare = new CompareControlActions(sectionFromDataSource.Imbalances, controlActionWithNeedDirection, sectionFromDataSource.AOPOlist, sectionFromDataSource.AOCNlist, true);
+
+			progressBar.Visible = true;
+			progressBar.Maximum = workWithCellsGroup.PathAndDislocation.Count;
+			foreach (CellsGroup cellsGroupOneTemperature in workWithCellsGroup.PathAndDislocation)
+			{
+				InfoFromParusFile infoFromParusFile = new InfoFromParusFile(cellsGroupOneTemperature,
+					ImbalancesWithRightDirection(compare.Imbalances, cellsGroupOneTemperature.Direction),
+					AOPOwithRightDirection(compare.AOPOlist,cellsGroupOneTemperature.Direction),
+					AOCNwithRightDirection(compare.AOCNlist,cellsGroupOneTemperature.Direction), 
+					compare.LAPNYlist, !EmergencyLineDisconnection.Checked, ref excelOutputFile);
+				progressBar.Value += 1;
+			}
+			
+			FileInfo file = new FileInfo(filePath);
+			excelOutputFile.SaveAs(file);
+			
+			MessageBox.Show("Файл сформирован", "Успешно", MessageBoxButtons.OK, MessageBoxIcon.None, 
+				MessageBoxDefaultButton.Button1,MessageBoxOptions.ServiceNotification);
+			Application.Exit();
 		}
 
 		private List<Imbalance> ImbalancesWithRightDirection(List<Imbalance> imbalances, string direction)
@@ -264,6 +267,40 @@ namespace GUI
 		private void TemperatureCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			TemperatureGroupBox.Enabled = TemperatureCheckBox.Checked;
+			if(TemperatureCheckBox.Checked)
+			{
+				bool checkFlag = false;
+				foreach (CheckBox checkBox in _winterCheckBox)
+				{
+					if (checkBox.Checked)
+					{
+						checkFlag = true;
+					}
+				}
+				foreach (CheckBox checkBox in _summerCheckBox)
+				{
+					if (checkBox.Checked)
+					{
+						checkFlag = true;
+					}
+				}
+				
+				if(checkFlag)
+				{
+					PathTextBox_TextChanged(sender, e);
+				}
+				else
+				{
+					FormButton.Enabled = false;
+				}
+			}
+			else
+			{
+				if (!FormButton.Enabled)
+				{
+					PathTextBox_TextChanged(sender, e);
+				}
+			}
 		}
 
 		private void EmergencyLineDisconnection_CheckedChanged(object sender, EventArgs e)

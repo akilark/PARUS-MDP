@@ -22,6 +22,7 @@ namespace OutputFileStructure
 
 		public SampleSection(string path, string samplePath)
 		{
+			_temperature = new string[0];
 			SampleFillInitiate(path, samplePath, false);
 		}
 

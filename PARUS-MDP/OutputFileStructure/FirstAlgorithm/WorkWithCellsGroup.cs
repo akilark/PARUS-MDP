@@ -82,6 +82,11 @@ namespace OutputFileStructure
 				if(temperatureDependence)
 				{
 					cellsGroup.Temperature = int.Parse(FindPreviousText(nextRowIndex, FactorsInSample[FactorsInSample.Count - 1].Item2.Item2, excelPackage));
+					cellsGroup.TemperatureDependence = true;
+				}
+				else
+				{
+					cellsGroup.TemperatureDependence = false;
 				}
 				//TODO добавть Try catch.
 				string[] xlsxFilesFolder = FindFolderForCellsGroup(foldersPath, direction,

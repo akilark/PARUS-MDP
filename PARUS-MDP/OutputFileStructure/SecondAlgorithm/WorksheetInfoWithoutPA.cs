@@ -109,7 +109,8 @@ namespace OutputFileStructure
 			foreach ((string, List<int>) bodyRow in disturbanceWithControlAction)
 			{
 				ImbalanceAndAutomatics imbalance = new ImbalanceAndAutomatics();
-				imbalance.ImbalanceID = bodyRow.Item1;
+				var controlAction = FindRightControlAction(imbalances, bodyRow.Item1);
+				imbalance.ImbalanceID = controlAction.ParamID;
 				if (disconnectingLineForEachEmergency)
 				{
 					var emergency = MaximumAllowPowerFlowDefinition(headRow, bodyRow, excelWorksheetPARUS);
@@ -133,7 +134,7 @@ namespace OutputFileStructure
 					imbalance.ImbalanceCriterion = $"8%P ПАР '{bodyRow.Item1}'";
 				}
 
-				var controlAction = FindRightControlAction(imbalances, bodyRow.Item1);
+				
 				imbalance.ImbalanceCoefficient = controlAction.CoefficientEfficiency;
 				imbalance.MaximumImbalance = controlAction.MaxValue;
 				var compare = CompareAllowPowerFlowWithImbalanceEquation(controlAction.CoefficientEfficiency,

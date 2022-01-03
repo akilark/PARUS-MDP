@@ -21,5 +21,6 @@ namespace DataTypes
 		public (int, int) StartID { get; set; }
 
 		public int Temperature { get; set; }
+		public bool TemperatureDependence { get; set; }
 	}
 }
