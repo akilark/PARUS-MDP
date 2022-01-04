@@ -5,9 +5,20 @@ using System.IO;
 
 namespace WorkWithCatalog
 {
+	/// <summary>
+	/// Класс необходимый для установления соответствия 
+	/// группы ячеек с расположением необходимых файлов
+	/// </summary>
 	public class FolderForCellsGroup
 	{
 		private string _path;
+
+		/// <summary>
+		/// Конструктор с 3 параметрами
+		/// </summary>
+		/// <param name="path">путь к сформированному дереву папок </param>
+		/// <param name="direction">направление перетока</param>
+		/// <param name="schemeWithNumber">схема с её номером</param>
 		public FolderForCellsGroup(string path, string direction, string schemeWithNumber)
 		{
 			string[] pathPart = new string[] { direction, schemeWithNumber };
@@ -19,6 +30,11 @@ namespace WorkWithCatalog
 			
 		}
 
+		/// <summary>
+		/// Поиск нужной директории для комбинации факторов
+		/// </summary>
+		/// <param name="factorsCombination">Комбинация факторов</param>
+		/// <returns></returns>
 		public string[] Find(string factorsCombination)
 		{
 			string factorPath = PathCheck(factorsCombination);

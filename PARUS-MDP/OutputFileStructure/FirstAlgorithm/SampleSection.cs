@@ -11,6 +11,9 @@ using DataTypes;
 
 namespace OutputFileStructure
 {
+	/// <summary>
+	/// Класс реализующий алгоритм "Формирование структуры файла"
+	/// </summary>
 	public class SampleSection
 	{
 		private CatalogReader _catalogReader;
@@ -19,13 +22,24 @@ namespace OutputFileStructure
 		private string[] _temperature;
 		private bool _temperatureDependence;
 		private SampleControlActions _sampleControlActions;
-
+		
+		/// <summary>
+		/// Конструктор с 2 параметрами
+		/// </summary>
+		/// <param name="path">Путь к дереву папок</param>
+		/// <param name="samplePath">путь к файлу шаблона</param>
 		public SampleSection(string path, string samplePath)
 		{
 			_temperature = new string[0];
 			SampleFillInitiate(path, samplePath, false);
 		}
 
+		/// <summary>
+		/// Конструктор с 3 параметрами
+		/// </summary>
+		/// <param name="path">Путь к дереву папок</param>
+		/// <param name="samplePath">путь к файлу шаблона</param>
+		/// <param name="temperature">Массив рассматриваемых температур</param>
 		public SampleSection(string path, string samplePath, string[] temperature)
 		{
 			_temperature = temperature;

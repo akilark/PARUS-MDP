@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using DataTypes;
 
 namespace OutputFileStructure
 {
+	/// <summary>
+	/// Статический класс необходимый для сравнения различных величин
+	/// </summary>
 	public static class Comparator
 	{
 	

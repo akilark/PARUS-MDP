@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using OfficeOpenXml;
 using DataTypes;
 
 namespace OutputFileStructure
 {
+	/// <summary>
+	/// Класс необходимый для выполнения алгоритма "МДП без ПА"
+	/// </summary>
 	public class WorksheetInfoWithoutPA
 	{
 		private MaximumAllowPowerFlow _maximumAllowPowerFlow;
@@ -14,6 +16,16 @@ namespace OutputFileStructure
 
 		//TODO: После переноса imbalanceDataSource на imbalance 
 		//не будет необходимости в NBinSample и imbalanceDataSources
+
+		/// <summary>
+		/// Конструктор класса с 5 параметрами
+		/// </summary>
+		/// <param name="repairScheme">Название ремонтной схемы</param>
+		/// <param name="noRegularOscilation">Значение нерегулярных колебаний</param>
+		/// <param name="imbalances">Корректный список небалансов</param>
+		/// <param name="excelWorksheetPARUS">Эксель файл паруса</param>
+		/// <param name="disconnectingLineForEachEmergency">Учет каждого аварийного небаланса
+		/// выполнялся отключением соответсвующей ветви?</param>
 		public WorksheetInfoWithoutPA(string repairScheme, int noRegularOscilation, List<Imbalance> imbalances,	
 			ExcelWorksheet excelWorksheetPARUS, bool disconnectingLineForEachEmergency)
 		{
@@ -31,11 +43,19 @@ namespace OutputFileStructure
 			MainMethod(startRow, imbalances, noRegularOscilation, excelWorksheetPARUS, disconnectingLineForEachEmergency);
 		}
 
+		/// <summary>
+		/// МДП и АДП
+		/// </summary>
 		public MaximumAllowPowerFlow MaximumAllowPowerFlow => _maximumAllowPowerFlow;
 
-
+		/// <summary>
+		/// Лист небалансов подлежащих учету в приложении № 6 ПУР
+		/// </summary>
 		public List<ImbalanceAndAutomatics> MaximumAllowPowerFlowNonBalance => _maximumAllowPowerFlowNonBalance;
 
+		/// <summary>
+		/// Допустимые перетоки активной мощности
+		/// </summary>
 		public AllowPowerOverflows AllowPowerOverflow => _allowPowerOverflow;
 
 		private void Inizialize()
@@ -99,8 +119,6 @@ namespace OutputFileStructure
 			}		
 		}
 
-		//TODO: После переноса imbalanceDataSource на imbalance 
-		//Этот класс будет требовать существенной переработки
 		private void MaximumAllowPowerFlowControlActionDefine(int headRow, int noRegularOscilation, List<Imbalance> imbalances,
 			List<(string, List<int>)> disturbanceWithControlAction,	ExcelWorksheet excelWorksheetPARUS, bool disconnectingLineForEachEmergency)
 		{

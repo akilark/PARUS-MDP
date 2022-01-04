@@ -22,6 +22,9 @@ namespace WorkWithDataSource
 		private List<AOCN> _AOCNdataSource;
 		private bool _connectedFlag;
 
+		/// <summary>
+		/// Конструктор класса без параметров
+		/// </summary>
 		public PullData()
 		{
 			_connectedFlag = true;
@@ -71,19 +74,30 @@ namespace WorkWithDataSource
 		public List<string> Sections => _sections;
 
 		/// <summary>
-		/// Свойство возвращающее список факторов в формате (string, (string, string[])[])
+		/// Свойство возвращающее список факторов для сечения
 		/// </summary>
 		public List<FactorsWithDirection> Factors => _factors;
 
 		public bool IsConnected => _connectedFlag;
 
 		/// <summary>
-		/// Свойство возврщающее список схем в формате (string, (string, bool)[])
+		/// Свойство возврщающее список схем для сечения
 		/// </summary>
 		public List<Scheme> Schemes => _schemes;
 
+		/// <summary>
+		/// Свойство возвращающее список небалансов
+		/// </summary>
 		public List<ImbalanceDataSource> Imbalances => _imbalancesDataSource;
+
+		/// <summary>
+		/// Свойство возвращающее список АОПО
+		/// </summary>
 		public List<AOPO> AOPOlist => _AOPOdataSource;
+
+		/// <summary>
+		/// Свойство возвращающее список АОСН
+		/// </summary>
 		public List<AOCN> AOCNlist => _AOCNdataSource;
 
 		/// <summary>

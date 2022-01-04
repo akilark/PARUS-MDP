@@ -5,22 +5,43 @@ using DataTypes;
 
 namespace OutputFileStructure
 {
+	/// <summary>
+	/// Класс необходимый для комбинирования факторов для заполнения файла шаблона
+	/// </summary>
 	public class FactorsCombinations
 	{
 		private string[,] _factorsMixed;
 		
+		/// <summary>
+		/// Конструктор с 3 параметрами
+		/// </summary>
+		/// <param name="factorsFromFolder">Факторы из директории</param>
+		/// <param name="factorsFromSample"> Факторы из шаблона</param>
+		/// <param name="temperatureMerge">Сколько строчек должна занимать одна
+		/// ячейка для температуры (или крайний фактор, если зависимости от температуры нет)</param>
 		public FactorsCombinations(FactorsWithDirection factorsFromFolder, 
 			List<(string, (int, int))> factorsFromSample, int temperatureMerge)
 		{
 			_factorsMixed = GenerateFactorMatrix(Comparator.CompareFactors(factorsFromFolder, factorsFromSample, false ,new string[0]), temperatureMerge);
 		}
 
+		/// <summary>
+		/// Конструктор с 4 параметрами
+		/// </summary>
+		/// <param name="factorsFromFolder">Факторы из директории</param>
+		/// <param name="factorsFromSample"> Факторы из шаблона</param>
+		/// <param name="temperature">Массив рассматриваемых температур</param>
+		/// <param name="temperatureMerge">Сколько строчек должна занимать одна
+		/// ячейка для температуры (или крайний фактор, если зависимости от температуры нет)</param>
 		public FactorsCombinations(FactorsWithDirection factorsFromFolder, 
 			List<(string, (int, int))> factorsFromSample, string[] temperature, int temperatureMerge)
 		{
 			_factorsMixed = GenerateFactorMatrix(Comparator.CompareFactors(factorsFromFolder, factorsFromSample, true, temperature), temperatureMerge);
 		}
 
+		/// <summary>
+		/// Перемешанные факторы для заполнения файла шаблона
+		/// </summary>
 		public string[,] FactorMixed => _factorsMixed;
 
 

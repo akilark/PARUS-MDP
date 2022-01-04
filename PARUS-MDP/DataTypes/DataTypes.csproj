@@ -55,7 +55,6 @@
     <Compile Include="ImbalanceDataSource.cs" />
     <Compile Include="SectionFromDataSource.cs" />
     <Compile Include="MaximumAllowPowerFlow.cs" />
-    <Compile Include="MaximumAllowPowerFlowPA.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scheme.cs" />

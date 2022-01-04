@@ -1,16 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using OfficeOpenXml;
 using DataTypes;
 
 namespace OutputFileStructure
 {
+	/// <summary>
+	/// Класс необходимый для выполнения алгоритма "МДП с ПА"
+	/// </summary>
 	public class WorksheetInfoWithPA
 	{
 		private AllowPowerFlowPA _maximumAllowPowerFlowPA;
 		private List<ImbalanceAndAutomatics> _maximumAllowPowerFlowNonBalancePA;
+		//TODO: repairscheme and DisturbanceDataSource скорее всего можно заменить на scheme
 
+		/// <summary>
+		/// Конструктор с 11 параметрами
+		/// </summary>
+		/// <param name="repairScheme">Название ремонтной схемы</param>
+		/// <param name="noRegularOscilation">Значение нерегулярных колебаний</param>
+		/// <param name="allowPowerOverflow">Допустимый переток, полученный по результатам 
+		/// работы алгоритма "МДП без ПА"</param>
+		/// <param name="imbalances">Корректный список небалансов</param>
+		/// <param name="excelWorksheetPARUS">Эксель файл паруса</param>
+		/// <param name="firstAlghorithmResult">Лист небалансов подлежащих учету в приложении 
+		/// № 6 ПУР полученный в результате выполнения алгоритма "МДП без ПА и АДП"</param>
+		/// <param name="AOPOlist">Корректный список АОПО</param>
+		/// <param name="AOCNlist">Корректный список АОСН</param>
+		/// <param name="LAPNYlist">Корректный список ЛАПНУ</param>
+		/// <param name="disturbancesDataSource">Возмущения для рассматриваемой схемы</param>
+		/// <param name="disconnectingLineForEachEmergency">Учет каждого аварийного небаланса
+		/// выполнялся отключением соответсвующей ветви?</param>
 		public WorksheetInfoWithPA(string repairScheme,int noRegularOscilation, AllowPowerOverflows allowPowerOverflow, 
 			List<Imbalance> imbalances, ExcelWorksheet excelWorksheetPARUS, List<ImbalanceAndAutomatics> firstAlghorithmResult, List<AOPO> AOPOlist,
 			List<AOCN> AOCNlist, List<ControlActionRow> LAPNYlist,List<(string, bool)> disturbancesDataSource, bool disconnectingLineForEachEmergency)
@@ -35,8 +55,15 @@ namespace OutputFileStructure
 				firstAlghorithmResult, AOPOlist,AOCNlist, LAPNYlist, disturbancesDataSource, disconnectingLineForEachEmergency);
 		}
 
+		/// <summary>
+		/// Допустимый переток с ПА
+		/// </summary>
 		public AllowPowerFlowPA AllowPowerFlowPA => _maximumAllowPowerFlowPA;
-		public List<ImbalanceAndAutomatics> imbalances => _maximumAllowPowerFlowNonBalancePA;
+
+		/// <summary>
+		/// Лист небалансов подлежащих учету в приложении № 6 ПУР
+		/// </summary>
+		public List<ImbalanceAndAutomatics> Imbalances => _maximumAllowPowerFlowNonBalancePA;
 
 		private void MainMethod(int startRow, List<Imbalance> imbalances, int noRegularOscilation, 
 			AllowPowerOverflows allowPowerOverflow, ExcelWorksheet excelWorksheetPARUS, List<ImbalanceAndAutomatics> firstAlghorithmResult,
@@ -61,7 +88,7 @@ namespace OutputFileStructure
 				}
 				MaximumAllowPowerFlowDefineWithPA(headRow, disturbances, allowPowerOverflow, AOPOlist, AOCNlist, LAPNYlist,excelWorksheetPARUS, disturbanceDataSource);
 				MaximumAllowPowerFlowControlActionDefineWithPA(headRow,noRegularOscilation, disturbancesWithControlAction, 
-					imbalances,	allowPowerOverflow, firstAlghorithmResult, excelWorksheetPARUS, disturbanceDataSource, disconnectingLineForEachEmergency);
+					imbalances,	allowPowerOverflow, firstAlghorithmResult, excelWorksheetPARUS, disconnectingLineForEachEmergency);
 
 			}
 		}
@@ -230,7 +257,7 @@ namespace OutputFileStructure
 
 		private void MaximumAllowPowerFlowControlActionDefineWithPA(int headRow, int noRegularOscilation,
 			List<(string, List<int>)> disturbanceWithControlAction, List<Imbalance> imbalances,	AllowPowerOverflows allowPowerOverflow, 
-			List<ImbalanceAndAutomatics> firstAlghorithmResult, ExcelWorksheet excelWorksheetPARUS, List<(string, bool)> disturbances, bool disconnectingLineForEachEmergency)
+			List<ImbalanceAndAutomatics> firstAlghorithmResult, ExcelWorksheet excelWorksheetPARUS, bool disconnectingLineForEachEmergency)
 		{
 			_maximumAllowPowerFlowNonBalancePA = new List<ImbalanceAndAutomatics>();
 

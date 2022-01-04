@@ -1,17 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using OfficeOpenXml;
 using DataTypes;
 
 namespace OutputFileStructure
 {
+	/// <summary>
+	/// Класс для добавления в приложение №6 ПУР файла информации, 
+	/// полученной из ПК ПАРУС, для конкретной группы ячеек.
+	/// </summary>
 	public class InfoFromParusFile
 	{
 		private int _nonRegularOscilation;
 		private List<string> _errorList;
 
+		/// <summary>
+		/// Конструктор с 7 параметрами
+		/// </summary>
+		/// <param name="cellsGroupOneTemperature">группа ячеек</param>
+		/// <param name="imbalances">список небалансов</param>
+		/// <param name="AOPOlist">список АОПО</param>
+		/// <param name="AOCNlist">список АОСН</param>
+		/// <param name="LAPNYlist">список ЛАПНУ</param>
+		/// <param name="disconnectingLineForEachEmergency">Учет каждого аварийного НБ
+		/// выполнялся отключением соответствующей ветви?</param>
+		/// <param name="excelPackageOutputFile">Файл экселя, куда записывается информация</param>
 		public InfoFromParusFile(CellsGroup cellsGroupOneTemperature, List<Imbalance> imbalances, 
 			List<AOPO> AOPOlist, List<AOCN> AOCNlist, List<ControlActionRow> LAPNYlist, bool disconnectingLineForEachEmergency,
 			ref ExcelPackage excelPackageOutputFile)
@@ -20,6 +34,9 @@ namespace OutputFileStructure
 			MainMethod(cellsGroupOneTemperature, imbalances, AOPOlist, AOCNlist, LAPNYlist, disconnectingLineForEachEmergency, ref excelPackageOutputFile);	
 		}
 
+		/// <summary>
+		/// Значение нерегулярных колебаний
+		/// </summary>
 		public int NonRegularOscilation => _nonRegularOscilation;
 
 		public List<string> ErrorList => _errorList;
@@ -225,7 +242,7 @@ namespace OutputFileStructure
 					(nextRow, cellsGroupOneTemperature.StartID.Item2 + 4), ref excelPackageOutputFile);
 			}
 
-			foreach (ImbalanceAndAutomatics imbalance in worksheetInfoWithPA.imbalances)
+			foreach (ImbalanceAndAutomatics imbalance in worksheetInfoWithPA.Imbalances)
 			{
 				nextRow = FindNextRowWithoutText((cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2 + 1),
 				cellsGroupOneTemperature.SizeCellsArea, excelPackageOutputFile);
@@ -332,7 +349,7 @@ namespace OutputFileStructure
 		private void NeedForControlWithPA(WorksheetInfoWithPA worksheetInfoWithPA, List<float> MDPwithPAlist, AllowPowerOverflows allowPowerOverflow, (int, int) startID, int sizeCellsArea, ref ExcelPackage excelPackageOutputFile)
 		{
 			
-			if (CompareWithImbalancePA(worksheetInfoWithPA.imbalances,
+			if (CompareWithImbalancePA(worksheetInfoWithPA.Imbalances,
 							MDPwithPAlist, allowPowerOverflow.CurrentLoadLinesValue))
 			{
 				InsertText( allowPowerOverflow.CurrentLoadLinesValue.ToString() + "*",
@@ -342,7 +359,7 @@ namespace OutputFileStructure
 				InsertText($"Дополнительно осуществляется контроль токовой нагрузки '{allowPowerOverflow.CurrentLoadLinesCriterion}'",
 					(startID.Item1, startID.Item2 + 7), ref excelPackageOutputFile);
 			}
-			else if (CompareWithImbalancePA(worksheetInfoWithPA.imbalances,
+			else if (CompareWithImbalancePA(worksheetInfoWithPA.Imbalances,
 							MDPwithPAlist, allowPowerOverflow.StabilityVoltageValue))
 			{
 				InsertText(allowPowerOverflow.StabilityVoltageValue.ToString() + "*",

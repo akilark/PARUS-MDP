@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using OfficeOpenXml;
 using DataTypes;
 
 namespace OutputFileStructure
 {
+	/// <summary>
+	/// Класс необходимый для получения информации об управляющих воздействиях из файла шаблона.
+	/// </summary>
 	public class SampleControlActions
 	{
 
 		private List<ControlActionRow> _controlActionRows;
+
+		/// <summary>
+		/// Конструктор класса с 1 параметром
+		/// </summary>
+		/// <param name="excelPackage">Эксель документ полученный на основе файла шаблона</param>
 		public SampleControlActions(ExcelPackage excelPackage)
 		{
 			_controlActionRows = new List<ControlActionRow>();
@@ -17,8 +24,7 @@ namespace OutputFileStructure
 		}
 
 		/// <summary>
-		/// Получение списка управляющих воздействий в следующем формате 
-		/// List<(Направление перетока,List<(строка,столбец с направлением перетока)>)>
+		/// Получение списка управляющих воздействий
 		/// </summary>
 		public List<ControlActionRow> ControlActionRows => _controlActionRows;
 
@@ -85,20 +91,12 @@ namespace OutputFileStructure
 
 			throw new Exception("Вкладка УВ НБ шаблона не заполнена");
 		}
-
-		public int AmountControlActions(string direction)
-		{
-			int outputValue = 0;
-			foreach(ControlActionRow row in ControlActionRows)
-			{
-
-				if(Comparator.CompareString(direction, row.Direction))
-				{
-					outputValue += 1;
-				}
-			}
-			return outputValue;
-		}
+		
+		/// <summary>
+		/// Метод выделения списка факторов для конкретного направления перетока 
+		/// </summary>
+		/// <param name="direction">направление перетока</param>
+		/// <returns>Список факторов для конкретного направления перетока</returns>
 		public List<ControlActionRow> ControlActionsForNeedDirection(string direction)
 		{
 			var outputValue = new List<ControlActionRow>();

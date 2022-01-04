@@ -13,7 +13,6 @@ namespace WorkWithCatalog
 	/// </summary>
 	public class CatalogReader
 	{
-		//TODO: Добавить проверку на наличие файла с моим расширением, если этот файл есть, то берем данные из него, если нет, пытаемся подключится к БД, если подключения нет, ошибка
 		private string _rootName;
 		private string[] _allScheme;
 		private List<Scheme> _schemesFromDataBase;
@@ -52,7 +51,6 @@ namespace WorkWithCatalog
 			FindRootName(path);
 			FindFactorsEachDirections(path);
 
-			//проверка соединения (добавить)
 			PullData pullData = new PullData(_rootName);
 			bool dataBaseConected = true;
 			if(dataBaseConected)
@@ -165,8 +163,6 @@ namespace WorkWithCatalog
 
 		}
 
-		//TODO: добавить проверку данных на листе
-		//TODO: Перенести в работу с экселем
 		/// <summary>
 		/// Определения направления
 		/// </summary>

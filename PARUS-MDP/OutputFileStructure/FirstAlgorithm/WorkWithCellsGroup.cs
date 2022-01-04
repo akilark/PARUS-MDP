@@ -7,24 +7,46 @@ using DataTypes;
 
 namespace OutputFileStructure
 {
+	/// <summary>
+	/// Класс необходимый для формирования информации о группе ячеек
+	/// </summary>
 	public class WorkWithCellsGroup
 	{
-		private string[] _temperature;
 		private List<CellsGroup> _pathAndDislocation;
 
+		/// <summary>
+		/// Конструктор класса с 4 параметрами
+		/// </summary>
+		/// <param name="foldersPath">Путь к дереву папок</param>
+		/// <param name="excelPackage">Эксель файл шаблона</param>
+		/// <param name="FactorsInSample">факторы и расположение факторов в файле шаблона</param>
+		/// <param name="schemes">Список схем</param>
 		public WorkWithCellsGroup(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample, 
 			List<Scheme> schemes)
 		{
 			_pathAndDislocation = new List<CellsGroup>();
 			JuxtaposePathAndCells(foldersPath, excelPackage, FactorsInSample, schemes, false);
 		}
+
+		/// <summary>
+		/// Конструктор класса с 5 параметрами
+		/// </summary>
+		/// <param name="foldersPath">Путь к дереву папок</param>
+		/// <param name="excelPackage">Эксель файл шаблона</param>
+		/// <param name="FactorsInSample">факторы и расположение факторов в файле шаблона</param>
+		/// <param name="schemes">Список схем</param>
+		/// <param name="Temperature">Рассматриваемые температуры</param>
 		public WorkWithCellsGroup(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample, 
 			List<Scheme> schemes, string[] Temperature)
 		{
 			_pathAndDislocation = new List<CellsGroup>();
-			_temperature = Temperature;
 			JuxtaposePathAndCells(foldersPath, excelPackage, FactorsInSample, schemes,true);
 		}
+
+		/// <summary>
+		/// Свойство класса возвращающее список групп ячеек с соотнесенными путями 
+		/// в файловой системе с указанием на необходимые файлы ПК ПАРУС
+		/// </summary>
 		public List<CellsGroup> PathAndDislocation => _pathAndDislocation;
 
 		private void JuxtaposePathAndCells(string foldersPath, ExcelPackage excelPackage, List<(string, (int, int))> FactorsInSample,
@@ -88,7 +110,6 @@ namespace OutputFileStructure
 				{
 					cellsGroup.TemperatureDependence = false;
 				}
-				//TODO добавть Try catch.
 				string[] xlsxFilesFolder = FindFolderForCellsGroup(foldersPath, direction,
 					FindPreviousText(nextRowIndex, FactorsInSample[0].Item2.Item2 - 2, excelPackage) + "_" + schemeName, factors);
 				cellsGroup.Folders = xlsxFilesFolder;
@@ -129,7 +150,7 @@ namespace OutputFileStructure
 
 
 		/// <summary>
-		/// 
+		/// Метод для нахождения следущей строки с текстом
 		/// </summary>
 		/// <param name="startIndex"></param>
 		/// <param name="excelPackage"></param>
@@ -165,7 +186,7 @@ namespace OutputFileStructure
 		}
 
 		
-		public void Permutation(string[] factors, int k, ref List<string> factorsMixed)
+		private void Permutation(string[] factors, int k, ref List<string> factorsMixed)
 		{
 			if(k >= factors.Length)
 			{
