@@ -9,31 +9,14 @@ namespace OutputFileStructure
 	/// </summary>
 	public static class Comparator
 	{
-	
-		public static string[] CompareTemperature(string[] necessaryTemperatures, string[] existingTemperatures)
-		{
-			string[] compareTemperature = new string[0];
-			foreach(string nTemperature in necessaryTemperatures)
-			{
-				foreach (string eTemperature in existingTemperatures)
-				{
-					if (nTemperature.Trim().ToLower() == eTemperature.Trim().ToLower())
-					{
-						Array.Resize(ref compareTemperature, compareTemperature.Length + 1);
-						compareTemperature[compareTemperature.Length - 1] = nTemperature;
-					}
-				}
-			}
-			if(compareTemperature.Length != 0)
-			{
-				return compareTemperature;
-			}
-			else
-			{
-				throw new Exception("Нет вкладок для нужных температур в файлах Excel");
-			}
-		}
-
+		/// <summary>
+		/// Сравнение факторов
+		/// </summary>
+		/// <param name="factorsFromFolder">Факторы из дерева папок</param>
+		/// <param name="factorsFromSample">Факторы из шаблона</param>
+		/// <param name="temperatureDependence">Зависимость от температуры</param>
+		/// <param name="temperature">Рассматриваемая температура</param>
+		/// <returns></returns>
 		public static List<(string, string[])> CompareFactors(FactorsWithDirection factorsFromFolder,
 			List<(string, (int, int))> factorsFromSample, bool temperatureDependence, string[] temperature)
 		{
@@ -67,9 +50,14 @@ namespace OutputFileStructure
 			return factorList;
 		}
 
+		/// <summary>
+		/// Сравнение строк (проверка идет в нижнем регистре и без пробелов)
+		/// </summary>
+		/// <param name="stringOne">первая сравниваемая строка</param>
+		/// <param name="stringTwo">вторая сравниваемся строка</param>
+		/// <returns></returns>
 		public static bool CompareString(string stringOne, string stringTwo)
 		{
-			
 			if(PrepareStringToCompare(stringOne) == PrepareStringToCompare(stringTwo))
 			{
 				return true;
@@ -80,6 +68,12 @@ namespace OutputFileStructure
 			}
 		}
 
+		/// <summary>
+		/// Проверка содержит ли первая строка в себе вторую (проверка идет в нижнем регистре и без пробелов)
+		/// </summary>
+		/// <param name="stringOne">Строка в которую может входить вторая строка</param>
+		/// <param name="stringTwo"> Строка, которая может входить в первую строку</param>
+		/// <returns></returns>
 		public static bool ContainsString(string stringOne, string stringTwo)
 		{
 			if(PrepareStringToCompare(stringOne).Contains(PrepareStringToCompare(stringTwo)))

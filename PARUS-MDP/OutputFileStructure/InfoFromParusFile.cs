@@ -59,42 +59,59 @@ namespace OutputFileStructure
 						if (excelPackage.Workbook.Worksheets[i].Name == $"T= {cellsGroupOneTemperature.Temperature}")
 						{
 							FillExcelFile(cellsGroupOneTemperature, imbalances, AOPOlist, AOCNlist, LAPNYlist, disconnectingLineForEachEmergency,
-								ref excelPackageOutputFile, excelPackage.Workbook.Worksheets[i]);
+								ref excelPackageOutputFile, excelPackage.Workbook.Worksheets[i], path);
 							errorFlag = false;
 							break;
 						}
 					}
+					break;
 				}
 				else
 				{
 					FillExcelFile(cellsGroupOneTemperature, imbalances, AOPOlist, AOCNlist, LAPNYlist, disconnectingLineForEachEmergency,
-									ref excelPackageOutputFile, excelPackage.Workbook.Worksheets[0]);
+									ref excelPackageOutputFile, excelPackage.Workbook.Worksheets[0], path);
 					errorFlag = false;
+					break;
 				}
 			}
 			
 			if (errorFlag)
 			{
-				if (cellsGroupOneTemperature.Folders.Length > 1)
+				string factorCombination = "";
+				foreach((string, string) factor in cellsGroupOneTemperature.Factors)
 				{
-					foreach (string path in cellsGroupOneTemperature.Folders)
-					{
-						string error = $@"В выходном файле ПК ПАРУС в папке {path} нет информации о Т= {cellsGroupOneTemperature.Temperature}";
-						_errorList.Add(error);
-					}
+					factorCombination += "[" + factor.Item2+ "]" + factor.Item1 + " ";
 				}
+				string error = $"Требуемая температура '{cellsGroupOneTemperature.Temperature}' для следующего сочетания:" +
+					$"-{cellsGroupOneTemperature.Direction}; \n -{cellsGroupOneTemperature.SchemeInfo.SchemeName}; " +
+					$"\n -{factorCombination} не найдена" ;
+				_errorList.Add(error);
+				
+				
 			}
 		}
 
 		private void FillExcelFile(CellsGroup cellsGroupOneTemperature, List<Imbalance> imbalances,
 			List<AOPO> AOPOlist, List<AOCN> AOCNlist, List<ControlActionRow> LAPNYlist, bool disconnectingLineForEachEmergency,
-			ref ExcelPackage excelPackageOutputFile, ExcelWorksheet excelWorksheetPARUS)
+			ref ExcelPackage excelPackageOutputFile, ExcelWorksheet excelWorksheetPARUS, string path)
 		{
-			WorksheetInfoWithoutPA workSheetInfoTMP = new WorksheetInfoWithoutPA(cellsGroupOneTemperature.SchemeName, NonRegularOscilation,
-							imbalances, excelWorksheetPARUS, disconnectingLineForEachEmergency);
-			WorksheetInfoWithPA worksheetInfoWithPA = new WorksheetInfoWithPA(cellsGroupOneTemperature.SchemeName,
+			WorksheetInfoWithoutPA workSheetInfoTMP = new WorksheetInfoWithoutPA(cellsGroupOneTemperature.SchemeInfo, NonRegularOscilation,
+							imbalances, excelWorksheetPARUS, disconnectingLineForEachEmergency, path);
+
+			
+			foreach (string error in workSheetInfoTMP.ErrorList)
+			{
+				_errorList.Add(error);
+			}
+			WorksheetInfoWithPA worksheetInfoWithPA = new WorksheetInfoWithPA(cellsGroupOneTemperature.SchemeInfo,
 				NonRegularOscilation, workSheetInfoTMP.AllowPowerOverflow, imbalances, excelWorksheetPARUS,
-				workSheetInfoTMP.MaximumAllowPowerFlowNonBalance, AOPOlist, AOCNlist, LAPNYlist, cellsGroupOneTemperature.Disturbance, disconnectingLineForEachEmergency);
+				workSheetInfoTMP.MaximumAllowPowerFlowNonBalance, AOPOlist, AOCNlist, LAPNYlist, disconnectingLineForEachEmergency, path);
+			
+			foreach (string error in worksheetInfoWithPA.ErrorList)
+			{
+				_errorList.Add(error);
+			}
+
 
 			InsertText("МИН",
 				(cellsGroupOneTemperature.StartID.Item1, cellsGroupOneTemperature.StartID.Item2), ref excelPackageOutputFile);

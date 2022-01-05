@@ -5,9 +5,20 @@ using OfficeOpenXml;
 
 namespace OutputFileStructure
 {
-	//убрать или сделать не статичным
+	/// <summary>
+	/// необходим для декорирования заполненного файла шаблона
+	/// </summary>
 	public static class TextDecor
 	{
+		/// <summary>
+		/// Декорирование для стобцов факторов
+		/// </summary>
+		/// <param name="row">строка</param>
+		/// <param name="column">столбец</param>
+		/// <param name="temperatureUse">Рассматривается ли температура</param>
+		/// <param name="temperatureCount">Количество температур</param>
+		/// <param name="temperatureMerge">сколько строк занимает ячейка для температуры</param>
+		/// <param name="excelPackage">файл экселя</param>
 		public static void FactorCellsUnion(int row, int column,bool temperatureUse, int temperatureCount, int temperatureMerge, ref ExcelPackage excelPackage)
 		{
 			if(temperatureUse)
@@ -47,6 +58,13 @@ namespace OutputFileStructure
 			
 		}
 
+		/// <summary>
+		/// Декорирование для первых столбцов
+		/// </summary>
+		/// <param name="row">строка</param>
+		/// <param name="column">столбец</param>
+		/// <param name="amountFilledRows">количество заполненных строк</param>
+		/// <param name="excelPackage">Файл экселя</param>
 		public static void FirstCellsUnion(int row, int column, int amountFilledRows, ref ExcelPackage excelPackage)
 		{
 			int nextTextIndex = FindNextTextInColumn(row, column, excelPackage);

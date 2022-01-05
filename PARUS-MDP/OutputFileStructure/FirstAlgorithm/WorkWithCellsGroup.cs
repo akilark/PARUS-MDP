@@ -74,7 +74,7 @@ namespace OutputFileStructure
 				flagFirst = false;
 				
 				
-				cellsGroup.Factors = new List<(string, int)>();
+				cellsGroup.Factors = new List<(string, string)>();
 				List<string> factors = new List<string>();
 				for (int i = 0; i < FactorsInSample.Count - substractor + 1; i++)
 				{
@@ -83,7 +83,7 @@ namespace OutputFileStructure
 					if (factorValue != "-")
 					{
 						factors.Add("[" + factorValue + "]" + FactorsInSample[i].Item1);
-						cellsGroup.Factors.Add((FactorsInSample[i].Item1, int.Parse(factorValue)));
+						cellsGroup.Factors.Add((FactorsInSample[i].Item1, factorValue));
 					}
 				}
 				Permutation(factors.ToArray(), 0, ref factors);
@@ -94,12 +94,13 @@ namespace OutputFileStructure
 				{
 					if(schemes[i].SchemeName == schemeName)
 					{
-						cellsGroup.Disturbance = schemes[i].Disturbance;
+						cellsGroup.SchemeInfo = new Scheme();
+						cellsGroup.SchemeInfo.Disturbance = schemes[i].Disturbance;
 
 					}
 				}
 
-				cellsGroup.SchemeName = schemeName;
+				cellsGroup.SchemeInfo.SchemeName = schemeName;
 				cellsGroup.Direction = direction;
 				if(temperatureDependence)
 				{

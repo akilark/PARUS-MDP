@@ -22,25 +22,18 @@ namespace DataTypes
 		/// Направление перетока
 		/// </summary>
 		public string Direction { get; set; }
-		
-		/// <summary>
-		/// Название схемы
-		/// </summary>
-		public string SchemeName { get; set; }
 
 		/// <summary>
-		/// Рассматриваемые возмущения для данной схемы
-		/// item1 - название возмущения
-		/// item2 - наличие ПА
+		/// Ифнормация о схеме сети
 		/// </summary>
-		public List<(string, bool)> Disturbance { get; set; }
+		public Scheme SchemeInfo { get; set; }
 
 		/// <summary>
 		/// Название фактора и значение фактора.
 		/// item1- Название.
 		/// item2- Значение.
 		/// </summary>
-		public List<(string, int)> Factors { get; set; }
+		public List<(string, string)> Factors { get; set; }
 		
 		/// <summary>
 		/// Количество строк выделенное для группы ячеек

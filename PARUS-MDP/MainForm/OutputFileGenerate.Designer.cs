@@ -60,6 +60,7 @@ namespace GUI
 			this.SamplePathtextBox = new System.Windows.Forms.TextBox();
 			this.SamplePathButton = new System.Windows.Forms.Button();
 			this.progressBar = new System.Windows.Forms.ProgressBar();
+			this.errorButton = new System.Windows.Forms.Button();
 			this.TemperatureAllowGroupBox.SuspendLayout();
 			this.TemperatureGroupBox.SuspendLayout();
 			this.SuspendLayout();
@@ -432,11 +433,24 @@ namespace GUI
 			this.progressBar.TabIndex = 2;
 			this.progressBar.Visible = false;
 			// 
+			// ErrorButton
+			// 
+			this.errorButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.errorButton.Location = new System.Drawing.Point(335, 366);
+			this.errorButton.Name = "ErrorButton";
+			this.errorButton.Size = new System.Drawing.Size(121, 23);
+			this.errorButton.TabIndex = 10;
+			this.errorButton.Text = "Ошибки";
+			this.errorButton.UseVisualStyleBackColor = true;
+			this.errorButton.Visible = false;
+			this.errorButton.Click += new System.EventHandler(this.ErrorButton_Click);
+			// 
 			// OutputFileGenerate
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(600, 401);
+			this.Controls.Add(this.errorButton);
 			this.Controls.Add(this.progressBar);
 			this.Controls.Add(this.SamplePathButton);
 			this.Controls.Add(this.SamplePathtextBox);
@@ -496,5 +510,6 @@ namespace GUI
 		private System.Windows.Forms.TextBox SamplePathtextBox;
 		private System.Windows.Forms.Button SamplePathButton;
 		private System.Windows.Forms.ProgressBar progressBar;
+		private System.Windows.Forms.Button errorButton;
 	}
 }
