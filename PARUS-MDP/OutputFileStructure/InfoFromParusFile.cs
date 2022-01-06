@@ -109,7 +109,17 @@ namespace OutputFileStructure
 			
 			foreach (string error in worksheetInfoWithPA.ErrorList)
 			{
-				_errorList.Add(error);
+				if (_errorList.Count > 0)
+				{
+					if (_errorList[_errorList.Count - 1] != error)
+					{
+						_errorList.Add(error);
+					}
+				}
+				else
+				{
+					_errorList.Add(error);
+				}
 			}
 
 

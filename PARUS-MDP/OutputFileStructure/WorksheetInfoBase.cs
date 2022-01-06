@@ -51,7 +51,6 @@ namespace OutputFileStructure
 							flag =false;
 						}
 					}
-					
 					if(flag)
 					{
 						string error = $"В файле {path} нет информации о возмущении {disturbance.Item1}";

@@ -46,7 +46,7 @@ namespace GUI
 			};
 			if (createFileDialog.ShowDialog() == DialogResult.OK)
 			{
-				using (StreamWriter sw = new StreamWriter(Path.GetFullPath(createFileDialog.FileName), true, Encoding.Default))
+				using (StreamWriter sw = new StreamWriter(Path.GetFullPath(createFileDialog.FileName), false, Encoding.Default))
 				{
 					foreach (string error in _errorList)
 					{

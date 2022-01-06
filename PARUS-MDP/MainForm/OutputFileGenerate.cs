@@ -6,6 +6,7 @@ using OfficeOpenXml;
 using DataTypes;
 using OutputFileStructure;
 using WorkWithCatalog;
+using Microsoft.VisualBasic;
 
 namespace GUI
 {
@@ -146,6 +147,7 @@ namespace GUI
 					_errorWindow = new ErrorWindow(errorList);
 					_errorWindow.ShowDialog();
 					errorButton.Visible = true;
+					Microsoft.VisualBasic.FileIO.FileSystem.RenameFile(filePath, "ОШИБКА" + file.Name);
 				}
 				else
 				{
@@ -153,6 +155,7 @@ namespace GUI
 					MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
 				}
 			}
+			//TODO: try catch сделать там, где файлы открываются и в catch прописать throw excel problem, здесь по тексту ошибки определять та ошибка или не та.
 			catch (IOException exception)
 			{
 				progressBar.Visible = false;

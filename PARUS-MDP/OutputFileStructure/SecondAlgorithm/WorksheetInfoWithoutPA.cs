@@ -103,7 +103,9 @@ namespace OutputFileStructure
 			_maximumAllowPowerFlow = new MaximumAllowPowerFlow();
 			_maximumAllowPowerFlow.EmergencyAllowPowerFlowValue = _allowPowerOverflow.EmergencyAllowPowerOverflow;
 			_maximumAllowPowerFlow.EmergencyAllowPowerCriterion = "8% P исходная схема";
-						
+			_maximumAllowPowerFlow.MaximumAllowPowerFlowValue = _allowPowerOverflow.StaticStabilityNormal;
+			_maximumAllowPowerFlow.MaximumAllowPowerCriterion = "20% исходная схема";
+
 			foreach ((string, List<int>) disturbance in disturbances)
 			{
 				
