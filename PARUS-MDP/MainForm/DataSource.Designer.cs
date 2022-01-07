@@ -37,6 +37,7 @@ namespace GUI
 			this.PasswordLabel = new System.Windows.Forms.Label();
 			this.ConnectButton = new System.Windows.Forms.Button();
 			this.CancelingButton = new System.Windows.Forms.Button();
+			this.labelConnnect = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// ConnectionTextBox
@@ -116,11 +117,24 @@ namespace GUI
 			this.CancelingButton.UseVisualStyleBackColor = true;
 			this.CancelingButton.Click += new System.EventHandler(this.CancelingButton_Click);
 			// 
+			// labelConnnect
+			// 
+			this.labelConnnect.AutoSize = true;
+			this.labelConnnect.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.labelConnnect.ForeColor = System.Drawing.Color.Red;
+			this.labelConnnect.Location = new System.Drawing.Point(164, 19);
+			this.labelConnnect.Name = "labelConnnect";
+			this.labelConnnect.Size = new System.Drawing.Size(217, 19);
+			this.labelConnnect.TabIndex = 3;
+			this.labelConnnect.Text = "Необходимо заполнить все поля";
+			this.labelConnnect.Visible = false;
+			// 
 			// DataSource
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(401, 270);
+			this.Controls.Add(this.labelConnnect);
 			this.Controls.Add(this.CancelingButton);
 			this.Controls.Add(this.ConnectButton);
 			this.Controls.Add(this.PasswordLabel);
@@ -150,5 +164,6 @@ namespace GUI
 		private System.Windows.Forms.Label PasswordLabel;
 		private System.Windows.Forms.Button ConnectButton;
 		private System.Windows.Forms.Button CancelingButton;
+		private System.Windows.Forms.Label labelConnnect;
 	}
 }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
+using WorkWithDataSource;
 
 namespace GUI
 {
@@ -17,7 +13,17 @@ namespace GUI
 
 		private void button1_Click(object sender, EventArgs e)
 		{
-
+			labelConnnect.Visible = false;
+			if (ConnectionTextBox.Text != "" && LoginTextBox.Text != "" && PasswordTextBox.Text != "" )
+			{
+				DataBaseAutentification dataBaseAutentification = new DataBaseAutentification(ConnectionTextBox.Text, LoginTextBox.Text,PasswordTextBox.Text);
+				new DataBaseAutentificationToXML(dataBaseAutentification);
+				this.Close();
+			}
+			else
+			{
+				labelConnnect.Visible = true;
+			}
 		}
 
 		private void DataSource_Load(object sender, EventArgs e)
@@ -27,7 +33,7 @@ namespace GUI
 
 		private void CancelingButton_Click(object sender, EventArgs e)
 		{
-			this.Hide();
+			this.Close();
 		}
 	}
 }

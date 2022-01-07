@@ -18,10 +18,23 @@ namespace GUI
 		private List<string> _sections;
 		private bool _dataSourceConnected;
 		private PullData _nullPullData;
+		private DataBaseAutentification _dataBaseAutentification;
 		public Section()
 		{
 			InitializeComponent();
-			PullData pullData = new PullData();
+			DataBaseAutentificationToXML dataBaseAutentification = new DataBaseAutentificationToXML();
+			_dataBaseAutentification = dataBaseAutentification.ReadFileInfo();
+			ComboBoxFill();
+		}
+
+		private void Section_Load(object sender, EventArgs e)
+		{
+			
+		}
+
+		private void ComboBoxFill()
+		{
+			PullData pullData = new PullData(_dataBaseAutentification);
 			_dataSourceConnected = pullData.IsConnected;
 			if (_dataSourceConnected)
 			{
@@ -36,15 +49,13 @@ namespace GUI
 			SectionComboBox.DataSource = _sections;
 		}
 
-		private void Section_Load(object sender, EventArgs e)
-		{
-			
-		}
-
 		private void DataSourceButton_Click(object sender, EventArgs e)
 		{
 			DataSource dataSource = new DataSource();
-			dataSource.Show();
+			dataSource.ShowDialog();
+			DataBaseAutentificationToXML dataBaseAutentification = new DataBaseAutentificationToXML();
+			_dataBaseAutentification = dataBaseAutentification.ReadFileInfo();
+			ComboBoxFill();
 		}
 
 		private void AcceptingButton_Click(object sender, EventArgs e)
@@ -52,7 +63,7 @@ namespace GUI
 			PullData pullData;
 			if(_dataSourceConnected)
 			{
-				pullData = new PullData(SectionComboBox.Text);
+				pullData = new PullData(SectionComboBox.Text, _dataBaseAutentification);
 				bool uniqueFlag = true;
 				for(int i = 0; i < pullData.Sections.Count; i ++)
 				{

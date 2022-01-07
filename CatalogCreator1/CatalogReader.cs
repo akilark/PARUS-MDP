@@ -50,8 +50,8 @@ namespace WorkWithCatalog
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			FindRootName(path);
 			FindFactorsEachDirections(path);
-
-			PullData pullData = new PullData(_rootName);
+			DataBaseAutentificationToXML dataBaseAutentification = new DataBaseAutentificationToXML();
+			PullData pullData = new PullData(_rootName, dataBaseAutentification.ReadFileInfo());
 			bool dataBaseConected = true;
 			if(dataBaseConected)
 			{

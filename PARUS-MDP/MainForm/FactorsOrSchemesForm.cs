@@ -336,7 +336,8 @@ namespace GUI
 
 		private void SaveButton_Click(object sender, EventArgs e)
 		{
-			switch(_enumforGUI)
+			DataBaseAutentificationToXML dataBaseAutentification = new DataBaseAutentificationToXML();
+			switch (_enumforGUI)
 			{
 				case EnumForGUI.Scheme:
 					{
@@ -344,7 +345,7 @@ namespace GUI
 						{
 							foreach ((string, bool) disturbance in scheme.Disturbance)
 							{
-								ChangeData changeData = new ChangeData(_section, scheme.SchemeName, disturbance.Item1, disturbance.Item2);
+								ChangeData changeData = new ChangeData(_section, scheme.SchemeName, disturbance.Item1, disturbance.Item2, dataBaseAutentification.ReadFileInfo());
 								changeData.Insert();
 							}
 						}
@@ -352,7 +353,7 @@ namespace GUI
 						{
 							foreach((string,bool) disturbance in scheme.Disturbance)
 							{
-								ChangeData changeData = new ChangeData(_section, scheme.SchemeName, disturbance.Item1, disturbance.Item2);
+								ChangeData changeData = new ChangeData(_section, scheme.SchemeName, disturbance.Item1, disturbance.Item2, dataBaseAutentification.ReadFileInfo());
 								changeData.Delete();
 							}
 						}						
@@ -366,7 +367,7 @@ namespace GUI
 							{
 								foreach (string valueFactor in factorNameAndValues.Item2)
 								{
-									ChangeData changeData = new ChangeData(_section, factor.Direction, factorNameAndValues.Item1, valueFactor);
+									ChangeData changeData = new ChangeData(_section, factor.Direction, factorNameAndValues.Item1, valueFactor, dataBaseAutentification.ReadFileInfo());
 									changeData.Insert();
 								}
 							}
@@ -377,7 +378,7 @@ namespace GUI
 							{
 								foreach(string valueFactor in factorNameAndValues.Item2)
 								{
-									ChangeData changeData = new ChangeData(_section, factor.Direction, factorNameAndValues.Item1, valueFactor);
+									ChangeData changeData = new ChangeData(_section, factor.Direction, factorNameAndValues.Item1, valueFactor, dataBaseAutentification.ReadFileInfo());
 									changeData.Delete();
 								}
 							}

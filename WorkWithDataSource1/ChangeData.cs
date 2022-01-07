@@ -22,11 +22,11 @@ namespace WorkWithDataSource
 		/// Конструктор класса для добавления/удаления сечения в БД
 		/// </summary>
 		/// <param name="SectionName">Название сечения</param>
-		public ChangeData(string SectionName)
+		public ChangeData(string SectionName, DataBaseAutentification dataBaseAutentification)
 		{
 			_sectionName = SectionName;
 			_dataType = DataType.Section;
-			_sqlConnection = new DataBaseAutentification();
+			_sqlConnection = dataBaseAutentification;
 		}
 
 		/// <summary>
@@ -40,14 +40,14 @@ namespace WorkWithDataSource
 			string SectionName,
 			string Direction,
 			string Factor,
-			string FactorValue)
+			string FactorValue, DataBaseAutentification dataBaseAutentification)
 		{
 			_sectionName = SectionName;
 			_direction = Direction;
 			_factor = Factor;
 			_factorValue = FactorValue;
 			_dataType = DataType.Factor;
-			_sqlConnection = new DataBaseAutentification();
+			_sqlConnection = dataBaseAutentification;
 		}
 
 		/// <summary>
@@ -62,7 +62,7 @@ namespace WorkWithDataSource
 			string SectionName,
 			string Scheme,
 			string Disturbance,
-			bool Automatics)
+			bool Automatics, DataBaseAutentification dataBaseAutentification)
 		{
 			_sectionName = SectionName;
 			_scheme = Scheme;
@@ -76,7 +76,7 @@ namespace WorkWithDataSource
 				_automatics = 0;
 			}
 			_dataType = DataType.Scheme;
-			_sqlConnection = new DataBaseAutentification();
+			_sqlConnection = dataBaseAutentification;
 		}
 
 		/// <summary>
@@ -86,7 +86,7 @@ namespace WorkWithDataSource
 		/// <returns>Численное значение</returns>
 		private int ConnectWithDataBaseID(string sqlExpression)
 		{
-			using (SqlConnection connection = new SqlConnection(_sqlConnection.GetStringForConnect()))
+			using (SqlConnection connection = new SqlConnection(_sqlConnection.StringForConnect))
 			{
 				connection.Open();
 				SqlCommand command = new SqlCommand(sqlExpression, connection);
@@ -276,7 +276,7 @@ namespace WorkWithDataSource
 		/// <param name="sqlExpression">SQL запрос</param>
 		private void ExecuteExpression(string sqlExpression)
 		{
-			using (SqlConnection connection = new SqlConnection(_sqlConnection.GetStringForConnect()))
+			using (SqlConnection connection = new SqlConnection(_sqlConnection.StringForConnect))
 			{
 				connection.Open();
 				SqlCommand command = new SqlCommand(sqlExpression, connection);

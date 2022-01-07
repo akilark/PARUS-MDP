@@ -23,12 +23,12 @@ namespace WorkWithDataSource
 		private bool _connectedFlag;
 
 		/// <summary>
-		/// Конструктор класса без параметров
+		/// Конструктор класса c 1 параметром
 		/// </summary>
-		public PullData()
+		public PullData(DataBaseAutentification dataBaseAutentification)
 		{
 			_connectedFlag = true;
-			_sqlConnectionString = new DataBaseAutentification();
+			_sqlConnectionString = dataBaseAutentification;
 			try
 			{
 				PullSections();
@@ -40,14 +40,14 @@ namespace WorkWithDataSource
 		}
 
 		/// <summary>
-		/// Конструктор класса с 1 параметром
+		/// Конструктор класса с 2 параметрами
 		/// </summary>
 		/// <param name="sectionName">название сечения</param>
-		public PullData(string sectionName)
+		public PullData(string sectionName, DataBaseAutentification dataBaseAutentification)
 		{
 			_connectedFlag = true;
 			_sectionName = sectionName;
-			_sqlConnectionString = new DataBaseAutentification();
+			_sqlConnectionString = dataBaseAutentification;
 			_imbalancesDataSource = new List<ImbalanceDataSource>();
 			_AOCNdataSource = new List<AOCN>();
 			_AOPOdataSource = new List<AOPO>();
@@ -172,7 +172,7 @@ namespace WorkWithDataSource
 		private void ConnectWithDataBase(string sqlExpression, DataType dataType)
 		{
 			using (SqlConnection connection = new SqlConnection(
-				_sqlConnectionString.GetStringForConnect()))
+				_sqlConnectionString.StringForConnect))
 			{
 				using (SqlCommand command = new SqlCommand(sqlExpression, connection))
 				{
