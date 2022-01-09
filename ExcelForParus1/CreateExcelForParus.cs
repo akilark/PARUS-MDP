@@ -12,7 +12,7 @@ namespace ExcelForParus
 	{
 		private List<string> _errorList;
 		private string _path;
-		private List<(string, string, string)> _filesLinkList = new List<(string, string, string)>();
+		private List<(string, string, string, string)> _filesLinkList = new List<(string, string, string, string)>();
 		private string _fileSch;
 		private bool _outputDirectory = false;
 
@@ -61,7 +61,8 @@ namespace ExcelForParus
 			if (ArrayDirectory.Length == 0)
 			{
 				string fileRg ="";
-				string fileUt= "";
+				string fileUt = "";
+				string filedfw = "";
 				try
 				{
 					fileRg = FindFile(path, "*.rg2");
@@ -69,6 +70,15 @@ namespace ExcelForParus
 				catch (ArgumentException exception)
 				{
 					_errorList.Add(exception.Message);
+				}
+
+				try
+				{
+					filedfw = FindFile(path, "*.dfw");
+				}
+				catch
+				{
+
 				}
 
 				try
@@ -82,7 +92,7 @@ namespace ExcelForParus
 
 				if (fileRg != "" && fileUt != "")
 				{
-					_filesLinkList.Add((fileRg, fileUt, path));
+					_filesLinkList.Add((fileRg, fileUt, filedfw, path));
 				}
 				
 			}
@@ -112,7 +122,7 @@ namespace ExcelForParus
 			}
 			else
 			{
-				throw new ArgumentException(@$"Необходим 1 файл с расширением '{pattern}' в директории: {path}");
+				throw new ArgumentException(@$"Необходим файл с расширением '{pattern}' в директории: {path}");
 			}
 		}
 
@@ -138,7 +148,7 @@ namespace ExcelForParus
 			using (ExcelPackage excelPackage = new ExcelPackage())
 			{
 				excelPackage.Workbook.Properties.Author = "PARUS-MDP";
-				excelPackage.Workbook.Properties.Title = @$"Для Паруса '{SectionName()}'";
+				excelPackage.Workbook.Properties.Title = @$"Для ПАРУСа '{SectionName()}'";
 				excelPackage.Workbook.Properties.Created = DateTime.Now;
 				ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add("Лист 1");
 				for (int listIndex = 0; listIndex < _filesLinkList.Count; listIndex++)
@@ -147,9 +157,10 @@ namespace ExcelForParus
 					worksheet.Cells[excelIndex, 1].Value = _filesLinkList[listIndex].Item1;
 					worksheet.Cells[excelIndex, 2].Value = _fileSch;
 					worksheet.Cells[excelIndex, 3].Value = _filesLinkList[listIndex].Item2;
+					worksheet.Cells[excelIndex, 4].Value = _filesLinkList[listIndex].Item3;
 					if (_outputDirectory)
 					{
-						worksheet.Cells[excelIndex, 5].Value = _filesLinkList[listIndex].Item3;
+						worksheet.Cells[excelIndex, 5].Value = _filesLinkList[listIndex].Item4;
 					}
 					worksheet.Cells.AutoFitColumns();
 

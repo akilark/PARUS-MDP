@@ -71,9 +71,9 @@ namespace GUI
 			this.ConnectionLabel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.ConnectionLabel.Location = new System.Drawing.Point(19, 19);
 			this.ConnectionLabel.Name = "ConnectionLabel";
-			this.ConnectionLabel.Size = new System.Drawing.Size(148, 19);
+			this.ConnectionLabel.Size = new System.Drawing.Size(93, 19);
 			this.ConnectionLabel.TabIndex = 1;
-			this.ConnectionLabel.Text = "Строка подключения:";
+			this.ConnectionLabel.Text = "Имя сервера:";
 			// 
 			// LoginLabel
 			// 

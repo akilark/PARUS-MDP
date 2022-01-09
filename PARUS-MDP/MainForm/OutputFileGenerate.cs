@@ -22,7 +22,7 @@ namespace GUI
 
 		private void PathTextBox_TextChanged(object sender, EventArgs e)
 		{
-			if(PathTextBox.Text.Length != 0 && SamplePathtextBox.Text.Length != 0)
+			if(PathTextBox.Text.Trim().Length != 0 && SamplePathtextBox.Text.Trim().Length != 0)
 			{
 				FormButton.Enabled = true;
 			}

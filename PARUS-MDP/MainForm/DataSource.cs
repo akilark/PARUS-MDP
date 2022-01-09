@@ -14,7 +14,7 @@ namespace GUI
 		private void button1_Click(object sender, EventArgs e)
 		{
 			labelConnnect.Visible = false;
-			if (ConnectionTextBox.Text != "" && LoginTextBox.Text != "" && PasswordTextBox.Text != "" )
+			if (ConnectionTextBox.Text.Trim() != "" && LoginTextBox.Text.Trim() != "" && PasswordTextBox.Text.Trim() != "" )
 			{
 				DataBaseAutentification dataBaseAutentification = new DataBaseAutentification(ConnectionTextBox.Text, LoginTextBox.Text,PasswordTextBox.Text);
 				new DataBaseAutentificationToXML(dataBaseAutentification);

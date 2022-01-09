@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using DataTypes;
+using OutputFileStructure;
 
 namespace GUI
 {
@@ -30,8 +31,7 @@ namespace GUI
 		public FactorsWithDirection FactorAdd => _newFactor;
 		private void AddFactor_Load(object sender, EventArgs e)
 		{
-			string[] directions = new string[] { "На запад", "На восток" };
-			DirectionComboBox.DataSource = directions;
+			
 		}
 
 		private void AddingButton_Click(object sender, EventArgs e)
@@ -39,7 +39,7 @@ namespace GUI
 			
 			List<(string, string[])> factorAndValue = new List<(string, string[])>();
 			ErrorLabel.Visible = false;
-			if (FactorComboBox.Text =="" || DirectionComboBox.Text =="" || FactorValueTextBox.Text =="")
+			if (FactorComboBox.Text.Trim() == "" || DirectionComboBox.Text.Trim() == "" || FactorValueTextBox.Text.Trim() == "")
 			{
 				ErrorLabel.Visible = true;
 			}
@@ -47,8 +47,8 @@ namespace GUI
 			{
 				factorAndValue.Add((FactorComboBox.Text, new string[] { FactorValueTextBox.Text }));
 				_newFactor.FactorNameAndValues = factorAndValue;
+				this.Close();
 			}
-			this.Close();
 		}
 
 		private void SectionComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -57,7 +57,7 @@ namespace GUI
 			List<string> factors = new List<string>();
 			for (int i = 0; i < _factors.Count; i++)
 			{
-				if (_factors[i].Direction == _newFactor.Direction)
+				if (Comparator.CompareString(_factors[i].Direction, _newFactor.Direction))
 				{
 					foreach ((string,string[]) factor in _factors[i].FactorNameAndValues)
 					{

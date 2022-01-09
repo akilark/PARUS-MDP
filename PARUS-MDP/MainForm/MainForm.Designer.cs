@@ -80,7 +80,7 @@ namespace GUI
 			this.MaximizeBox = false;
 			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "ПАРУС- МДП";
+			this.Text = "ПАРУС- АФТП";
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.ResumeLayout(false);
 

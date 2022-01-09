@@ -50,12 +50,15 @@ namespace GUI
 				createParusFile = new CreateExcelForParus(_folderBrowserDialog.SelectedPath);
 				if (createParusFile.ErrorList.Count > 0)
 				{
+					MessageBox.Show("Не удалось сформировать файл", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error,
+					MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
 					ErrorWindow errorWindow = new ErrorWindow(createParusFile.ErrorList);
 					errorWindow.ShowDialog();
 				}
-				
-					
-				
+				MessageBox.Show("Файл сформирован", "Успешно", MessageBoxButtons.OK, MessageBoxIcon.None,
+					MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
+
+
 			}
 			
 		}

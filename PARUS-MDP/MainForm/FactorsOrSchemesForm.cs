@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using WorkWithDataSource;
 using DataTypes;
+using OutputFileStructure;
 
 namespace GUI
 {
@@ -135,7 +136,7 @@ namespace GUI
 					{
 						AddFactor addFactor = new AddFactor(_factors);
 						addFactor.ShowDialog();
-						if(addFactor.FactorAdd !=null)
+						if(addFactor.FactorAdd.FactorNameAndValues !=null)
 						{
 							AddFactors(addFactor.FactorAdd);
 						}
@@ -454,7 +455,7 @@ namespace GUI
 			bool flag = true;
 			if(_pullData.Schemes.Count == 1)
 			{
-				if(_pullData.Schemes[0].SchemeName == "")
+				if(_pullData.Schemes[0].SchemeName.Trim() == "")
 				{
 					flag = false;
 				}
@@ -482,7 +483,7 @@ namespace GUI
 			bool flag = true;
 			if (_pullData.Factors.Count == 1)
 			{
-				if (_pullData.Factors[0].Direction == "")
+				if (_pullData.Factors[0].Direction.Trim() == "")
 				{
 					flag = false;
 				}
@@ -618,19 +619,19 @@ namespace GUI
 			bool uniqueDirection = true;
 			for (int i = 0; i < factorsWithDirections.Count; i++)
 			{
-				if (factorsWithDirections[i].Direction == factor.Direction)
+				if (Comparator.CompareString(factorsWithDirections[i].Direction, factor.Direction))
 				{
 					bool uniqueFactor = true;
 					for (int j = 0; j < factorsWithDirections[i].FactorNameAndValues.Count; j++)
 					{
-						if (factorsWithDirections[i].FactorNameAndValues[j].Item1 == factor.FactorNameAndValues[0].Item1)
+						if (Comparator.CompareString(factorsWithDirections[i].FactorNameAndValues[j].Item1, factor.FactorNameAndValues[0].Item1))
 						{
 							uniqueFactor = false;
 							string[] factorValues = factorsWithDirections[i].FactorNameAndValues[j].Item2;
 							bool valueFlag = true;
 							for (int z = 0; z < factorsWithDirections[i].FactorNameAndValues[j].Item2.Length; z++)
 							{
-								if (factorsWithDirections[i].FactorNameAndValues[j].Item2[z] == factor.FactorNameAndValues[0].Item2[0])
+								if (Comparator.CompareString(factorsWithDirections[i].FactorNameAndValues[j].Item2[z], factor.FactorNameAndValues[0].Item2[0]))
 								{
 									valueFlag = false;
 								}

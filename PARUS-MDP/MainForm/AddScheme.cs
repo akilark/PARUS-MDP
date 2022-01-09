@@ -36,21 +36,21 @@ namespace GUI
 
 		private void AddingButton_Click(object sender, EventArgs e)
 		{
-			_scheme = new Scheme();
-			_scheme.Disturbance = new List<(string, bool)>();
 			ErrorLabel.Visible = false;
-			if (SchemeComboBox.Text != "" )
+			if (SchemeComboBox.Text.Trim() != "" )
 			{
-				if (DisturbanceComboBox.Text != "")
+				if (DisturbanceComboBox.Text.Trim() != "")
 				{
 					bool raduoButtoResult = false;
 					if (PAradioButtonYes.Checked)
 					{
 						raduoButtoResult =true;
 					}
-					
+					_scheme = new Scheme();
+					_scheme.Disturbance = new List<(string, bool)>();
 					_scheme.SchemeName = SchemeComboBox.Text;
 					_scheme.Disturbance.Add((DisturbanceComboBox.Text, raduoButtoResult));
+					this.Close();
 				}
 				else
 				{
@@ -62,7 +62,6 @@ namespace GUI
 			{
 				ErrorLabel.Visible = true;
 			}
-			this.Close();
 		}
 
 		private void SchemeComboBox_SelectedIndexChanged(object sender, EventArgs e)

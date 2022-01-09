@@ -28,7 +28,7 @@ namespace WorkWithDataSource
 		/// <summary>
 		/// Конструктор для формирования строки подключения
 		/// </summary>
-		/// <param name="DataSource">Сервер, где находится необходима БД</param>
+		/// <param name="DataSource">Имя сервера, где находится необходима БД</param>
 		/// <param name="UserID">Логин</param>
 		/// <param name="Password">Пароль</param>
 		/// <param name="InitialCatalog">Необходимая БД</param>
@@ -38,7 +38,7 @@ namespace WorkWithDataSource
 			_sqlConnectionBuilder.DataSource = DataSource;
 			_sqlConnectionBuilder.UserID = UserID;
 			_sqlConnectionBuilder.Password = Password;
-			_sqlConnectionBuilder.InitialCatalog = "PARUS-MDP";
+			_sqlConnectionBuilder.InitialCatalog = "PARUS-AFTP";
 		}
 
 		/// <summary>

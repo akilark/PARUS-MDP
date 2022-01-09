@@ -39,6 +39,7 @@ namespace GUI
 			if (_dataSourceConnected)
 			{
 				_sections = pullData.Sections;
+				dataSourceLabel.Visible = false;
 			}
 			else
 			{
@@ -82,61 +83,65 @@ namespace GUI
 				pullData = _nullPullData;
 				_sections.Add(SectionComboBox.Text);
 			}
-			
-			FactorsOrSchemesForm schemeForm = new FactorsOrSchemesForm(SectionComboBox.Text, EnumForGUI.Scheme, pullData);
-			FactorsOrSchemesForm factorForm = new FactorsOrSchemesForm(SectionComboBox.Text, EnumForGUI.Factor, pullData);
-			bool flag = true;
-			this.Hide();
-			var dialogresultScheme = schemeForm.ShowForm();
-			while (flag)
+			if(SectionComboBox.Text.Trim() != "")
 			{
-				if (dialogresultScheme == DialogResult.Cancel)
+				FactorsOrSchemesForm schemeForm = new FactorsOrSchemesForm(SectionComboBox.Text, EnumForGUI.Scheme, pullData);
+				FactorsOrSchemesForm factorForm = new FactorsOrSchemesForm(SectionComboBox.Text, EnumForGUI.Factor, pullData);
+				bool flag = true;
+				this.Hide();
+				var dialogresultScheme = schemeForm.ShowForm();
+				while (flag)
 				{
-					this.Show();
-					flag = false;
-				}
-				if (dialogresultScheme == DialogResult.OK)
-				{
-					var dialogResultFactor = factorForm.ShowForm();
-
-					if (dialogResultFactor == DialogResult.OK)
+					if (dialogresultScheme == DialogResult.Cancel)
 					{
-						FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
-						if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+						this.Show();
+						flag = false;
+					}
+					if (dialogresultScheme == DialogResult.OK)
+					{
+						var dialogResultFactor = factorForm.ShowForm();
+
+						if (dialogResultFactor == DialogResult.OK)
 						{
-							CatalogCreator catalogCreator = 
-								new CatalogCreator(folderBrowserDialog.SelectedPath, SectionComboBox.Text, factorForm.Factors, schemeForm.Schemes);
-							catalogCreator.Create();
+							FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+							if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+							{
+								CatalogCreator catalogCreator =
+									new CatalogCreator(folderBrowserDialog.SelectedPath, SectionComboBox.Text, factorForm.Factors, schemeForm.Schemes);
+								catalogCreator.Create();
 
-							SectionFromDataSource sectionFromDataSource = new SectionFromDataSource();
-							sectionFromDataSource.SectionName = SectionComboBox.Text;
-							sectionFromDataSource.Schemes = schemeForm.Schemes;
-							sectionFromDataSource.Factors = factorForm.Factors;
-							sectionFromDataSource.Imbalances = pullData.Imbalances;
-							sectionFromDataSource.AOPOlist = pullData.AOPOlist;
-							sectionFromDataSource.AOCNlist = pullData.AOCNlist;
-							SectionInfoToXml pullDataToXml = new SectionInfoToXml(folderBrowserDialog.SelectedPath + @$"\{SectionComboBox.Text}", sectionFromDataSource);
-							
-							this.Close();
+								SectionFromDataSource sectionFromDataSource = new SectionFromDataSource();
+								sectionFromDataSource.SectionName = SectionComboBox.Text;
+								sectionFromDataSource.Schemes = schemeForm.Schemes;
+								sectionFromDataSource.Factors = factorForm.Factors;
+								sectionFromDataSource.Imbalances = pullData.Imbalances;
+								sectionFromDataSource.AOPOlist = pullData.AOPOlist;
+								sectionFromDataSource.AOCNlist = pullData.AOCNlist;
+								new SectionInfoToXml(folderBrowserDialog.SelectedPath + @$"\{SectionComboBox.Text}", sectionFromDataSource);
+								MessageBox.Show("Дерево папок сформировано", "Успешно", MessageBoxButtons.OK, MessageBoxIcon.None,
+									MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
+								this.Close();
+							}
+							break;
 						}
-						break;
+						if (dialogResultFactor == DialogResult.Cancel)
+						{
+							dialogresultScheme = schemeForm.ShowForm();
+						}
+						if (dialogResultFactor == DialogResult.Abort)
+						{
+							this.Close();
+							break;
+						}
 					}
-					if (dialogResultFactor == DialogResult.Cancel)
-					{
-						dialogresultScheme = schemeForm.ShowForm();
-					}
-					if(dialogResultFactor == DialogResult.Abort)
+					if (dialogresultScheme == DialogResult.Abort)
 					{
 						this.Close();
 						break;
 					}
 				}
-				if(dialogresultScheme == DialogResult.Abort)
-				{
-					this.Close();
-					break;
-				}
 			}
+			
 		}
 
 		private void Section_FormClosed(object sender, FormClosedEventArgs e)
