@@ -109,6 +109,8 @@ namespace OutputFileStructure
 				
 				var emergency = MaximumAllowPowerFlowDefinition(headRow, disturbance, excelWorksheetPARUS);
 
+
+				//TODO: изменить в FindCellValue логику и возвращать "", если внутри FindCellValue ошибка.
 				for (int valueNumber = 0; valueNumber < disturbance.Item2.Count; valueNumber++)
 				{
 					try

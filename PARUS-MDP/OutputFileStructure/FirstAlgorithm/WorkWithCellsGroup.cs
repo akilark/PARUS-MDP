@@ -143,7 +143,7 @@ namespace OutputFileStructure
 				}
 				catch (ArgumentException)
 				{
-
+					//TODO: Нормально ли catch оставлять пустым, если необходимо перебрать все файлы до первого совпадения ? Или лучше использовать что-то другое ? 
 				}
 			}
 			throw new Exception($"Таких факторов нет в {folderPath}");

@@ -203,7 +203,7 @@ namespace OutputFileStructure
 			assignedValuesBeforeFault[assignedValuesBeforeFault.Length - 1] =
 				RoundAndMultiply(assignedValuesBeforeFault[assignedValuesBeforeFault.Length - 2], 0.92);
 			AllowPowerOverflows allowPowerOverflows = new AllowPowerOverflows();
-			//переделать во что-то красивое
+			//TODO: переделать во что-то красивое
 			try
 			{
 				

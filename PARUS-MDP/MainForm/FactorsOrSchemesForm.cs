@@ -164,7 +164,7 @@ namespace GUI
 							FactorOrSchemeTreeView.SelectedNode.Remove();
 							foreach (Scheme scheme in _schemes)
 							{
-								if (scheme.SchemeName == schemeTmp.SchemeName)
+								if (Comparator.CompareString(scheme.SchemeName, schemeTmp.SchemeName))
 								{
 									_schemes.Remove(scheme);
 									break;
@@ -181,7 +181,7 @@ namespace GUI
 							
 							foreach (Scheme scheme in _schemes)
 							{
-								if (scheme.SchemeName == schemeTmp.SchemeName)
+								if (Comparator.CompareString(scheme.SchemeName, schemeTmp.SchemeName))
 								{
 									foreach ((string, bool) disturbance in scheme.Disturbance)
 									{
@@ -221,7 +221,7 @@ namespace GUI
 										_deletedFactors.Add(factor);
 										for(int i= 0; i< _factors.Count; i ++)
 										{
-											if(_factors[i].Direction == factor.Direction)
+											if(Comparator.CompareString(_factors[i].Direction, factor.Direction))
 											{
 												_factors.Remove(_factors[i]);
 											}
@@ -244,11 +244,11 @@ namespace GUI
 
 									for (int i = 0; i < _factors.Count; i++)
 									{
-										if (_factors[i].Direction == factor.Direction)
+										if (Comparator.CompareString(_factors[i].Direction, factor.Direction))
 										{
 											for(int j = 0; j< _factors[i].FactorNameAndValues.Count; j++)
 											{
-												if(_factors[i].FactorNameAndValues[j].Item1 == factorName)
+												if(Comparator.CompareString(_factors[i].FactorNameAndValues[j].Item1, factorName))
 												{
 													_factors[i].FactorNameAndValues.Remove(_factors[i].FactorNameAndValues[j]);
 												}
@@ -268,7 +268,7 @@ namespace GUI
 									bool factorFlag = false;
 									for(int i = 0; i< _deletedFactors.Count; i++)
 									{
-										if (_deletedFactors[i].Direction == factor.Direction)
+										if (Comparator.CompareString(_deletedFactors[i].Direction, factor.Direction))
 										{
 											if(_deletedFactors[i].FactorNameAndValues == null)
 											{
@@ -277,7 +277,7 @@ namespace GUI
 											}
 											for (int j = 0; j < _deletedFactors[i].FactorNameAndValues.Count; j++)
 											{
-												if(_deletedFactors[i].FactorNameAndValues[j].Item1 == factorName)
+												if(Comparator.CompareString(_deletedFactors[i].FactorNameAndValues[j].Item1, factorName))
 												{
 													string[] factorsValues = new string[_deletedFactors[i].FactorNameAndValues[j].Item2.Length + 1];
 													for(int z = 0; z < _deletedFactors[i].FactorNameAndValues[j].Item2.Length; z ++)
@@ -300,16 +300,16 @@ namespace GUI
 
 									for (int i = 0; i < _factors.Count; i++)
 									{
-										if (_factors[i].Direction == factor.Direction)
+										if (Comparator.CompareString(_factors[i].Direction, factor.Direction))
 										{
 											for (int j = 0; j < _factors[i].FactorNameAndValues.Count; j++)
 											{
-												if (_factors[i].FactorNameAndValues[j].Item1 == factorName)
+												if (Comparator.CompareString(_factors[i].FactorNameAndValues[j].Item1, factorName))
 												{
 													for(int z = 0; z < _factors[i].FactorNameAndValues[j].Item2.Length; z++)
 													{
 														string[] factorsValues = new string[0];
-														if (_factors[i].FactorNameAndValues[j].Item2[z] != factorValues[0])
+														if (!Comparator.CompareString(_factors[i].FactorNameAndValues[j].Item2[z], factorValues[0]))
 														{
 															Array.Resize(ref factorsValues, factorsValues.Length + 1);
 															factorsValues[factorsValues.Length - 1] = _factors[i].FactorNameAndValues[j].Item2[z];
@@ -528,14 +528,14 @@ namespace GUI
 			bool schemeNameUnique = true;
 			foreach (Scheme scheme in schemes)
 			{
-				if (scheme.SchemeName == schemeTmp.SchemeName)
+				if (Comparator.CompareString(scheme.SchemeName, schemeTmp.SchemeName))
 				{
 					bool valueAppear = false;
 					(string, bool) disturbanceTmp = ("", false);
 					schemeNameUnique = false;
 					foreach((string, bool) disturbance in scheme.Disturbance)
 					{
-						if (schemeTmp.Disturbance[0].Item1 == disturbance.Item1)
+						if (Comparator.CompareString(schemeTmp.Disturbance[0].Item1, disturbance.Item1))
 						{
 							disturbanceTmp = disturbance;
 							valueAppear = true;
@@ -570,16 +570,17 @@ namespace GUI
 		{
 			if (schemeTmp != null)
 			{
+				//TODO: Нормально ли расставлять такие переменные с типом данных bool ?
 				bool schemeAppear = false;
 				for (int i = 0; i < FactorOrSchemeTreeView.Nodes.Count; i++)
 				{
-					if (schemeTmp.SchemeName == FactorOrSchemeTreeView.Nodes[i].Text)
+					if (Comparator.CompareString(schemeTmp.SchemeName, FactorOrSchemeTreeView.Nodes[i].Text))
 					{
 						schemeAppear = true;
 						bool disturbanceAppear = false;
 						for (int j = 0; j < FactorOrSchemeTreeView.Nodes[i].Nodes.Count; j++)
 						{
-							if (schemeTmp.Disturbance[0].Item1 == FactorOrSchemeTreeView.Nodes[i].Nodes[j].Text)
+							if (Comparator.CompareString(schemeTmp.Disturbance[0].Item1, FactorOrSchemeTreeView.Nodes[i].Nodes[j].Text))
 							{
 								FactorOrSchemeTreeView.Nodes[i].Nodes[j].Checked = schemeTmp.Disturbance[0].Item2;
 								disturbanceAppear = true;
@@ -668,19 +669,19 @@ namespace GUI
 				bool factorAppear = false;
 				for (int i = 0; i < FactorOrSchemeTreeView.Nodes.Count; i++)
 				{
-					if (factor.Direction == FactorOrSchemeTreeView.Nodes[i].Text)
+					if (Comparator.CompareString(factor.Direction, FactorOrSchemeTreeView.Nodes[i].Text))
 					{
 						directionAppear = true;
 						
 						for (int j = 0; j < FactorOrSchemeTreeView.Nodes[i].Nodes.Count; j++)
 						{
-							if (factor.FactorNameAndValues[0].Item1 == FactorOrSchemeTreeView.Nodes[i].Nodes[j].Text)
+							if (Comparator.CompareString(factor.FactorNameAndValues[0].Item1, FactorOrSchemeTreeView.Nodes[i].Nodes[j].Text))
 							{
 								factorAppear = true;
 								bool factorValueAppear = false;
 								for(int z = 0; z < FactorOrSchemeTreeView.Nodes[i].Nodes[j].Nodes.Count; z++)
 								{
-									if(factor.FactorNameAndValues[0].Item2[0] == FactorOrSchemeTreeView.Nodes[i].Nodes[j].Nodes[z].Text)
+									if(Comparator.CompareString(factor.FactorNameAndValues[0].Item2[0], FactorOrSchemeTreeView.Nodes[i].Nodes[j].Nodes[z].Text))
 									{
 										factorValueAppear = true;
 									}

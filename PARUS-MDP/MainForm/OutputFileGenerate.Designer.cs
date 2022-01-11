@@ -77,11 +77,11 @@ namespace GUI
 			// PathLabel
 			// 
 			this.PathLabel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.PathLabel.Location = new System.Drawing.Point(-8, 8);
+			this.PathLabel.Location = new System.Drawing.Point(-2, 10);
 			this.PathLabel.Name = "PathLabel";
-			this.PathLabel.Size = new System.Drawing.Size(100, 48);
+			this.PathLabel.Size = new System.Drawing.Size(100, 47);
 			this.PathLabel.TabIndex = 1;
-			this.PathLabel.Text = "Путь к каталогу";
+			this.PathLabel.Text = "Путь к дереву папок";
 			this.PathLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
 			// ExploreButton
@@ -396,13 +396,14 @@ namespace GUI
 			// 
 			// SamplePathLabel
 			// 
-			this.SamplePathLabel.AutoSize = true;
 			this.SamplePathLabel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.SamplePathLabel.Location = new System.Drawing.Point(10, 86);
+			this.SamplePathLabel.Location = new System.Drawing.Point(-2, 72);
 			this.SamplePathLabel.Name = "SamplePathLabel";
-			this.SamplePathLabel.Size = new System.Drawing.Size(60, 19);
+			this.SamplePathLabel.Size = new System.Drawing.Size(100, 47);
 			this.SamplePathLabel.TabIndex = 7;
-			this.SamplePathLabel.Text = "Шаблон";
+			this.SamplePathLabel.Text = "Путь к шаблону";
+			this.SamplePathLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.SamplePathLabel.Click += new System.EventHandler(this.SamplePathLabel_Click);
 			// 
 			// SamplePathtextBox
 			// 
@@ -433,11 +434,11 @@ namespace GUI
 			this.progressBar.TabIndex = 2;
 			this.progressBar.Visible = false;
 			// 
-			// ErrorButton
+			// errorButton
 			// 
 			this.errorButton.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.errorButton.Location = new System.Drawing.Point(335, 366);
-			this.errorButton.Name = "ErrorButton";
+			this.errorButton.Name = "errorButton";
 			this.errorButton.Size = new System.Drawing.Size(121, 23);
 			this.errorButton.TabIndex = 10;
 			this.errorButton.Text = "Ошибки";

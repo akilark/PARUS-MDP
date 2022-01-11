@@ -59,8 +59,15 @@ namespace OutputFileStructure
 
 		private void DownloadSample(string samplePath)
 		{
-			FileInfo fileInfo = new FileInfo(samplePath);
-			_excelPackage = new ExcelPackage(fileInfo);
+			try
+			{
+				FileInfo fileInfo = new FileInfo(samplePath);
+				_excelPackage = new ExcelPackage(fileInfo);
+			}
+			catch
+			{
+				throw new Exception($"Необходимо закрыть файл {samplePath}, данный файл необходим для формирования приложения №6 ПУР");
+			}
 		}
 
 		private int FindFirstOccurance()

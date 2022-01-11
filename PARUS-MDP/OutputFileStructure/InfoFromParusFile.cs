@@ -49,8 +49,18 @@ namespace OutputFileStructure
 			bool errorFlag = true;
 			foreach (string path in cellsGroupOneTemperature.Folders)
 			{
-				FileInfo fileInfo = new FileInfo(path);
-				var excelPackage = new ExcelPackage(fileInfo);
+				FileInfo fileInfo;
+				ExcelPackage excelPackage;
+				try
+				{
+					fileInfo = new FileInfo(path);
+					excelPackage = new ExcelPackage(fileInfo);
+				}
+				catch
+				{
+					throw new Exception($"Необходимо закрыть файл {path}, данный файл необходим для формирования приложения №6 ПУР");
+				}
+
 				FindNonRegularOscilation(excelPackage);
 				if (cellsGroupOneTemperature.TemperatureDependence)
 				{

@@ -82,7 +82,7 @@ namespace GUI
 				string filePath = PathTextBox.Text + @"\Сформированная структура.xlsx";
 				var openFileDialog = new SaveFileDialog
 				{
-					Filter = "txt files (*.xlsx)|*.xlsx",
+					Filter = "Excel file (*.xlsx)|*.xlsx",
 					InitialDirectory = PathTextBox.Text,
 					RestoreDirectory = true,
 				};
@@ -92,11 +92,32 @@ namespace GUI
 				}
 				sampleSection.SaveSampleWithStructure(filePath);
 
+				//TODO: Конструкция одинаковая
+				FileInfo sampleFile;
+				ExcelPackage excelSample;
+				try
+				{
+					sampleFile = new FileInfo(SamplePathtextBox.Text);
+					excelSample = new ExcelPackage(sampleFile);
+				}
+				catch
+				{
+					throw new Exception($"Необходимо закрыть файл {SamplePathtextBox.Text}, данный файл необходим для формирования приложения №6 ПУР");
+				}
+				
 
-				FileInfo sampleFile = new FileInfo(SamplePathtextBox.Text);
-				var excelSample = new ExcelPackage(sampleFile);
-				FileInfo outputFile = new FileInfo(filePath);
-				var excelOutputFile = new ExcelPackage(outputFile);
+				FileInfo outputFile;
+				ExcelPackage excelOutputFile;
+				try
+				{
+					outputFile = new FileInfo(filePath);
+					excelOutputFile = new ExcelPackage(outputFile);
+				}
+				catch
+				{
+					throw new Exception($"Необходимо закрыть файл {filePath}, данный файл необходим для формирования приложения №6 ПУР");
+				}
+
 				SectionInfoToXml sectionInfoToXml = new SectionInfoToXml(PathTextBox.Text + @"\configurationFile.kek");
 				SectionFromDataSource sectionFromDataSource = sectionInfoToXml.ReadFileInfo();
 				WorkWithCellsGroup workWithCellsGroup;
@@ -155,13 +176,13 @@ namespace GUI
 					MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
 				}
 			}
-			//TODO: try catch сделать там, где файлы открываются и в catch прописать throw excel problem, здесь по тексту ошибки определять та ошибка или не та.
 			catch (IOException exception)
 			{
 				progressBar.Visible = false;
 				progressBar.Value = 0;
-				MessageBox.Show("Приложение пытается использовать файл, который открыт пользователем", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error,
+				MessageBox.Show(exception.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error,
 					MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
+
 			}
 			
 			
@@ -181,8 +202,6 @@ namespace GUI
 					outputList.Add(imbalance);
 				}
 			}
-
-
 			return outputList;
 		}
 
@@ -367,6 +386,11 @@ namespace GUI
 			this.Enabled = false;
 			_errorWindow.ShowDialog();
 			this.Enabled = true;
+		}
+
+		private void SamplePathLabel_Click(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

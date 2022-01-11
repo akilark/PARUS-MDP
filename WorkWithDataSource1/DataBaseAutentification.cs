@@ -19,10 +19,7 @@ namespace WorkWithDataSource
 		public DataBaseAutentification()
 		{
 			_sqlConnectionBuilder = new SqlConnectionStringBuilder();
-			//_sqlConnectionBuilder.DataSource = @"LAPTOP-EFSS8TJ6\SQLEXPRESS";
-			//_sqlConnectionBuilder.UserID = @"ParusMDP";
-			//_sqlConnectionBuilder.Password = "1234567890";
-			//_sqlConnectionBuilder.InitialCatalog = "PARUS-MDP";
+
 		}
 
 		/// <summary>

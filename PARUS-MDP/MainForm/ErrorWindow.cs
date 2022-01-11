@@ -32,11 +32,6 @@ namespace GUI
 			this.Close();
 		}
 
-		private void hScrollBar1_Scroll(object sender, ScrollEventArgs e)
-		{
-
-		}
-
 		private void TextButton_Click(object sender, EventArgs e)
 		{
 			var createFileDialog = new SaveFileDialog
